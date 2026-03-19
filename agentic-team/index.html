@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Agentic Team</title>
+    <script>
+      if (sessionStorage.getItem('auth') !== '1') {
+        window.location.replace('../');
+      }
+    </script>
     <style>
       :root {
         --bg: #f4efe6;
