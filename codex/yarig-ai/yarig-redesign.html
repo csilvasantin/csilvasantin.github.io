@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yarig.ai · Propuesta de Rediseño</title>
+    <script>
+      if (sessionStorage.getItem('auth') !== '1') {
+        window.location.replace('../');
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #f2ede4;
+        --paper: #fbf7ef;
+        --ink: #1f2a37;
+        --muted: #5c6775;
+        --line: #d8cfbf;
+        --teal: #0c6d68;
+        --sand: #c78a3c;
+        --rose: #a4495f;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(12, 109, 104, 0.08), transparent 26%),
+          linear-gradient(180deg, #f8f3eb 0%, var(--bg) 100%);
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 34px 20px 64px;
+      }
+
+      .hero, .section, .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        box-shadow: 0 16px 42px rgba(31, 42, 55, 0.08);
+      }
+
+      .hero { padding: 34px; }
+      .section { padding: 26px; margin-top: 20px; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+        margin-top: 18px;
+      }
+      .card { padding: 20px; }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.8rem;
+        color: var(--teal);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.6rem, 6vw, 5rem);
+        line-height: 0.96;
+      }
+
+      h2 { margin: 0 0 12px; font-size: 1.85rem; }
+      h3 { margin: 0 0 10px; font-size: 1.2rem; }
+
+      p, li {
+        color: var(--muted);
+        line-height: 1.72;
+        font-size: 1.04rem;
+      }
+
+      .lead {
+        max-width: 50rem;
+        margin-top: 16px;
+        font-size: 1.14rem;
+      }
+
+      .actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+      }
+
+      .button {
+        display: inline-block;
+        padding: 12px 16px;
+        border-radius: 999px;
+        text-decoration: none;
+        border: 1px solid var(--line);
+        color: var(--ink);
+        background: rgba(12, 109, 104, 0.08);
+        font-weight: 600;
+      }
+
+      .button.primary {
+        background: linear-gradient(135deg, rgba(12, 109, 104, 0.14), rgba(199, 138, 60, 0.16));
+      }
+
+      .badge {
+        display: inline-block;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        padding: 7px 10px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        background: rgba(164, 73, 95, 0.08);
+        color: var(--rose);
+        border: 1px solid rgba(164, 73, 95, 0.14);
+      }
+
+      .mock {
+        margin-top: 18px;
+        padding: 22px;
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background:
+          linear-gradient(180deg, rgba(12, 109, 104, 0.06), rgba(251, 247, 239, 0.9)),
+          var(--paper);
+      }
+
+      .mock h3 {
+        font-size: 2rem;
+        margin-bottom: 8px;
+      }
+
+      .quote {
+        padding: 18px;
+        border-left: 4px solid var(--sand);
+        background: rgba(199, 138, 60, 0.08);
+        border-radius: 12px;
+      }
+
+      a { color: var(--teal); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <p class="eyebrow">Francesc Locke · Director de Diseno</p>
+        <h1>Propuesta de Rediseño para Yarig.ai</h1>
+        <p class="lead">
+          La web actual comunica una idea valida, pero todavia no convierte esa
+          idea en una marca reconocible. Esta propuesta busca que Yarig.ai deje
+          de parecer una landing generica de productividad y pase a sentirse como
+          un producto con criterio, personalidad y promesa clara.
+        </p>
+        <div class="actions">
+          <a class="button primary" href="https://www.yarig.ai/" target="_blank">Ver web actual</a>
+          <a class="button" href="./index.html">Volver a Yarig.ai</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Diagnostico</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Lo que funciona</h3>
+            <ul>
+              <li>La estructura de landing es comprensible.</li>
+              <li>El producto se entiende como herramienta de gestion.</li>
+              <li>La navegacion y el ritmo general son familiares.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Lo que debilita la marca</h3>
+            <ul>
+              <li>El copy principal es demasiado intercambiable.</li>
+              <li>Los testimonios parecen plantilla y reducen confianza.</li>
+              <li>La identidad visual no refleja el concepto de Yarigai.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Oportunidad</h3>
+            <ul>
+              <li>Construir una narrativa centrada en la satisfaccion de avanzar.</li>
+              <li>Dar una voz mas humana y menos corporativa vacia.</li>
+              <li>Convertir el concepto japones en una ventaja emocional real.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Nueva direccion creativa</h2>
+        <span class="badge">Calma productiva</span>
+        <span class="badge">Claridad visual</span>
+        <span class="badge">Progreso con sentido</span>
+        <p>
+          La propuesta es mover Yarig.ai hacia una identidad mas serena,
+          editorial y confiable. Menos interfaz de plantilla SaaS y mas lenguaje
+          visual orientado a claridad, progreso y satisfaccion por el trabajo bien hecho.
+        </p>
+        <div class="quote">
+          <strong>Idea fuerza:</strong> No se trata solo de gestionar tareas.
+          Se trata de recuperar la sensacion de avanzar con orden, foco y sentido.
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Cambios propuestos</h2>
+        <div class="grid">
+          <article class="card">
+            <h3>Hero</h3>
+            <p>
+              Sustituir el titular generico por una promesa mas distintiva:
+              <em>"Convierte cada tarea en progreso visible"</em>.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Prueba social</h3>
+            <p>
+              Eliminar testimonios de relleno y cambiarlos por casos reales,
+              cifras verificables o escenarios de uso concretos.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Tono</h3>
+            <p>
+              Escribir en un lenguaje mas cercano, menos inflado y mas centrado
+              en alivio operativo, coordinacion y sensacion de control.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Sistema visual</h3>
+            <p>
+              Pasar de bloques repetitivos con iconografia generica a una
+              composicion mas editorial, con jerarquia tipografica y pausas reales.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Mock verbal del nuevo inicio</h2>
+        <div class="mock">
+          <p class="eyebrow">Nuevo enfoque</p>
+          <h3>Convierte cada tarea en progreso visible</h3>
+          <p>
+            Yarig.ai ayuda a equipos que necesitan menos ruido, mas claridad y
+            una forma compartida de avanzar. Organiza trabajo, coordina personas
+            y convierte el dia a dia en una secuencia clara de decisiones y logros.
+          </p>
+          <div class="actions">
+            <span class="button primary">Solicitar demo</span>
+            <span class="button">Ver como funciona</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Siguiente paso recomendado</h2>
+        <p>
+          Antes de rediseñar la web completa, conviene definir una mini guia de
+          marca con tres piezas: tono verbal, paleta y estructura narrativa de la
+          home. Con eso, el rediseño puede pasar de opinion subjetiva a sistema.
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

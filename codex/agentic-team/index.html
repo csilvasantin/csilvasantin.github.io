@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agentic Team</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --panel: #fffaf2;
+        --ink: #1f2937;
+        --muted: #5f6b7a;
+        --line: #dfd5c7;
+        --accent: #006d77;
+        --accent-2: #c97b32;
+        --code: #f1ece2;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(201, 123, 50, 0.15), transparent 30%),
+          linear-gradient(180deg, #f9f4eb 0%, var(--bg) 100%);
+      }
+
+      .wrap {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(0, 109, 119, 0.12), rgba(201, 123, 50, 0.12));
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 12px 40px rgba(31, 41, 55, 0.08);
+      }
+
+      .eyebrow {
+        margin: 0 0 12px;
+        font-size: 0.85rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      h1, h2, h3 { line-height: 1.1; }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2.4rem, 6vw, 4.6rem);
+      }
+
+      h2 {
+        margin: 0 0 16px;
+        font-size: 2rem;
+      }
+
+      h3 {
+        margin: 24px 0 10px;
+        font-size: 1.25rem;
+      }
+
+      p, li {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: var(--ink);
+      }
+
+      .lead {
+        max-width: 52rem;
+        font-size: 1.15rem;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+      }
+
+      .card, .section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(31, 41, 55, 0.05);
+      }
+
+      .sections {
+        display: grid;
+        gap: 18px;
+        margin-top: 24px;
+      }
+
+      .pill {
+        display: inline-block;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(0, 109, 119, 0.1);
+        color: var(--accent);
+        font-size: 0.92rem;
+      }
+
+      pre {
+        overflow-x: auto;
+        padding: 16px;
+        border-radius: 14px;
+        background: var(--code);
+        border: 1px solid var(--line);
+        font-size: 0.95rem;
+        line-height: 1.55;
+      }
+
+      code {
+        font-family: "SFMono-Regular", Menlo, Consolas, monospace;
+      }
+
+      a { color: var(--accent); }
+
+      .footer {
+        margin-top: 28px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      @media (max-width: 640px) {
+        .hero, .card, .section { padding: 20px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="hero">
+        <p class="eyebrow">Distributed Agent Architecture</p>
+        <h1>Agentic Team</h1>
+        <p class="lead">
+          Proyecto base para operar un equipo distribuido de agentes con roles
+          claros en distintos ordenadores de una misma red.
+        </p>
+        <div>
+          <span class="pill">Orchestrator central</span>
+          <span class="pill">David Harvey · Director General</span>
+          <span class="pill">Marc Bohr · Director Tecnico</span>
+          <span class="pill">Francesc Locke · Director de Diseno</span>
+        </div>
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Objetivo</h2>
+          <p>
+            Construir un sistema donde varios agentes colaboren como un equipo
+            ejecutivo real, con responsabilidades separadas y una sintesis final
+            centralizada.
+          </p>
+          <ul>
+            <li>El Orchestrator recibe una mision.</li>
+            <li>Divide la tarea por rol.</li>
+            <li>Envia subtareas a cada agente remoto.</li>
+            <li>Recoge respuestas estructuradas.</li>
+            <li>Genera una sintesis ejecutiva final.</li>
+          </ul>
+        </article>
+
+        <article class="card">
+          <h2>Despliegue</h2>
+          <ul>
+            <li>Ordenador 1: Orchestrator + David Harvey</li>
+            <li>Ordenador 2: Marc Bohr</li>
+            <li>Ordenador 3: Francesc Locke</li>
+          </ul>
+          <p>
+            Cada maquina expone una API HTTP con identidad fija y parametros
+            minimos como <code>AGENT_NAME</code>, <code>AGENT_ROLE</code>,
+            <code>PORT</code> y <code>MODEL</code>.
+          </p>
+        </article>
+      </section>
+
+      <section class="sections">
+        <article class="section">
+          <h2>Arquitectura</h2>
+          <pre><code>                +----------------------+
+                |     Usuario / UI     |
+                +----------+-----------+
+                           |
+                           v
+                +----------------------+
+                |     Orchestrator     |
+                | David Harvey (opt.)  |
+                +----+------------+----+
+                     |            |
+          POST /task |            | POST /task
+                     v            v
+          +----------------+   +----------------+
+          |   Marc Bohr    |   | Francesc Locke |
+          | Dir. Tecnico   |   | Dir. Diseno    |
+          +----------------+   +----------------+</code></pre>
+          <p>Mas detalle tecnico en <a href="./architecture.html">architecture.html</a>.</p>
+        </article>
+
+        <article class="section">
+          <h2>Roles</h2>
+          <h3>David Harvey</h3>
+          <ul>
+            <li>Prioriza objetivos y resuelve conflictos entre areas.</li>
+            <li>Unifica la salida final y traduce resultados en decisiones.</li>
+          </ul>
+          <h3>Marc Bohr</h3>
+          <ul>
+            <li>Evalua viabilidad tecnica, arquitectura y roadmap.</li>
+            <li>Detecta deuda, riesgos y prioridades de ingenieria.</li>
+          </ul>
+          <h3>Francesc Locke</h3>
+          <ul>
+            <li>Define posicionamiento, audiencia y propuesta de valor.</li>
+            <li>Propone lanzamiento, mensajes y crecimiento.</li>
+          </ul>
+        </article>
+
+        <article class="section">
+          <h2>API minima</h2>
+          <h3><code>GET /health</code></h3>
+          <p>Comprueba si el agente esta disponible.</p>
+          <h3><code>POST /task</code></h3>
+          <p>Entrega una tarea a un agente con su contexto y expectativas.</p>
+          <pre><code>{
+  "task_id": "abc-123",
+  "goal": "Evaluar una idea SaaS para restaurantes",
+  "role": "director_tecnico",
+  "instructions": "Analiza viabilidad, arquitectura inicial y riesgos",
+  "context": {
+    "product": "SaaS para reservas y fidelizacion",
+    "market": "restaurantes pequenos en Espana"
+  }
+}</code></pre>
+          <pre><code>{
+  "task_id": "abc-123",
+  "agent": "Marc Bohr",
+  "role": "director_tecnico",
+  "status": "completed",
+  "summary": "Proyecto viable con un MVP acotado",
+  "details": [
+    "Backend y panel web suficientes para el inicio",
+    "Riesgo principal en integraciones externas",
+    "Mejor evitar app nativa en la fase 1"
+  ]
+}</code></pre>
+        </article>
+
+        <article class="section">
+          <h2>Roadmap</h2>
+          <h3>Fase 1</h3>
+          <ul>
+            <li>Contrato JSON comun.</li>
+            <li>Endpoints <code>health</code> y <code>task</code>.</li>
+            <li>Orquestacion local por red privada.</li>
+          </ul>
+          <h3>Fase 2</h3>
+          <ul>
+            <li>Seguimiento de estados por <code>task_id</code>.</li>
+            <li>Logs estructurados.</li>
+            <li>Reintentos y timeouts.</li>
+          </ul>
+          <h3>Fase 3</h3>
+          <ul>
+            <li>Memoria por agente.</li>
+            <li>Priorizacion automatica.</li>
+            <li>Dashboard de observabilidad.</li>
+          </ul>
+        </article>
+      </section>
+
+      <p class="footer">Version HTML preparada para publicacion en GitHub Pages.</p>
+    </div>
+  </body>
+</html>

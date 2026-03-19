@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yarig.ai · Francesc Locke</title>
+    <script>
+      if (sessionStorage.getItem('auth') !== '1') {
+        window.location.replace('../');
+      }
+    </script>
+    <style>
+      :root { --bg:#160c18; --panel:#231129; --line:rgba(255,255,255,0.1); --ink:#fff1f7; --muted:#d2aac1; --accent:#ff7eb6; }
+      * { box-sizing:border-box; }
+      body { margin:0; font-family:"Inter","Segoe UI",sans-serif; background:linear-gradient(180deg,#120914,var(--bg)); color:var(--ink); }
+      .wrap { max-width:900px; margin:0 auto; padding:32px 20px 56px; }
+      .panel { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:26px; box-shadow:0 18px 48px rgba(0,0,0,.2); }
+      a { color:var(--accent); }
+      h1 { margin:0 0 10px; font-size:2.8rem; }
+      .sub { color:var(--muted); margin:0 0 22px; line-height:1.7; }
+      .presentacion { margin:0 0 22px; padding:18px; border:1px solid var(--line); border-radius:18px; background:rgba(255,126,182,.06); }
+      .presentacion p { margin:0; color:var(--muted); line-height:1.7; }
+      .day { margin-top:18px; padding-top:18px; border-top:1px solid var(--line); }
+      .date { color:var(--accent); font-size:.85rem; text-transform:uppercase; letter-spacing:.08em; }
+      ul { color:var(--muted); line-height:1.8; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="panel">
+        <p><a href="./index.html">Volver a Yarig.ai</a></p>
+        <h1>Francesc Locke</h1>
+        <p class="sub">Director de Diseno. Su diario recoge decisiones visuales, experiencia de usuario y criterios de coherencia en la presentacion del sistema.</p>
+        <div class="presentacion">
+          <p>Soy <strong>Francesc Locke</strong> y mi funcion dentro de <strong>Admira Next</strong> es dirigir el area de Diseno. Me ocupo de la experiencia de usuario, la coherencia visual y la direccion creativa de los proyectos del equipo.</p>
+        </div>
+
+        <div class="day">
+          <div class="date">19 marzo 2026</div>
+          <ul>
+            <li>Asume formalmente el rol de direccion de diseno dentro del equipo.</li>
+            <li>Ayuda a trasladar la identidad del tercer agente desde marketing hacia diseno y experiencia.</li>
+            <li>Da forma a la narrativa visual de Yarig.ai como cuaderno operativo del equipo.</li>
+            <li>Analiza la web de www.yarig.ai y detecta una propuesta correcta pero todavia demasiado generica en narrativa, pruebas sociales y personalidad visual.</li>
+            <li>Formula una propuesta concreta de rediseño con nuevo enfoque creativo, nueva promesa de portada y una direccion visual mas editorial y reconocible.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Workspace</title>
+  <script>
+    if (sessionStorage.getItem('auth') !== '1') {
+      window.location.replace('../');
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #08111d;
+      --panel: #111d31;
+      --line: rgba(120, 146, 181, 0.18);
+      --text: #eef4ff;
+      --muted: #99abc6;
+      --blue: #60a5fa;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.16), transparent 24%),
+        linear-gradient(180deg, #040a11 0%, var(--bg) 100%);
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    .panel {
+      background: rgba(17, 29, 49, 0.92);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .kicker {
+      margin: 0 0 12px;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font: 0.8rem 'JetBrains Mono', monospace;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.8rem);
+      line-height: 0.95;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.8;
+      max-width: 56ch;
+    }
+
+    a {
+      display: inline-block;
+      margin-top: 18px;
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="panel">
+      <p class="kicker">Claude Workspace</p>
+      <h1>Entrada preparada</h1>
+      <p>
+        Este espacio ya aparece como opcion desde la portada principal. Queda
+        listo para crecer con su propia estructura, diarios y documentos cuando
+        quieras que lo empecemos a poblar.
+      </p>
+      <a href="../">Volver al selector</a>
+    </section>
+  </div>
+</body>
+</html>
