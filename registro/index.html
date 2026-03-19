@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro publico — csilvasantin</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #f5efe2;
+      --paper: rgba(255, 250, 242, 0.94);
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --line: rgba(87, 76, 61, 0.16);
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --accent-3: #1d4ed8;
+      --shadow: 0 18px 45px rgba(31, 41, 55, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.11), transparent 24%),
+        linear-gradient(180deg, #fcf8f1 0%, var(--bg) 100%);
+    }
+
+    a { color: var(--accent); }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 34px 20px 72px;
+    }
+
+    .hero,
+    .panel,
+    .entry,
+    table {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .hero,
+    .panel,
+    .entry {
+      border-radius: 26px;
+      padding: 28px;
+    }
+
+    .eyebrow,
+    th,
+    .date,
+    .status {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: 'Fraunces', serif;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      line-height: 0.96;
+      max-width: 11ch;
+    }
+
+    p,
+    li {
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    .hero p {
+      max-width: 60ch;
+      font-size: 1.08rem;
+    }
+
+    .actions,
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .button,
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 11px 16px;
+      text-decoration: none;
+    }
+
+    .button {
+      background: var(--accent);
+      color: white;
+      font-weight: 700;
+    }
+
+    .chip {
+      background: rgba(15, 118, 110, 0.08);
+      border: 1px solid rgba(15, 118, 110, 0.14);
+      color: var(--accent);
+      font-size: 0.84rem;
+    }
+
+    .layout {
+      display: grid;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .split {
+      display: grid;
+      gap: 22px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    th {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      background: rgba(15, 118, 110, 0.05);
+    }
+
+    .status {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .status.live { color: var(--accent); }
+    .status.active { color: var(--accent-3); }
+    .status.private { color: var(--accent-2); }
+
+    .entries {
+      display: grid;
+      gap: 16px;
+    }
+
+    .date {
+      color: var(--accent);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .entry h3 {
+      margin-top: 8px;
+      font-size: 1.4rem;
+    }
+
+    code {
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(31, 41, 55, 0.06);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;
+    }
+
+    @media (max-width: 860px) {
+      .split { grid-template-columns: 1fr; }
+      table, thead, tbody, th, td, tr { display: block; }
+      thead { display: none; }
+      td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+      }
+      td::before {
+        content: attr(data-label);
+        display: block;
+        margin-bottom: 4px;
+        color: var(--accent);
+        font: 700 0.78rem 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Public Registry</p>
+      <h1>Registro central de trabajo</h1>
+      <p>
+        Esta pagina es la bitacora publica de referencia para los proyectos de
+        <strong>csilvasantin</strong> en GitHub. Cada iniciativa debe dejar al menos una
+        entrada publica con repo, estado y siguiente paso visible.
+      </p>
+      <div class="actions">
+        <a class="button" href="../">Volver al hub</a>
+        <a class="button" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Abrir repo Pages</a>
+      </div>
+      <div class="chips">
+        <span class="chip">Fuente publica central</span>
+        <span class="chip">Actualizado: 19 marzo 2026</span>
+        <span class="chip">GitHub Pages activo</span>
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="split">
+        <section class="panel">
+          <p class="eyebrow">Norma operativa</p>
+          <h2>Como registraremos el trabajo</h2>
+          <ul>
+            <li>Cada proyecto nuevo debe aparecer aqui con enlace a repo o pagina.</li>
+            <li>La pagina publica debe explicar en una frase el objetivo y el estado.</li>
+            <li>Los cambios de infraestructura importantes dejan una entrada cronologica.</li>
+            <li>El repo <code>csilvasantin.github.io</code> funciona como escaparate y ledger publico.</li>
+          </ul>
+        </section>
+
+        <section class="panel">
+          <p class="eyebrow">Base tecnica</p>
+          <h2>Accesos ya resueltos</h2>
+          <ul>
+            <li><strong>SSH</strong> verificado contra <code>git@github.com</code>.</li>
+            <li><strong>HTTPS</strong> autenticado con <code>gh</code>.</li>
+            <li><strong>GitHub Pages</strong> reutilizado como web publica de referencia.</li>
+            <li><strong>Git global</strong> ajustado para <code>Carlos Silva</code> y <code>csilvasantin@gmail.com</code>.</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="panel">
+        <p class="eyebrow">Inventario</p>
+        <h2>Proyectos y espacios registrados</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Estado</th>
+              <th>Enlace</th>
+              <th>Nota</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Nombre">Hub publico GitHub</td>
+              <td data-label="Estado"><span class="status live">Live</span></td>
+              <td data-label="Enlace"><a href="../">csilvasantin.github.io</a></td>
+              <td data-label="Nota">Portada publica y punto de entrada comun.</td>
+            </tr>
+            <tr>
+              <td data-label="Nombre">Registro</td>
+              <td data-label="Estado"><span class="status live">Live</span></td>
+              <td data-label="Enlace"><a href="./">/registro/</a></td>
+              <td data-label="Nota">Ledger publico para trabajo, decisiones y estado.</td>
+            </tr>
+            <tr>
+              <td data-label="Nombre">Agentic Team</td>
+              <td data-label="Estado"><span class="status active">Activo</span></td>
+              <td data-label="Enlace"><a href="../agentic-team/">/agentic-team/</a></td>
+              <td data-label="Nota">Documentacion de arquitectura para equipo distribuido de agentes.</td>
+            </tr>
+            <tr>
+              <td data-label="Nombre">Yarig.ai</td>
+              <td data-label="Estado"><span class="status private">Privado</span></td>
+              <td data-label="Enlace"><a href="../">Acceso desde hub</a></td>
+              <td data-label="Nota">Diario operativo interno con capa protegida por sesion.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">Cronologia</p>
+        <h2>Entradas publicas</h2>
+        <div class="entries">
+          <article class="entry">
+            <div class="date">19 marzo 2026</div>
+            <h3>Se activa la base GitHub del ordenador</h3>
+            <p>
+              Se instalaron y verificaron <code>GitHub Desktop</code> y <code>GitHub CLI</code>,
+              quedo autenticada la cuenta <code>csilvasantin</code>, se validaron accesos por
+              SSH y HTTPS, y se preparo la identidad global de Git.
+            </p>
+          </article>
+          <article class="entry">
+            <div class="date">19 marzo 2026</div>
+            <h3>GitHub Pages pasa a ser el hub publico central</h3>
+            <p>
+              La portada del sitio se transforma en acceso publico y el repositorio
+              <code>csilvasantin.github.io</code> queda definido como el punto central para
+              registrar proyectos, actividad y referencias de trabajo.
+            </p>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

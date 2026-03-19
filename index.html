@@ -3,511 +3,525 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>csilvasantin — Proyectos</title>
+  <title>csilvasantin — Hub publico</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap');
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
     :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --border: #1e1e2e;
-      --text: #e0e0e8;
-      --muted: #6b6b80;
-      --accent: #7c5cfc;
-      --accent-glow: rgba(124, 92, 252, 0.3);
-      --green: #4ade80;
-      --blue: #60a5fa;
-      --orange: #fb923c;
-      --pink: #f472b6;
-      --cyan: #22d3ee;
+      --bg: #07111b;
+      --surface: rgba(12, 23, 37, 0.82);
+      --surface-strong: #0d1b2a;
+      --border: rgba(117, 138, 167, 0.22);
+      --text: #eef4ff;
+      --muted: #93a5be;
+      --accent: #5eead4;
+      --accent-2: #f59e0b;
+      --accent-3: #60a5fa;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
     }
+
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
       color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(94, 234, 212, 0.14), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.12), transparent 24%),
+        linear-gradient(180deg, #050b12 0%, var(--bg) 100%);
       min-height: 100vh;
-      overflow-x: hidden;
     }
 
-    /* ── Animated background ── */
-    .bg-grid {
+    a { color: inherit; }
+
+    .grid-bg {
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(124, 92, 252, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124, 92, 252, 0.03) 1px, transparent 1px);
-      background-size: 60px 60px;
-      z-index: 0;
-    }
-
-    .bg-glow {
-      position: fixed;
-      width: 600px;
-      height: 600px;
-      border-radius: 50%;
-      filter: blur(120px);
-      opacity: 0.15;
-      z-index: 0;
+        linear-gradient(rgba(117, 138, 167, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(117, 138, 167, 0.08) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
       pointer-events: none;
     }
 
-    .bg-glow-1 { top: -200px; left: -100px; background: var(--accent); }
-    .bg-glow-2 { bottom: -200px; right: -100px; background: var(--cyan); opacity: 0.1; }
-
-    /* ── Lock Screen ── */
-    #lock-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    #lock-screen.hidden {
-      opacity: 0;
-      transform: scale(1.05);
-      pointer-events: none;
-    }
-
-    .lock-box {
-      text-align: center;
-      padding: 3rem;
-      width: 100%;
-      max-width: 400px;
-    }
-
-    .lock-icon {
-      font-size: 3rem;
-      margin-bottom: 1.5rem;
-      display: block;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
-    }
-
-    .lock-box h1 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-
-    .lock-box p {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 2rem;
-    }
-
-    .password-wrapper {
-      position: relative;
-      margin-bottom: 1rem;
-    }
-
-    .password-wrapper input {
-      width: 100%;
-      padding: 0.9rem 1.2rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .password-wrapper input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    .password-wrapper input.error {
-      border-color: #ef4444;
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
-      animation: shake 0.4s ease;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
-    }
-
-    .enter-btn {
-      width: 100%;
-      padding: 0.9rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 12px;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .enter-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px var(--accent-glow);
-    }
-
-    .error-msg {
-      color: #ef4444;
-      font-size: 0.8rem;
-      margin-top: 0.8rem;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .error-msg.visible { opacity: 1; }
-
-    /* ── Main Content ── */
-    #main-content {
-      display: none;
+    .wrap {
       position: relative;
       z-index: 1;
-      max-width: 1000px;
+      max-width: 1120px;
       margin: 0 auto;
-      padding: 3rem 1.5rem 4rem;
-      animation: fadeUp 0.8s ease;
+      padding: 28px 20px 72px;
     }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hero,
+    .panel,
+    .project-card,
+    .timeline-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
-    #main-content.visible { display: block; }
-
-    /* Header */
-    .header {
-      text-align: center;
-      margin-bottom: 3rem;
+    .hero {
+      border-radius: 28px;
+      padding: 32px;
+      overflow: hidden;
     }
 
-    .avatar {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      border: 2px solid var(--accent);
-      margin-bottom: 1rem;
-      box-shadow: 0 0 30px rgba(125, 249, 255, 0.3), 0 0 60px rgba(124, 92, 252, 0.15);
-    }
-
-    .header h1 {
+    .eyebrow,
+    .meta-pill,
+    .tag,
+    .timeline-date {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 2rem;
-      background: linear-gradient(135deg, var(--accent), var(--cyan));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
     }
 
-    .header .tagline {
+    .eyebrow {
+      margin: 0 0 14px;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    h1,
+    h2,
+    h3 { margin: 0; }
+
+    h1 {
+      max-width: 12ch;
+      font-size: clamp(2.8rem, 7vw, 5.8rem);
+      line-height: 0.94;
+    }
+
+    .lead {
+      max-width: 60ch;
+      margin: 18px 0 0;
+      font-size: 1.08rem;
+      line-height: 1.75;
       color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 0.4rem;
     }
 
-    .header .links {
-      margin-top: 1rem;
+    .hero-actions,
+    .meta,
+    .tags {
       display: flex;
-      gap: 1rem;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions {
+      margin-top: 28px;
+    }
+
+    .button,
+    .link-button {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-    }
-
-    .header .links a {
-      color: var(--muted);
+      gap: 8px;
+      border-radius: 999px;
+      padding: 12px 18px;
       text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.2s;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
-    .header .links a:hover { color: var(--accent); }
+    .button {
+      background: linear-gradient(135deg, var(--accent), #2dd4bf);
+      color: #06252a;
+      box-shadow: 0 16px 40px rgba(45, 212, 191, 0.25);
+    }
 
-    /* Project Cards */
-    .projects-grid {
+    .link-button {
+      border: 1px solid rgba(238, 244, 255, 0.15);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--text);
+    }
+
+    .button:hover,
+    .link-button:hover { transform: translateY(-2px); }
+
+    .meta {
+      margin-top: 26px;
+    }
+
+    .meta-pill,
+    .tag {
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .meta-pill {
+      color: var(--accent);
+      background: rgba(94, 234, 212, 0.08);
+    }
+
+    .sections {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.2rem;
+      gap: 22px;
+      margin-top: 22px;
+    }
+
+    .two-col {
+      display: grid;
+      gap: 22px;
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .panel {
+      border-radius: 24px;
+      padding: 26px;
+    }
+
+    .panel p,
+    .project-card p,
+    .timeline-item p,
+    li {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .project-grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      margin-top: 18px;
     }
 
     .project-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.5rem;
-      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
       display: block;
+      text-decoration: none;
+      border-radius: 20px;
+      padding: 22px;
       position: relative;
       overflow: hidden;
+      min-height: 220px;
     }
 
     .project-card::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
       background: var(--card-accent, var(--accent));
-      opacity: 0;
-      transition: opacity 0.3s;
     }
 
     .project-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--card-accent, var(--accent));
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      transform: translateY(-3px);
+      border-color: rgba(255, 255, 255, 0.16);
     }
 
-    .project-card:hover::before { opacity: 1; }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      margin-bottom: 0.8rem;
+    .project-card h3 {
+      margin-top: 18px;
+      font-size: 1.25rem;
     }
 
-    .card-icon {
-      font-size: 1.5rem;
-    }
-
-    .card-header h3 {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1rem;
-      font-weight: 700;
-    }
-
-    .card-desc {
-      color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
-      margin-bottom: 1rem;
-    }
-
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
+    .project-card p {
+      margin: 12px 0 16px;
     }
 
     .tag {
-      padding: 0.2rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      font-family: 'JetBrains Mono', monospace;
-      background: rgba(124, 92, 252, 0.1);
-      color: var(--accent);
-      border: 1px solid rgba(124, 92, 252, 0.2);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
     }
 
-    .tag.js { background: rgba(251, 146, 60, 0.1); color: var(--orange); border-color: rgba(251, 146, 60, 0.2); }
-    .tag.py { background: rgba(96, 165, 250, 0.1); color: var(--blue); border-color: rgba(96, 165, 250, 0.2); }
-    .tag.html { background: rgba(244, 114, 182, 0.1); color: var(--pink); border-color: rgba(244, 114, 182, 0.2); }
-    .tag.bot { background: rgba(74, 222, 128, 0.1); color: var(--green); border-color: rgba(74, 222, 128, 0.2); }
-    .tag.ai { background: rgba(34, 211, 238, 0.1); color: var(--cyan); border-color: rgba(34, 211, 238, 0.2); }
+    .tag.public { color: var(--accent); }
+    .tag.private { color: var(--accent-2); }
+    .tag.docs { color: var(--accent-3); }
 
-    /* Footer */
+    .timeline {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .timeline-item {
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+
+    .timeline-date {
+      font-size: 0.78rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .timeline-item h3 {
+      margin-top: 8px;
+      font-size: 1.08rem;
+    }
+
+    .private-shell {
+      display: grid;
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .login-box {
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.05);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .login-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .login-form input {
+      flex: 1 1 220px;
+      min-width: 0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(7, 17, 27, 0.72);
+      color: var(--text);
+      font: inherit;
+      outline: none;
+    }
+
+    .login-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.12);
+    }
+
+    .login-form button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .error-msg {
+      display: none;
+      margin-top: 10px;
+      color: #fca5a5;
+    }
+
+    .error-msg.visible { display: block; }
+
+    #private-projects {
+      display: none;
+    }
+
+    #private-projects.visible {
+      display: block;
+      animation: fade-up 0.45s ease;
+    }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .footer {
+      margin-top: 28px;
       text-align: center;
-      margin-top: 3rem;
       color: var(--muted);
-      font-size: 0.75rem;
+      font-size: 0.92rem;
     }
 
-    .footer span {
-      color: var(--accent);
-    }
-
-    /* Responsive */
-    @media (max-width: 640px) {
-      .projects-grid { grid-template-columns: 1fr; }
-      .header h1 { font-size: 1.5rem; }
-      .lock-box { padding: 2rem 1.5rem; }
+    @media (max-width: 840px) {
+      .two-col { grid-template-columns: 1fr; }
+      .hero { padding: 26px; }
+      .panel { padding: 22px; }
     }
   </style>
 </head>
 <body>
-  <div class="bg-grid"></div>
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
-  <!-- Lock Screen -->
-  <div id="lock-screen">
-    <div class="lock-box">
-      <span class="lock-icon">🔐</span>
-      <h1>csilvasantin</h1>
-      <p>Introduce la contraseña para acceder</p>
-      <form id="login-form" autocomplete="off">
-        <div class="password-wrapper">
-          <input type="password" id="password" placeholder="Contraseña" autofocus>
-        </div>
-        <button type="submit" class="enter-btn">Entrar</button>
-      </form>
-      <div class="error-msg" id="error-msg">Contraseña incorrecta</div>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div id="main-content">
-    <div class="header">
-      <img class="avatar" src="logo.svg" alt="logo">
-      <h1>csilvasantin</h1>
-      <p class="tagline">Mis proyectos en GitHub</p>
-      <div class="links">
-        <a href="https://github.com/csilvasantin" target="_blank">GitHub ↗</a>
+  <div class="grid-bg"></div>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">GitHub Public Hub</p>
+      <h1>Trabajo centralizado y visible en GitHub</h1>
+      <p class="lead">
+        Esta web es la portada publica de <strong>csilvasantin</strong>. A partir de aqui
+        queda registrado el trabajo activo, la base tecnica de acceso por GitHub y el
+        inventario de proyectos que estamos manteniendo en abierto.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="./registro/">Abrir registro publico</a>
+        <a class="link-button" href="https://github.com/csilvasantin" target="_blank" rel="noreferrer">Perfil GitHub</a>
+        <a class="link-button" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Repo GitHub Pages</a>
       </div>
-    </div>
+      <div class="meta">
+        <span class="meta-pill">Actualizado: 19 marzo 2026</span>
+        <span class="meta-pill">SSH activo</span>
+        <span class="meta-pill">HTTPS activo con gh</span>
+        <span class="meta-pill">Fuente publica central</span>
+      </div>
+    </section>
 
-    <div class="projects-grid">
+    <section class="sections">
+      <div class="two-col">
+        <section class="panel">
+          <p class="eyebrow">Registro central</p>
+          <h2>Que queda aqui registrado</h2>
+          <p>
+            Todo lo que construyamos debe tener una referencia publica en GitHub: repositorio,
+            estado, enlace operativo y una nota corta de contexto. El punto de entrada es
+            <a href="./registro/">/registro/</a>, donde iremos dejando la traza publica.
+          </p>
+          <ul>
+            <li>Repositorio fuente y enlace publico.</li>
+            <li>Estado del proyecto y proximo paso visible.</li>
+            <li>Entrada cronologica cuando abrimos una nueva linea de trabajo.</li>
+          </ul>
+        </section>
 
-      <a class="project-card" href="https://github.com/csilvasantin/AenaJones" target="_blank" style="--card-accent: #fb923c;">
-        <div class="card-header">
-          <span class="card-icon">🏛️</span>
-          <h3>AenaJones</h3>
-        </div>
-        <div class="card-desc">Aventura interactiva estilo Indiana Jones ambientada en el mundo de AENA.</div>
-        <div class="card-tags">
-          <span class="tag js">JavaScript</span>
-          <span class="tag html">HTML</span>
-        </div>
-      </a>
+        <section class="panel">
+          <p class="eyebrow">Acceso GitHub</p>
+          <h2>Doble carril: SSH y HTTPS</h2>
+          <p>
+            El equipo ya puede trabajar por <strong>SSH</strong> para operar repositorios con claves,
+            y por <strong>HTTPS</strong> con autenticacion gestionada por <code>gh</code>. Asi podemos
+            elegir el flujo mas conveniente sin perder trazabilidad.
+          </p>
+          <div class="tags" style="margin-top:16px;">
+            <span class="tag public">SSH verificado</span>
+            <span class="tag docs">HTTPS con GitHub CLI</span>
+            <span class="tag">Git identity lista</span>
+          </div>
+        </section>
+      </div>
 
-      <a class="project-card" href="https://github.com/csilvasantin/CodexBot" target="_blank" style="--card-accent: #4ade80;">
-        <div class="card-header">
-          <span class="card-icon">🤖</span>
-          <h3>CodexBot</h3>
-        </div>
-        <div class="card-desc">Bot de automatización para auto-aprobar permisos en Codex.</div>
-        <div class="card-tags">
-          <span class="tag bot">PowerShell</span>
-          <span class="tag ai">Automation</span>
-        </div>
-      </a>
+      <section class="panel">
+        <p class="eyebrow">Portafolio activo</p>
+        <h2>Entradas publicas destacadas</h2>
+        <div class="project-grid">
+          <a class="project-card" href="./registro/" style="--card-accent:#5eead4;">
+            <span class="tag public">Publico</span>
+            <h3>Registro</h3>
+            <p>Libro mayor publico para centralizar proyectos, decisiones de acceso y estado operativo.</p>
+            <div class="tags">
+              <span class="tag docs">Hub</span>
+              <span class="tag">Ops</span>
+            </div>
+          </a>
 
-      <a class="project-card" href="https://github.com/csilvasantin/Matrix" target="_blank" style="--card-accent: #22d3ee;">
-        <div class="card-header">
-          <span class="card-icon">💊</span>
-          <h3>Matrix</h3>
-        </div>
-        <div class="card-desc">Efecto visual Matrix — lluvia de caracteres estilo terminal.</div>
-        <div class="card-tags">
-          <span class="tag js">JavaScript</span>
-          <span class="tag html">Canvas</span>
-        </div>
-      </a>
+          <a class="project-card" href="./agentic-team/" style="--card-accent:#60a5fa;">
+            <span class="tag public">Publico</span>
+            <h3>Agentic Team</h3>
+            <p>Arquitectura base para coordinar un equipo distribuido de agentes entre varios ordenadores.</p>
+            <div class="tags">
+              <span class="tag docs">Docs</span>
+              <span class="tag">Agents</span>
+            </div>
+          </a>
 
-      <a class="project-card" href="https://github.com/csilvasantin/diario" target="_blank" style="--card-accent: #7c5cfc;">
-        <div class="card-header">
-          <span class="card-icon">📓</span>
-          <h3>Diario</h3>
+          <a class="project-card" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer" style="--card-accent:#f59e0b;">
+            <span class="tag public">Publico</span>
+            <h3>GitHub Pages</h3>
+            <p>Repositorio central del sitio publico donde queda reflejado el trabajo y sus accesos.</p>
+            <div class="tags">
+              <span class="tag">Repo</span>
+              <span class="tag">Pages</span>
+            </div>
+          </a>
         </div>
-        <div class="card-desc">Diario personal de trabajo con entradas diarias.</div>
-        <div class="card-tags">
-          <span class="tag">Markdown</span>
-          <span class="tag html">Docs</span>
-        </div>
-      </a>
+      </section>
 
-      <a class="project-card" href="https://github.com/csilvasantin/AenaMallorca" target="_blank" style="--card-accent: #f472b6;">
-        <div class="card-header">
-          <span class="card-icon">🎬</span>
-          <h3>AenaMallorca</h3>
-        </div>
-        <div class="card-desc">Video interactivo sobre el aeropuerto de Mallorca.</div>
-        <div class="card-tags">
-          <span class="tag js">JavaScript</span>
-          <span class="tag html">Video</span>
-        </div>
-      </a>
+      <div class="two-col">
+        <section class="panel">
+          <p class="eyebrow">Bitacora</p>
+          <h2>Movimientos recientes</h2>
+          <div class="timeline">
+            <article class="timeline-item">
+              <div class="timeline-date">19 marzo 2026</div>
+              <h3>Base GitHub operativa</h3>
+              <p>Quedaron verificados GitHub CLI, autenticacion HTTPS, acceso SSH y la identidad global de Git para este ordenador.</p>
+            </article>
+            <article class="timeline-item">
+              <div class="timeline-date">19 marzo 2026</div>
+              <h3>Hub publico preparado</h3>
+              <p>La portada se convierte en acceso publico y el registro pasa a ser la referencia central para documentar el trabajo nuevo.</p>
+            </article>
+          </div>
+        </section>
 
-      <a class="project-card" href="./agentic-team/" style="--card-accent: #22d3ee;">
-        <div class="card-header">
-          <span class="card-icon">🧠</span>
-          <h3>Agentic Team</h3>
-        </div>
-        <div class="card-desc">Arquitectura base para coordinar un equipo distribuido de agentes entre varios ordenadores.</div>
-        <div class="card-tags">
-          <span class="tag ai">Agents</span>
-          <span class="tag html">Docs</span>
-        </div>
-      </a>
+        <section class="panel">
+          <p class="eyebrow">Zona privada</p>
+          <h2>Workspace protegido</h2>
+          <p>
+            El panel privado sigue disponible para contenido interno o en progreso. Al desbloquearlo
+            se mantiene la sesion para navegar por las secciones protegidas existentes.
+          </p>
+          <div class="private-shell">
+            <div class="login-box">
+              <strong>Entrar al workspace privado</strong>
+              <form id="login-form" class="login-form" autocomplete="off">
+                <input type="password" id="password" placeholder="Contrasena">
+                <button class="button" type="submit">Desbloquear</button>
+              </form>
+              <div class="error-msg" id="error-msg">Contrasena incorrecta.</div>
+            </div>
 
-      <a class="project-card" href="./yarig-ai/" style="--card-accent: #56d4ff;">
-        <div class="card-header">
-          <span class="card-icon">📘</span>
-          <h3>Yarig.ai</h3>
-        </div>
-        <div class="card-desc">Diario del equipo de agentes con seguimiento diario por rol, decisiones y actividad operativa.</div>
-        <div class="card-tags">
-          <span class="tag ai">Journal</span>
-          <span class="tag html">Agents</span>
-        </div>
-      </a>
+            <div id="private-projects">
+              <div class="project-grid">
+                <a class="project-card" href="./yarig-ai/" style="--card-accent:#56d4ff;">
+                  <span class="tag private">Privado</span>
+                  <h3>Yarig.ai</h3>
+                  <p>Cuaderno operativo del equipo de agentes con seguimiento diario, roles y decisiones internas.</p>
+                  <div class="tags">
+                    <span class="tag">Journal</span>
+                    <span class="tag">Ops</span>
+                  </div>
+                </a>
 
-    </div>
+                <a class="project-card" href="https://github.com/csilvasantin/AenaJones" target="_blank" rel="noreferrer" style="--card-accent:#fb923c;">
+                  <span class="tag public">Publico</span>
+                  <h3>AenaJones</h3>
+                  <p>Aventura interactiva ambientada en el universo AENA con enfoque narrativo y web.</p>
+                  <div class="tags">
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">HTML</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
 
-    <div class="footer">
-      <p>hecho con <span>♥</span> por csilvasantin</p>
-    </div>
-  </div>
+    <p class="footer">csilvasantin.github.io funciona ahora como punto publico de referencia para el trabajo en GitHub.</p>
+  </main>
 
   <script>
-    // Simple client-side password check using SHA-256 hash
-    // Hash of "Nomeacuerd0"
     const HASH = '09418087246c5efc32d92ed30f678fd02c0a4ade7dde8f2376da130991827a15';
 
     async function sha256(str) {
       const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
     }
 
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const input = document.getElementById('password');
-      const hash = await sha256(input.value);
-
-      if (hash === HASH) {
-        sessionStorage.setItem('auth', '1');
-        unlock();
-      } else {
-        input.classList.add('error');
+    async function unlockWorkspace(password) {
+      const hash = await sha256(password);
+      if (hash !== HASH) {
         document.getElementById('error-msg').classList.add('visible');
-        setTimeout(() => {
-          input.classList.remove('error');
-          document.getElementById('error-msg').classList.remove('visible');
-        }, 1500);
+        return;
       }
+
+      sessionStorage.setItem('auth', '1');
+      document.getElementById('error-msg').classList.remove('visible');
+      document.getElementById('private-projects').classList.add('visible');
+      document.getElementById('password').value = '';
+    }
+
+    document.getElementById('login-form').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      await unlockWorkspace(document.getElementById('password').value);
     });
 
-    function unlock() {
-      document.getElementById('lock-screen').classList.add('hidden');
-      document.getElementById('main-content').classList.add('visible');
-      setTimeout(() => {
-        document.getElementById('lock-screen').style.display = 'none';
-      }, 600);
-    }
-
-    // Stay unlocked during session
     if (sessionStorage.getItem('auth') === '1') {
-      document.getElementById('lock-screen').style.display = 'none';
-      document.getElementById('main-content').classList.add('visible');
+      document.getElementById('private-projects').classList.add('visible');
     }
   </script>
 </body>
