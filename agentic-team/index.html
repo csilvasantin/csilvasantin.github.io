@@ -153,9 +153,9 @@
         </p>
         <div>
           <span class="pill">Orchestrator central</span>
-          <span class="pill">Harvey · Director General</span>
-          <span class="pill">Bohr · Director Tecnico</span>
-          <span class="pill">Locke · Director de Marketing</span>
+          <span class="pill">David Harvey · Director General</span>
+          <span class="pill">Marc Bohr · Director Tecnico</span>
+          <span class="pill">Francesc Locke · Director de Diseno</span>
         </div>
       </section>
 
@@ -179,9 +179,9 @@
         <article class="card">
           <h2>Despliegue</h2>
           <ul>
-            <li>Ordenador 1: Orchestrator + Harvey</li>
-            <li>Ordenador 2: Bohr</li>
-            <li>Ordenador 3: Locke</li>
+            <li>Ordenador 1: Orchestrator + David Harvey</li>
+            <li>Ordenador 2: Marc Bohr</li>
+            <li>Ordenador 3: Francesc Locke</li>
           </ul>
           <p>
             Cada maquina expone una API HTTP con identidad fija y parametros
@@ -201,31 +201,31 @@
                            v
                 +----------------------+
                 |     Orchestrator     |
-                |   Harvey (optional)  |
+                | David Harvey (opt.)  |
                 +----+------------+----+
                      |            |
           POST /task |            | POST /task
                      v            v
           +----------------+   +----------------+
-          |      Bohr      |   |     Locke      |
-          | Dir. Tecnico   |   | Dir. Marketing |
+          |   Marc Bohr    |   | Francesc Locke |
+          | Dir. Tecnico   |   | Dir. Diseno    |
           +----------------+   +----------------+</code></pre>
           <p>Mas detalle tecnico en <a href="./architecture.html">architecture.html</a>.</p>
         </article>
 
         <article class="section">
           <h2>Roles</h2>
-          <h3>Harvey</h3>
+          <h3>David Harvey</h3>
           <ul>
             <li>Prioriza objetivos y resuelve conflictos entre areas.</li>
             <li>Unifica la salida final y traduce resultados en decisiones.</li>
           </ul>
-          <h3>Bohr</h3>
+          <h3>Marc Bohr</h3>
           <ul>
             <li>Evalua viabilidad tecnica, arquitectura y roadmap.</li>
             <li>Detecta deuda, riesgos y prioridades de ingenieria.</li>
           </ul>
-          <h3>Locke</h3>
+          <h3>Francesc Locke</h3>
           <ul>
             <li>Define posicionamiento, audiencia y propuesta de valor.</li>
             <li>Propone lanzamiento, mensajes y crecimiento.</li>
@@ -250,7 +250,7 @@
 }</code></pre>
           <pre><code>{
   "task_id": "abc-123",
-  "agent": "Bohr",
+  "agent": "Marc Bohr",
   "role": "director_tecnico",
   "status": "completed",
   "summary": "Proyecto viable con un MVP acotado",

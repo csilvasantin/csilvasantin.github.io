@@ -106,9 +106,9 @@
           <h2>Vision</h2>
           <p><code>Agentic Team</code> convierte varios ordenadores de una red local en un equipo de agentes con funciones ejecutivas separadas.</p>
           <ul>
-            <li><code>Harvey</code>: coordina y decide.</li>
-            <li><code>Bohr</code>: analiza y recomienda desde tecnica.</li>
-            <li><code>Locke</code>: analiza y recomienda desde negocio y marketing.</li>
+            <li><code>David Harvey</code>: coordina y decide.</li>
+            <li><code>Marc Bohr</code>: analiza y recomienda desde tecnica.</li>
+            <li><code>Francesc Locke</code>: analiza y recomienda desde diseno y experiencia.</li>
           </ul>
         </section>
 
@@ -143,7 +143,7 @@
 
           <h3>2. Agentes remotos</h3>
           <p>Cada agente remoto corre en un ordenador distinto y expone una API ligera.</p>
-          <pre><code>AGENT_NAME=Bohr
+          <pre><code>AGENT_NAME=Marc Bohr
 AGENT_ROLE=director_tecnico
 PORT=8001
 MODEL=gpt-5.4-mini</code></pre>
@@ -158,7 +158,7 @@ MODEL=gpt-5.4-mini</code></pre>
             <li>Envia una peticion <code>POST /task</code> a cada agente.</li>
             <li>Cada agente produce una respuesta estructurada.</li>
             <li>El Orchestrator consolida las respuestas.</li>
-            <li>Harvey o la capa ejecutiva publica una conclusion final.</li>
+            <li>David Harvey o la capa ejecutiva publica una conclusion final.</li>
           </ol>
         </section>
 
@@ -168,8 +168,8 @@ MODEL=gpt-5.4-mini</code></pre>
           <pre><code>{
   "task_id": "launch-001",
   "goal": "Definir el lanzamiento de un SaaS B2B",
-  "role": "director_marketing",
-  "instructions": "Propon posicionamiento, canales y secuencia de lanzamiento",
+  "role": "director_diseno",
+  "instructions": "Propone enfoque visual, experiencia y lineas maestras de diseno",
   "context": {
     "target": "pymes de servicios",
     "region": "Espana",
@@ -179,14 +179,14 @@ MODEL=gpt-5.4-mini</code></pre>
           <h3>Salida</h3>
           <pre><code>{
   "task_id": "launch-001",
-  "agent": "Locke",
-  "role": "director_marketing",
+  "agent": "Francesc Locke",
+  "role": "director_diseno",
   "status": "completed",
-  "summary": "Lanzamiento inicial apoyado en outreach y contenido experto",
+  "summary": "Direccion visual inicial coherente con un MVP claro y funcional",
   "details": [
-    "Definir nicho primero",
-    "Crear mensaje corto y claro",
-    "Validar con entrevistas y outreach manual"
+    "Definir una interfaz sobria y legible",
+    "Crear un sistema visual reutilizable",
+    "Priorizar claridad antes que complejidad estetica"
   ]
 }</code></pre>
         </section>
@@ -195,16 +195,16 @@ MODEL=gpt-5.4-mini</code></pre>
           <h2>Topologia recomendada</h2>
           <h3>Opcion base</h3>
           <ul>
-            <li>PC 1: Orchestrator + Harvey</li>
-            <li>PC 2: Bohr</li>
-            <li>PC 3: Locke</li>
+            <li>PC 1: Orchestrator + David Harvey</li>
+            <li>PC 2: Marc Bohr</li>
+            <li>PC 3: Francesc Locke</li>
           </ul>
           <h3>Opcion ampliada</h3>
           <ul>
             <li>PC 1: Orchestrator</li>
-            <li>PC 2: Harvey</li>
-            <li>PC 3: Bohr</li>
-            <li>PC 4: Locke</li>
+            <li>PC 2: David Harvey</li>
+            <li>PC 3: Marc Bohr</li>
+            <li>PC 4: Francesc Locke</li>
           </ul>
         </section>
 
