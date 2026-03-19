@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admira Next</title>
+  <script>
+    if (sessionStorage.getItem('auth') !== '1') {
+      window.location.replace('../');
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #f5efe5;
+      --paper: rgba(255, 251, 245, 0.95);
+      --ink: #1f2937;
+      --muted: #5f6b7a;
+      --line: rgba(95, 107, 122, 0.18);
+      --teal: #0f766e;
+      --gold: #b45309;
+      --blue: #1d4ed8;
+      --rose: #9f365f;
+      --shadow: 0 18px 48px rgba(31, 41, 55, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, 0.1), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(180, 83, 9, 0.08), transparent 22%),
+        linear-gradient(180deg, #fcf8f1 0%, var(--bg) 100%);
+    }
+
+    a { color: var(--teal); }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 34px 20px 72px;
+    }
+
+    .hero,
+    .section,
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 28px;
+    }
+
+    .hero {
+      padding: 34px;
+    }
+
+    .section {
+      margin-top: 22px;
+      padding: 28px;
+    }
+
+    .eyebrow,
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-family: 'Fraunces', serif;
+    }
+
+    h1 {
+      max-width: 10ch;
+      font-size: clamp(3rem, 7vw, 5.4rem);
+      line-height: 0.94;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 14px;
+    }
+
+    h3 {
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    p, li {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .lead {
+      max-width: 58ch;
+      margin: 18px 0 0;
+      font-size: 1.08rem;
+    }
+
+    .actions,
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .button,
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      text-decoration: none;
+    }
+
+    .button {
+      padding: 12px 18px;
+      background: var(--teal);
+      color: white;
+      font-weight: 700;
+    }
+
+    .badge {
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      border: 1px solid rgba(15, 118, 110, 0.14);
+      background: rgba(15, 118, 110, 0.08);
+      color: var(--teal);
+    }
+
+    .grid {
+      display: grid;
+      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      margin-top: 18px;
+    }
+
+    .card {
+      padding: 22px;
+    }
+
+    .team-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .team-card::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 4px;
+      background: var(--accent, var(--teal));
+    }
+
+    .role {
+      font: 0.8rem 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .accent-teal { --accent: var(--teal); }
+    .accent-blue { --accent: var(--blue); }
+    .accent-rose { --accent: var(--rose); }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="hero">
+      <p class="eyebrow">Admira Next</p>
+      <h1>Estrategia, tecnologia y diseño en un solo equipo</h1>
+      <p class="lead">
+        Admira Next es una estructura de trabajo donde la coordinación ejecutiva,
+        la dirección tecnológica y la dirección de diseño funcionan como un solo
+        sistema. La compañía organiza ideas, decisiones y ejecución con una capa
+        clara de responsabilidad por rol.
+      </p>
+      <div class="actions">
+        <a class="button" href="../yarig-ai/">Abrir Yarig.ai</a>
+        <a class="button" href="../">Volver a Codex</a>
+      </div>
+      <div class="badges">
+        <span class="badge">Equipo ejecutivo</span>
+        <span class="badge">Sistema agentico</span>
+        <span class="badge">Workspace privado</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Que es Admira Next</h2>
+      <p>
+        Admira Next actúa como marco de trabajo para desarrollar proyectos con
+        un equipo pequeño pero muy definido. Cada área tiene una voz propia:
+        dirección general para priorizar, tecnología para construir y diseño para
+        dar forma a la experiencia.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>Equipo</h2>
+      <div class="grid">
+        <article class="card team-card accent-teal">
+          <div class="role">Director General</div>
+          <h3>David Harvey</h3>
+          <p>
+            Coordina la estrategia, reparte prioridades y convierte el trabajo
+            del equipo en decisiones ejecutivas claras.
+          </p>
+        </article>
+
+        <article class="card team-card accent-blue">
+          <div class="role">Director de Tecnologia</div>
+          <h3>Marc Bohr</h3>
+          <p>
+            Define arquitectura, evalúa viabilidad técnica y dirige las
+            prioridades de ingeniería de cada proyecto.
+          </p>
+        </article>
+
+        <article class="card team-card accent-rose">
+          <div class="role">Director de Diseño</div>
+          <h3>Francesc Locke</h3>
+          <p>
+            Cuida la experiencia, el lenguaje visual y la coherencia creativa
+            para que cada producto tenga identidad propia.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Como se organiza</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>Direccion</h3>
+          <p>Ordena objetivos, asigna trabajo y da contexto al equipo.</p>
+        </article>
+        <article class="card">
+          <h3>Tecnologia</h3>
+          <p>Construye la base tecnica y asegura que las ideas sean viables.</p>
+        </article>
+        <article class="card">
+          <h3>Diseño</h3>
+          <p>Transforma la estrategia y la funcionalidad en una experiencia reconocible.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
