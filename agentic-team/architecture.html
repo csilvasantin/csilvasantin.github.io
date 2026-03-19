@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agentic Team · Arquitectura</title>
+    <style>
+      :root {
+        --bg: #f5f1ea;
+        --panel: #fffdf8;
+        --ink: #1f2937;
+        --muted: #5f6b7a;
+        --line: #ddd2c2;
+        --accent: #9a3412;
+        --accent-soft: rgba(154, 52, 18, 0.08);
+        --code: #f2ece3;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top right, rgba(154, 52, 18, 0.15), transparent 28%),
+          linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 20px 64px;
+      }
+
+      .header, .section {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 28px;
+        box-shadow: 0 10px 28px rgba(31, 41, 55, 0.05);
+      }
+
+      .header {
+        margin-bottom: 20px;
+        background: linear-gradient(135deg, var(--accent-soft), rgba(0, 0, 0, 0));
+      }
+
+      .sections {
+        display: grid;
+        gap: 18px;
+      }
+
+      h1, h2, h3 { line-height: 1.15; }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: clamp(2.2rem, 5vw, 4rem);
+      }
+
+      h2 {
+        margin: 0 0 14px;
+        font-size: 1.9rem;
+      }
+
+      h3 {
+        margin: 22px 0 10px;
+        font-size: 1.2rem;
+      }
+
+      p, li {
+        font-size: 1.05rem;
+        line-height: 1.72;
+      }
+
+      .muted { color: var(--muted); }
+
+      pre {
+        overflow-x: auto;
+        padding: 16px;
+        border-radius: 14px;
+        background: var(--code);
+        border: 1px solid var(--line);
+      }
+
+      code { font-family: "SFMono-Regular", Menlo, Consolas, monospace; }
+
+      a { color: var(--accent); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <section class="header">
+        <p class="muted">Documento tecnico</p>
+        <h1>Arquitectura de Agentic Team</h1>
+        <p><a href="./index.html">Volver al resumen</a></p>
+      </section>
+
+      <div class="sections">
+        <section class="section">
+          <h2>Vision</h2>
+          <p><code>Agentic Team</code> convierte varios ordenadores de una red local en un equipo de agentes con funciones ejecutivas separadas.</p>
+          <ul>
+            <li><code>Harvey</code>: coordina y decide.</li>
+            <li><code>Bohr</code>: analiza y recomienda desde tecnica.</li>
+            <li><code>Locke</code>: analiza y recomienda desde negocio y marketing.</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>Principios</h2>
+          <ul>
+            <li>Un rol por maquina siempre que sea posible.</li>
+            <li>Comunicacion simple por HTTP y JSON.</li>
+            <li>Mensajes estructurados en vez de texto libre.</li>
+            <li>Orquestacion centralizada para reducir complejidad operativa.</li>
+            <li>Identidad fija por agente para que el equipo sea entendible.</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>Componentes</h2>
+          <h3>1. Orchestrator</h3>
+          <ul>
+            <li>Recibir objetivos del usuario.</li>
+            <li>Descomponer una mision en tareas por rol.</li>
+            <li>Enviar trabajo a cada agente.</li>
+            <li>Esperar o consultar resultados.</li>
+            <li>Unificar una salida final.</li>
+          </ul>
+          <p>Funciones recomendadas:</p>
+          <ul>
+            <li>Tabla de agentes registrados.</li>
+            <li>Asignacion por rol.</li>
+            <li>Trazabilidad por <code>task_id</code>.</li>
+            <li>Manejo de timeout y errores de red.</li>
+          </ul>
+
+          <h3>2. Agentes remotos</h3>
+          <p>Cada agente remoto corre en un ordenador distinto y expone una API ligera.</p>
+          <pre><code>AGENT_NAME=Bohr
+AGENT_ROLE=director_tecnico
+PORT=8001
+MODEL=gpt-5.4-mini</code></pre>
+        </section>
+
+        <section class="section">
+          <h2>Flujo operativo</h2>
+          <ol>
+            <li>El usuario envia una mision al Orchestrator.</li>
+            <li>El Orchestrator genera un <code>task_id</code>.</li>
+            <li>Divide la mision por especialidad.</li>
+            <li>Envia una peticion <code>POST /task</code> a cada agente.</li>
+            <li>Cada agente produce una respuesta estructurada.</li>
+            <li>El Orchestrator consolida las respuestas.</li>
+            <li>Harvey o la capa ejecutiva publica una conclusion final.</li>
+          </ol>
+        </section>
+
+        <section class="section">
+          <h2>Contratos JSON</h2>
+          <h3>Entrada</h3>
+          <pre><code>{
+  "task_id": "launch-001",
+  "goal": "Definir el lanzamiento de un SaaS B2B",
+  "role": "director_marketing",
+  "instructions": "Propon posicionamiento, canales y secuencia de lanzamiento",
+  "context": {
+    "target": "pymes de servicios",
+    "region": "Espana",
+    "budget": "bajo"
+  }
+}</code></pre>
+          <h3>Salida</h3>
+          <pre><code>{
+  "task_id": "launch-001",
+  "agent": "Locke",
+  "role": "director_marketing",
+  "status": "completed",
+  "summary": "Lanzamiento inicial apoyado en outreach y contenido experto",
+  "details": [
+    "Definir nicho primero",
+    "Crear mensaje corto y claro",
+    "Validar con entrevistas y outreach manual"
+  ]
+}</code></pre>
+        </section>
+
+        <section class="section">
+          <h2>Topologia recomendada</h2>
+          <h3>Opcion base</h3>
+          <ul>
+            <li>PC 1: Orchestrator + Harvey</li>
+            <li>PC 2: Bohr</li>
+            <li>PC 3: Locke</li>
+          </ul>
+          <h3>Opcion ampliada</h3>
+          <ul>
+            <li>PC 1: Orchestrator</li>
+            <li>PC 2: Harvey</li>
+            <li>PC 3: Bohr</li>
+            <li>PC 4: Locke</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>Riesgos y mitigaciones</h2>
+          <h3>Ambiguedad de rol</h3>
+          <ul>
+            <li>Incluir <code>role</code> e <code>instructions</code> en cada tarea.</li>
+            <li>Mantener prompts base estables por agente.</li>
+          </ul>
+          <h3>Respuestas demasiado libres</h3>
+          <ul>
+            <li>Exigir JSON de salida.</li>
+            <li>Validar esquema antes de consolidar resultados.</li>
+          </ul>
+          <h3>Caida de un nodo</h3>
+          <ul>
+            <li>Endpoint <code>GET /health</code>.</li>
+            <li>Timeout por agente.</li>
+            <li>Reintentos limitados.</li>
+          </ul>
+          <h3>Complejidad prematura</h3>
+          <ul>
+            <li>Empezar solo con HTTP y JSON.</li>
+            <li>Evitar colas, memoria persistente y paneles al inicio.</li>
+          </ul>
+        </section>
+
+        <section class="section">
+          <h2>Implementacion recomendada</h2>
+          <ul>
+            <li>Python</li>
+            <li>FastAPI</li>
+            <li>Uvicorn</li>
+            <li>Pydantic</li>
+          </ul>
+          <p class="muted">Stack pensado para prototipar rapido, validar contratos y desplegar facilmente en varios ordenadores.</p>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
