@@ -174,7 +174,7 @@
     /* ─── Stats ───────────────────────────────────────────── */
     .stats-bar {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 14px;
       margin-bottom: 24px;
     }
@@ -478,6 +478,7 @@
       <div class="meta-chip"><div class="bullet"></div>Jornada completa — 1 día</div>
       <div class="meta-chip"><div class="bullet"></div>09:30 – 15:30 h</div>
       <div class="meta-chip"><div class="bullet"></div>6 bloques temáticos</div>
+      <div class="meta-chip"><div class="bullet"></div>6 asistentes</div>
     </div>
   </div>
 
@@ -495,6 +496,20 @@
       <div class="number">2</div>
       <div class="label">Pausas + comida</div>
     </div>
+    <div class="stat-card" style="border-bottom-color: var(--brown);">
+      <div class="number" style="color: var(--brown);">6</div>
+      <div class="label">Asistentes</div>
+    </div>
+  </div>
+
+  <!-- ── Physical AI Banner ── -->
+  <div style="background:white; border-radius:10px; border:1px solid var(--gray-border); border-left:4px solid var(--orange); padding:18px 22px; margin-bottom:24px; display:flex; gap:16px; align-items:flex-start; box-shadow:0 1px 6px rgba(69,54,40,0.07);">
+    <div style="font-size:26px; flex-shrink:0; margin-top:2px;">🤖</div>
+    <div>
+      <div style="font-size:9.5px; font-weight:700; letter-spacing:1.8px; text-transform:uppercase; color:var(--orange); margin-bottom:6px;">Formato de la jornada</div>
+      <p style="font-family:'Barlow',sans-serif; font-size:15px; font-weight:700; color:var(--brown); margin-bottom:5px;">Visitas a experiencias interactivas con Physical AI</p>
+      <p style="font-size:12.5px; color:var(--text-mid); line-height:1.65;">Todos los bloques temáticos del día se desarrollarán de forma integrada con visitas a diferentes <strong>experiencias interactivas creadas con Physical AI</strong> en distintas ubicaciones, combinando la reflexión estratégica con la vivencia práctica y directa de la tecnología en tiempo real.</p>
+    </div>
   </div>
 
   <!-- ── Timeline ── -->
@@ -503,9 +518,23 @@
     <!-- MAÑANA -->
     <div class="section-label"><span>Mañana</span></div>
 
-    <!-- 09:00 Bienvenida -->
+    <!-- 09:30 Café de bienvenida -->
     <div class="slot">
       <div class="time-col"><span class="time">09:30</span></div>
+      <div class="dot-col"><div class="dot break"></div></div>
+      <div class="card break">
+        <div class="card-header">
+          <span class="block-label">Recepción</span>
+          <span class="duration-badge">30 min</span>
+        </div>
+        <h3>Café de bienvenida</h3>
+        <p class="description">Recepción de los asistentes, presentaciones informales y primer contacto con las instalaciones antes de arrancar la jornada.</p>
+      </div>
+    </div>
+
+    <!-- 10:00 Apertura -->
+    <div class="slot">
+      <div class="time-col"><span class="time">10:00</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
@@ -517,9 +546,9 @@
       </div>
     </div>
 
-    <!-- 09:15 Bloque 1 -->
+    <!-- 10:15 Bloque 1 -->
     <div class="slot">
-      <div class="time-col"><span class="time">09:45</span></div>
+      <div class="time-col"><span class="time">10:15</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
@@ -537,23 +566,9 @@
       </div>
     </div>
 
-    <!-- 10:30 Café -->
+    <!-- 11:00 Bloque 2 -->
     <div class="slot">
-      <div class="time-col"><span class="time">10:30</span></div>
-      <div class="dot-col"><div class="dot break"></div></div>
-      <div class="card break">
-        <div class="card-header">
-          <span class="block-label">Descanso</span>
-          <span class="duration-badge">15 min</span>
-        </div>
-        <h3>Pausa — Café</h3>
-        <p class="description">Networking informal y asimilación de los conceptos de la primera sesión.</p>
-      </div>
-    </div>
-
-    <!-- 10:45 Bloque 2 -->
-    <div class="slot">
-      <div class="time-col"><span class="time">10:45</span></div>
+      <div class="time-col"><span class="time">11:00</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
@@ -572,14 +587,14 @@
       </div>
     </div>
 
-    <!-- 12:00 Bloque 3 -->
+    <!-- 11:45 Bloque 3 -->
     <div class="slot">
-      <div class="time-col"><span class="time">11:30</span></div>
+      <div class="time-col"><span class="time">11:45</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
           <span class="block-label">Bloque 3</span>
-          <span class="duration-badge">45 min</span>
+          <span class="duration-badge">30 min</span>
         </div>
         <h3>Futuro del empleo con la IA — Perspectiva actualizada</h3>
         <p class="description">Este tema ya fue abordado anteriormente, pero los tiempos se han acelerado. Se revisará con datos actuales: qué roles evolucionan, cuáles desaparecen y qué nuevas oportunidades laborales genera la IA en el sector.</p>
@@ -592,34 +607,31 @@
       </div>
     </div>
 
-    <!-- MEDIODÍA -->
-    <div class="section-label"><span>Mediodía</span></div>
-
-    <!-- 13:00 Comida -->
+    <!-- 12:15 Pausa café -->
     <div class="slot">
       <div class="time-col"><span class="time">12:15</span></div>
-      <div class="dot-col"><div class="dot lunch"></div></div>
-      <div class="card lunch">
+      <div class="dot-col"><div class="dot break"></div></div>
+      <div class="card break">
         <div class="card-header">
-          <span class="block-label">Pausa</span>
-          <span class="duration-badge">45 min</span>
+          <span class="block-label">Descanso</span>
+          <span class="duration-badge">15 min</span>
         </div>
-        <h3>Comida de trabajo</h3>
-        <p class="description">Almuerzo compartido. Momento para continuar las conversaciones informales, consolidar relaciones y prepararse para la sesión de tarde.</p>
+        <h3>Pausa — Café</h3>
+        <p class="description">Breve pausa para descansar antes de continuar con la sesión de tarde.</p>
       </div>
     </div>
 
     <!-- TARDE -->
     <div class="section-label"><span>Tarde</span></div>
 
-    <!-- 14:30 Bloque 4 -->
+    <!-- 12:30 Bloque 4 -->
     <div class="slot">
-      <div class="time-col"><span class="time">13:00</span></div>
+      <div class="time-col"><span class="time">12:30</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
           <span class="block-label">Bloque 4</span>
-          <span class="duration-badge">45 min</span>
+          <span class="duration-badge">30 min</span>
         </div>
         <h3>Formación necesaria para este contexto</h3>
         <p class="description">¿Qué necesitan aprender los equipos y directivos para no quedarse atrás? Rutas de formación, habilidades clave y cómo diseñar un plan de upskilling realista para la organización.</p>
@@ -632,14 +644,14 @@
       </div>
     </div>
 
-    <!-- 15:30 Bloque 5 -->
+    <!-- 13:00 Bloque 5 -->
     <div class="slot">
-      <div class="time-col"><span class="time">13:45</span></div>
+      <div class="time-col"><span class="time">13:00</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
           <span class="block-label">Bloque 5</span>
-          <span class="duration-badge">45 min</span>
+          <span class="duration-badge">30 min</span>
         </div>
         <h3>Errores más frecuentes al implementar la IA en empresas</h3>
         <p class="description">Revisión de los fallos más comunes: expectativas poco realistas, falta de datos de calidad, resistencia interna y ausencia de estrategia clara.</p>
@@ -653,23 +665,9 @@
       </div>
     </div>
 
-    <!-- 16:30 Café tarde -->
+    <!-- 13:30 Bloque 6 -->
     <div class="slot">
-      <div class="time-col"><span class="time">14:30</span></div>
-      <div class="dot-col"><div class="dot break"></div></div>
-      <div class="card break">
-        <div class="card-header">
-          <span class="block-label">Descanso</span>
-          <span class="duration-badge">15 min</span>
-        </div>
-        <h3>Pausa — Café de tarde</h3>
-        <p class="description">Descanso antes del bloque final y el debate de cierre.</p>
-      </div>
-    </div>
-
-    <!-- 16:45 Bloque 6 -->
-    <div class="slot">
-      <div class="time-col"><span class="time">14:45</span></div>
+      <div class="time-col"><span class="time">13:30</span></div>
       <div class="dot-col"><div class="dot"></div></div>
       <div class="card">
         <div class="card-header">
@@ -687,17 +685,14 @@
       </div>
     </div>
 
-    <!-- CIERRE -->
-    <div class="section-label"><span>Cierre</span></div>
-
-    <!-- 17:45 Debate -->
+    <!-- 14:00 Mesa redonda -->
     <div class="slot">
-      <div class="time-col"><span class="time">15:15</span></div>
+      <div class="time-col"><span class="time">14:00</span></div>
       <div class="dot-col"><div class="dot debate"></div></div>
       <div class="card debate">
         <div class="card-header">
           <span class="block-label">Mesa redonda</span>
-          <span class="duration-badge">15 min</span>
+          <span class="duration-badge">30 min</span>
         </div>
         <h3>Debate abierto, conclusiones y próximos pasos</h3>
         <p class="description">Espacio para preguntas, reflexiones finales y definición de acciones concretas a llevar de vuelta a la organización.</p>
@@ -709,7 +704,24 @@
       </div>
     </div>
 
-    <!-- 18:00 Cierre -->
+    <!-- CIERRE -->
+    <div class="section-label"><span>Cierre</span></div>
+
+    <!-- 14:30 Comida — último acto -->
+    <div class="slot">
+      <div class="time-col"><span class="time">14:30</span></div>
+      <div class="dot-col"><div class="dot lunch"></div></div>
+      <div class="card lunch">
+        <div class="card-header">
+          <span class="block-label">Comida</span>
+          <span class="duration-badge">60 min</span>
+        </div>
+        <h3>Comida de trabajo — Cierre de la jornada</h3>
+        <p class="description">Almuerzo compartido para cerrar el día. Momento para consolidar relaciones, poner en común las conclusiones y despedir la jornada de manera distendida.</p>
+      </div>
+    </div>
+
+    <!-- 15:30 Fin -->
     <div class="slot">
       <div class="time-col"><span class="time">15:30</span></div>
       <div class="dot-col"><div class="dot close"></div></div>
@@ -718,7 +730,7 @@
           <span class="block-label">Fin</span>
           <span class="duration-badge">—</span>
         </div>
-        <h3>Cierre de la jornada</h3>
+        <h3>Fin de la jornada</h3>
         <p class="description">Fin oficial de la visita. Agradecimientos y despedida.</p>
       </div>
     </div>
