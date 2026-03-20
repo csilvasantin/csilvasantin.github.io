@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agenda de Visita — IA en el Sector Estancos · Altadis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Barlow+Condensed:wght@700;800;900&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Altadis / Imperial Brands Brand Tokens ──────────── */
+    :root {
+      --orange:       #F07300;
+      --orange-dark:  #C45E00;
+      --orange-light: #FFF3E6;
+      --orange-mid:   #FFD4A3;
+      --brown:        #453628;
+      --brown-light:  #7A6552;
+      --cream:        #FAF8F5;
+      --white:        #FFFFFF;
+      --gray-light:   #F4F3F1;
+      --gray-border:  #E8E4DF;
+      --text-dark:    #453628;
+      --text-mid:     #7A6552;
+      --text-light:   #A8957F;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Source Sans 3', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 40px 20px 60px;
+    }
+
+    .page { max-width: 880px; margin: 0 auto; }
+
+    /* ─── Header ──────────────────────────────────────────── */
+    .header {
+      background: var(--brown);
+      border-radius: 16px;
+      padding: 44px 52px;
+      color: white;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Sunburst decorative shape (echoing IB logo) */
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(240,115,0,0.25) 0%, rgba(240,115,0,0) 70%);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -30px;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(240,115,0,0.08);
+    }
+
+    /* Orange top stripe */
+    .header-stripe {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 5px;
+      background: var(--orange);
+      border-radius: 16px 16px 0 0;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      position: relative;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* Logo block — mimics IB | Altadis wordmark */
+    .brand-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .brand-ib {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-divider {
+      width: 100%;
+      height: 1px;
+      background: rgba(240,115,0,0.35);
+      margin: 3px 0;
+    }
+    .brand-session {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-align: right;
+    }
+
+    /* Header content */
+    .header-tag {
+      display: inline-block;
+      background: rgba(240,115,0,0.2);
+      border: 1px solid rgba(240,115,0,0.45);
+      color: #FFB366;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+
+    .header h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 10px;
+      position: relative;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .header h1 em {
+      font-style: normal;
+      color: var(--orange);
+    }
+    .header .subtitle {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      position: relative;
+      font-weight: 400;
+    }
+
+    .header-meta {
+      display: flex;
+      gap: 10px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .meta-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 4px;
+      padding: 7px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+    }
+    .meta-chip .bullet {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+    }
+
+    /* ─── Stats ───────────────────────────────────────────── */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: center;
+      box-shadow: 0 1px 4px rgba(69,54,40,0.08);
+      border: 1px solid var(--gray-border);
+      border-bottom: 3px solid var(--orange);
+    }
+    .stat-card .number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--brown);
+      line-height: 1;
+    }
+    .stat-card .label {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--text-light);
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ─── Timeline ────────────────────────────────────────── */
+    .timeline { position: relative; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 68px;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom,
+        var(--orange) 0%,
+        rgba(240,115,0,0.3) 50%,
+        rgba(240,115,0,0.1) 100%
+      );
+    }
+
+    .slot {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 12px;
+    }
+
+    .time-col {
+      width: 52px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-top: 18px;
+    }
+    .time-col .time {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-mid);
+      letter-spacing: 0.3px;
+    }
+
+    .dot-col {
+      width: 16px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      padding-top: 21px;
+    }
+    .dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid var(--orange);
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    .dot.break  { border-color: var(--brown-light); }
+    .dot.lunch  { border-color: var(--orange-dark); background: var(--orange-light); }
+    .dot.debate { border-color: var(--brown); background: var(--brown); }
+    .dot.close  { border-color: var(--brown); }
+
+    /* ─── Cards ───────────────────────────────────────────── */
+    .card {
+      flex: 1;
+      background: var(--white);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 6px rgba(69,54,40,0.07);
+      border: 1px solid var(--gray-border);
+      border-left: 4px solid var(--orange);
+    }
+    .card.break {
+      border-left-color: var(--brown-light);
+      background: var(--gray-light);
+      border-color: var(--gray-border);
+    }
+    .card.lunch {
+      border-left-color: var(--orange-dark);
+      background: var(--orange-light);
+      border-color: rgba(240,115,0,0.2);
+    }
+    .card.debate {
+      border-left-color: var(--brown);
+      background: #F5F1EC;
+      border-color: rgba(69,54,40,0.15);
+    }
+    .card.close {
+      border-left-color: var(--brown);
+      background: var(--brown);
+      border-color: var(--brown);
+    }
+    .card.close h3,
+    .card.close .description { color: white; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 7px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .block-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--orange);
+      background: var(--orange-light);
+      border: 1px solid rgba(240,115,0,0.2);
+      padding: 3px 10px;
+      border-radius: 3px;
+    }
+    .break  .block-label { color: var(--brown-light); background: var(--gray-light); border-color: var(--gray-border); }
+    .lunch  .block-label { color: var(--orange-dark); background: var(--orange-mid); border-color: rgba(240,115,0,0.3); }
+    .debate .block-label { color: var(--brown);       background: #EDE7DF;           border-color: rgba(69,54,40,0.15); }
+    .close  .block-label { color: white;              background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
+
+    .duration-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 0.3px;
+    }
+    .close .duration-badge { color: rgba(255,255,255,0.5); }
+
+    .card h3 {
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--brown);
+      line-height: 1.3;
+      margin-bottom: 5px;
+    }
+    .card .description {
+      font-size: 12.5px;
+      color: var(--text-mid);
+      line-height: 1.65;
+    }
+    .card .topics {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .topic-tag {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--orange-dark);
+      background: var(--orange-light);
+      border: 1px solid rgba(240,115,0,0.2);
+      border-radius: 3px;
+      padding: 2px 9px;
+      letter-spacing: 0.2px;
+    }
+    .break  .topic-tag { color: var(--brown-light); background: var(--gray-light); border-color: var(--gray-border); }
+    .lunch  .topic-tag { color: var(--orange-dark); background: rgba(255,255,255,0.6); border-color: rgba(240,115,0,0.2); }
+    .debate .topic-tag { color: var(--brown);       background: rgba(255,255,255,0.7); border-color: rgba(69,54,40,0.15); }
+
+    /* ─── Section dividers ────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0 10px 86px;
+    }
+    .section-label span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--text-light);
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-border);
+    }
+
+    /* ─── Footer ──────────────────────────────────────────── */
+    .footer {
+      margin-top: 24px;
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px 28px;
+      border: 1px solid var(--gray-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-brand .orange-bar {
+      width: 3px; height: 24px;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+    .footer-brand .text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--brown);
+    }
+    .footer-brand .sub {
+      font-size: 10px;
+      color: var(--text-light);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+    .legend-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 620px) {
+      .header { padding: 28px 24px; }
+      .header h1 { font-size: 26px; }
+      .stats-bar { grid-template-columns: repeat(3,1fr); gap: 8px; }
+      .stat-card .number { font-size: 28px; }
+      .timeline::before { left: 52px; }
+      .time-col { width: 36px; }
+      .section-label { margin-left: 70px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <div class="header">
+    <div class="header-stripe"></div>
+
+    <div class="header-top">
+      <div>
+        <div class="header-tag">Jornada de trabajo · IA</div>
+        <h1>Inteligencia Artificial<br>en el Sector <em>Estancos</em></h1>
+        <p class="subtitle">Agenda completa para la sesión de trabajo del día</p>
+      </div>
+
+      <!-- Imperial Brands | Altadis logo real -->
+      <div class="brand-block">
+        <img
+          src="https://www.altadis.com/images/imperial-brands-logo.png"
+          alt="Imperial Brands · Altadis"
+          style="height:52px; width:auto; filter:brightness(0) invert(1);"
+        />
+        <div class="brand-session" style="margin-top:8px;">Jornada IA · 2026</div>
+      </div>
+    </div>
+
+    <div class="header-meta">
+      <div class="meta-chip"><div class="bullet"></div>Jornada completa — 1 día</div>
+      <div class="meta-chip"><div class="bullet"></div>09:00 – 18:00 h</div>
+      <div class="meta-chip"><div class="bullet"></div>6 bloques temáticos</div>
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="number">6</div>
+      <div class="label">Bloques temáticos</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">9h</div>
+      <div class="label">Duración total</div>
+    </div>
+    <div class="stat-card">
+      <div class="number">2</div>
+      <div class="label">Pausas + comida</div>
+    </div>
+  </div>
+
+  <!-- ── Timeline ── -->
+  <div class="timeline">
+
+    <!-- MAÑANA -->
+    <div class="section-label"><span>Mañana</span></div>
+
+    <!-- 09:00 Bienvenida -->
+    <div class="slot">
+      <div class="time-col"><span class="time">09:00</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Apertura</span>
+          <span class="duration-badge">15 min</span>
+        </div>
+        <h3>Bienvenida, presentaciones y objetivos del día</h3>
+        <p class="description">Introducción de los participantes, repaso de la agenda y definición de los objetivos que se esperan alcanzar durante la jornada.</p>
+      </div>
+    </div>
+
+    <!-- 09:15 Bloque 1 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">09:15</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 1</span>
+          <span class="duration-badge">75 min</span>
+        </div>
+        <h3>Impacto de la IA en el mundo de las empresas y de los estancos</h3>
+        <p class="description">Una panorámica del estado actual de la IA en el tejido empresarial: qué está cambiando, a qué velocidad, y cómo afecta específicamente al sector de los estancos.</p>
+        <div class="topics">
+          <span class="topic-tag">Tendencias globales</span>
+          <span class="topic-tag">Casos reales en retail</span>
+          <span class="topic-tag">Transformación del sector</span>
+          <span class="topic-tag">Retos y oportunidades</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10:30 Café -->
+    <div class="slot">
+      <div class="time-col"><span class="time">10:30</span></div>
+      <div class="dot-col"><div class="dot break"></div></div>
+      <div class="card break">
+        <div class="card-header">
+          <span class="block-label">Descanso</span>
+          <span class="duration-badge">15 min</span>
+        </div>
+        <h3>Pausa — Café</h3>
+        <p class="description">Networking informal y asimilación de los conceptos de la primera sesión.</p>
+      </div>
+    </div>
+
+    <!-- 10:45 Bloque 2 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">10:45</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 2</span>
+          <span class="duration-badge">75 min</span>
+        </div>
+        <h3>Mejoras que nos puede traer la IA a nuestra industria</h3>
+        <p class="description">Análisis concreto de las aplicaciones de IA más relevantes para el sector: automatización de procesos, gestión de inventario, atención al cliente, analítica de ventas y personalización.</p>
+        <div class="topics">
+          <span class="topic-tag">Automatización operativa</span>
+          <span class="topic-tag">Gestión de stock</span>
+          <span class="topic-tag">Analítica de ventas</span>
+          <span class="topic-tag">Experiencia de cliente</span>
+          <span class="topic-tag">Demos y herramientas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 12:00 Bloque 3 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">12:00</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 3</span>
+          <span class="duration-badge">60 min</span>
+        </div>
+        <h3>Futuro del empleo con la IA — Perspectiva actualizada</h3>
+        <p class="description">Este tema ya fue abordado anteriormente, pero los tiempos se han acelerado. Se revisará con datos actuales: qué roles evolucionan, cuáles desaparecen y qué nuevas oportunidades laborales genera la IA en el sector.</p>
+        <div class="topics">
+          <span class="topic-tag">Roles en transformación</span>
+          <span class="topic-tag">Nuevas profesiones</span>
+          <span class="topic-tag">Tiempos acelerados</span>
+          <span class="topic-tag">Impacto real hoy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEDIODÍA -->
+    <div class="section-label"><span>Mediodía</span></div>
+
+    <!-- 13:00 Comida -->
+    <div class="slot">
+      <div class="time-col"><span class="time">13:00</span></div>
+      <div class="dot-col"><div class="dot lunch"></div></div>
+      <div class="card lunch">
+        <div class="card-header">
+          <span class="block-label">Pausa</span>
+          <span class="duration-badge">90 min</span>
+        </div>
+        <h3>Comida de trabajo</h3>
+        <p class="description">Almuerzo compartido. Momento para continuar las conversaciones informales, consolidar relaciones y prepararse para la sesión de tarde.</p>
+      </div>
+    </div>
+
+    <!-- TARDE -->
+    <div class="section-label"><span>Tarde</span></div>
+
+    <!-- 14:30 Bloque 4 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">14:30</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 4</span>
+          <span class="duration-badge">60 min</span>
+        </div>
+        <h3>Formación necesaria para este contexto</h3>
+        <p class="description">¿Qué necesitan aprender los equipos y directivos para no quedarse atrás? Rutas de formación, habilidades clave y cómo diseñar un plan de upskilling realista para la organización.</p>
+        <div class="topics">
+          <span class="topic-tag">Habilidades esenciales</span>
+          <span class="topic-tag">Alfabetización en IA</span>
+          <span class="topic-tag">Formación de equipos</span>
+          <span class="topic-tag">Plan de upskilling</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15:30 Bloque 5 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">15:30</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 5</span>
+          <span class="duration-badge">60 min</span>
+        </div>
+        <h3>Errores más frecuentes al implementar la IA en empresas</h3>
+        <p class="description">Revisión de los fallos más comunes: expectativas poco realistas, falta de datos de calidad, resistencia interna y ausencia de estrategia clara.</p>
+        <div class="topics">
+          <span class="topic-tag">Errores estratégicos</span>
+          <span class="topic-tag">Gestión del cambio</span>
+          <span class="topic-tag">Calidad del dato</span>
+          <span class="topic-tag">Expectativas vs realidad</span>
+          <span class="topic-tag">Casos reales</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 16:30 Café tarde -->
+    <div class="slot">
+      <div class="time-col"><span class="time">16:30</span></div>
+      <div class="dot-col"><div class="dot break"></div></div>
+      <div class="card break">
+        <div class="card-header">
+          <span class="block-label">Descanso</span>
+          <span class="duration-badge">15 min</span>
+        </div>
+        <h3>Pausa — Café de tarde</h3>
+        <p class="description">Descanso antes del bloque final y el debate de cierre.</p>
+      </div>
+    </div>
+
+    <!-- 16:45 Bloque 6 -->
+    <div class="slot">
+      <div class="time-col"><span class="time">16:45</span></div>
+      <div class="dot-col"><div class="dot"></div></div>
+      <div class="card">
+        <div class="card-header">
+          <span class="block-label">Bloque 6</span>
+          <span class="duration-badge">60 min</span>
+        </div>
+        <h3>¿La ventaja competitiva futura estará en saber usar bien la IA?</h3>
+        <p class="description">Reflexión estratégica: ¿veremos en nuestra industria una brecha real entre las compañías que integren bien la IA y las que no? ¿Cuándo empieza a ser crítico actuar? ¿Qué posición queremos ocupar?</p>
+        <div class="topics">
+          <span class="topic-tag">Ventaja competitiva</span>
+          <span class="topic-tag">Diferenciación sectorial</span>
+          <span class="topic-tag">Urgencia estratégica</span>
+          <span class="topic-tag">Posicionamiento futuro</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CIERRE -->
+    <div class="section-label"><span>Cierre</span></div>
+
+    <!-- 17:45 Debate -->
+    <div class="slot">
+      <div class="time-col"><span class="time">17:45</span></div>
+      <div class="dot-col"><div class="dot debate"></div></div>
+      <div class="card debate">
+        <div class="card-header">
+          <span class="block-label">Mesa redonda</span>
+          <span class="duration-badge">15 min</span>
+        </div>
+        <h3>Debate abierto, conclusiones y próximos pasos</h3>
+        <p class="description">Espacio para preguntas, reflexiones finales y definición de acciones concretas a llevar de vuelta a la organización.</p>
+        <div class="topics">
+          <span class="topic-tag">Preguntas abiertas</span>
+          <span class="topic-tag">Conclusiones del día</span>
+          <span class="topic-tag">Próximos pasos</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 18:00 Cierre -->
+    <div class="slot">
+      <div class="time-col"><span class="time">18:00</span></div>
+      <div class="dot-col"><div class="dot close"></div></div>
+      <div class="card close">
+        <div class="card-header">
+          <span class="block-label">Fin</span>
+          <span class="duration-badge">—</span>
+        </div>
+        <h3>Cierre de la jornada</h3>
+        <p class="description">Fin oficial de la visita. Agradecimientos y despedida.</p>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="footer-brand">
+      <div class="orange-bar"></div>
+      <div>
+        <div class="text">Imperial Brands · Altadis</div>
+        <div class="sub">Jornada IA · Marzo 2026</div>
+      </div>
+    </div>
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#F07300"></div>Bloque temático
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#7A6552"></div>Descanso
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#C45E00"></div>Comida
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#453628"></div>Mesa redonda / Cierre
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
