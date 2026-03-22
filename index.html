@@ -3,541 +3,554 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>csilvasantin — Hub publico</title>
+  <title>Admira Next | Portal principal</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
     :root {
-      --bg: #07111b;
-      --surface: rgba(12, 23, 37, 0.82);
-      --surface-strong: #0d1b2a;
-      --border: rgba(117, 138, 167, 0.22);
-      --text: #eef4ff;
-      --muted: #93a5be;
-      --accent: #5eead4;
-      --accent-2: #f59e0b;
-      --accent-3: #60a5fa;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.32);
+      --bg: #f6efe4;
+      --bg-strong: #efe2cc;
+      --surface: rgba(255, 250, 241, 0.82);
+      --surface-strong: #fffaf1;
+      --ink: #1e1f1f;
+      --muted: #60594f;
+      --line: rgba(65, 54, 37, 0.14);
+      --teal: #167c80;
+      --red: #af3c2d;
+      --gold: #c2862f;
+      --blue: #2f5d96;
+      --shadow: 0 22px 60px rgba(93, 66, 21, 0.14);
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
+      color: var(--ink);
       font-family: 'Space Grotesk', sans-serif;
-      color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(94, 234, 212, 0.14), transparent 26%),
-        radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.12), transparent 24%),
-        linear-gradient(180deg, #050b12 0%, var(--bg) 100%);
+        radial-gradient(circle at top left, rgba(22, 124, 128, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(175, 60, 45, 0.10), transparent 30%),
+        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
       min-height: 100vh;
     }
 
     a { color: inherit; }
 
-    .grid-bg {
+    .texture {
       position: fixed;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(117, 138, 167, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(117, 138, 167, 0.08) 1px, transparent 1px);
-      background-size: 52px 52px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
       pointer-events: none;
+      background-image:
+        linear-gradient(rgba(65, 54, 37, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 54, 37, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
     }
 
     .wrap {
       position: relative;
       z-index: 1;
-      max-width: 1120px;
+      width: min(1180px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 28px 20px 72px;
+      padding: 24px 0 72px;
     }
 
     .hero,
     .panel,
     .project-card,
-    .timeline-item {
+    .route-card,
+    .output-card {
       background: var(--surface);
-      border: 1px solid var(--border);
+      border: 1px solid var(--line);
+      border-radius: 28px;
       box-shadow: var(--shadow);
-      backdrop-filter: blur(18px);
+      backdrop-filter: blur(14px);
     }
 
     .hero {
-      border-radius: 28px;
-      padding: 32px;
       overflow: hidden;
+      padding: 28px;
     }
 
     .eyebrow,
-    .meta-pill,
-    .tag,
-    .timeline-date {
+    .micro,
+    .pill,
+    .route-step,
+    .project-meta,
+    .output-type {
       font-family: 'JetBrains Mono', monospace;
     }
 
     .eyebrow {
       margin: 0 0 14px;
+      color: var(--teal);
       font-size: 0.82rem;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--accent);
     }
 
-    h1,
-    h2,
-    h3 { margin: 0; }
+    h1, h2, h3, p { margin: 0; }
 
     h1 {
-      max-width: 12ch;
-      font-size: clamp(2.8rem, 7vw, 5.8rem);
-      line-height: 0.94;
+      max-width: 10ch;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.02;
     }
 
     .lead {
-      max-width: 60ch;
-      margin: 18px 0 0;
-      font-size: 1.08rem;
-      line-height: 1.75;
+      max-width: 62ch;
+      margin-top: 18px;
       color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .hero-grid,
+    .two-col,
+    .tri-col,
+    .project-grid,
+    .output-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: end;
     }
 
     .hero-actions,
-    .meta,
-    .tags {
+    .hero-pills,
+    .card-links,
+    .project-tags {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
     }
 
-    .hero-actions {
-      margin-top: 28px;
-    }
+    .hero-actions { margin-top: 26px; }
+    .hero-pills { margin-top: 24px; }
 
     .button,
-    .link-button {
+    .button-ghost {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      border-radius: 999px;
       padding: 12px 18px;
+      border-radius: 999px;
       text-decoration: none;
       font-weight: 700;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
     .button {
-      background: linear-gradient(135deg, var(--accent), #2dd4bf);
-      color: #06252a;
-      box-shadow: 0 16px 40px rgba(45, 212, 191, 0.25);
+      color: #fff8eb;
+      background: linear-gradient(135deg, var(--red), #d75d3f);
+      box-shadow: 0 16px 34px rgba(175, 60, 45, 0.22);
     }
 
-    .link-button {
-      border: 1px solid rgba(238, 244, 255, 0.15);
-      background: rgba(255, 255, 255, 0.02);
-      color: var(--text);
+    .button-ghost {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.34);
+      color: var(--ink);
     }
 
     .button:hover,
-    .link-button:hover { transform: translateY(-2px); }
-
-    .meta {
-      margin-top: 26px;
+    .button-ghost:hover {
+      transform: translateY(-2px);
     }
 
-    .meta-pill,
-    .tag {
-      border-radius: 999px;
+    .pill {
       padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(22, 124, 128, 0.10);
+      border: 1px solid rgba(22, 124, 128, 0.16);
+      color: var(--teal);
       font-size: 0.78rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .meta-pill {
-      color: var(--accent);
-      background: rgba(94, 234, 212, 0.08);
-    }
-
-    .sections {
+    .dashboard-mark {
+      min-height: 100%;
+      border-radius: 22px;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(194, 134, 47, 0.18), rgba(22, 124, 128, 0.14)),
+        var(--bg-strong);
       display: grid;
-      gap: 22px;
-      margin-top: 22px;
+      align-content: space-between;
+      gap: 18px;
     }
 
-    .two-col {
-      display: grid;
-      gap: 22px;
-      grid-template-columns: 1.1fr 0.9fr;
+    .dashboard-mark strong {
+      display: block;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      line-height: 1;
     }
+
+    .dashboard-mark p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .sections { margin-top: 20px; }
+
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .tri-col { grid-template-columns: repeat(3, 1fr); }
 
     .panel {
-      border-radius: 24px;
-      padding: 26px;
+      padding: 24px;
     }
 
-    .panel p,
-    .project-card p,
-    .timeline-item p,
-    li {
+    .panel-copy {
+      margin-top: 14px;
       color: var(--muted);
       line-height: 1.7;
     }
 
+    .route-card {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 22px;
+    }
+
+    .route-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      font-size: 0.9rem;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+
+    .route-card p {
+      color: var(--muted);
+      line-height: 1.65;
+      margin-top: 10px;
+    }
+
     .project-grid {
-      display: grid;
-      gap: 18px;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       margin-top: 18px;
     }
 
     .project-card {
-      display: block;
+      display: grid;
+      gap: 14px;
       text-decoration: none;
-      border-radius: 20px;
       padding: 22px;
+      min-height: 260px;
       position: relative;
       overflow: hidden;
-      min-height: 220px;
     }
 
     .project-card::before {
-      content: '';
+      content: "";
       position: absolute;
       inset: 0 auto auto 0;
       width: 100%;
-      height: 4px;
-      background: var(--card-accent, var(--accent));
+      height: 5px;
+      background: var(--accent, var(--teal));
     }
 
     .project-card:hover {
       transform: translateY(-3px);
-      border-color: rgba(255, 255, 255, 0.16);
+      border-color: rgba(65, 54, 37, 0.22);
     }
 
-    .project-card h3 {
-      margin-top: 18px;
-      font-size: 1.25rem;
-    }
-
-    .project-card p {
-      margin: 12px 0 16px;
-    }
-
-    .tag {
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text);
-    }
-
-    .tag.public { color: var(--accent); }
-    .tag.private { color: var(--accent-2); }
-    .tag.docs { color: var(--accent-3); }
-
-    .timeline {
-      display: grid;
-      gap: 14px;
-      margin-top: 18px;
-    }
-
-    .timeline-item {
-      border-radius: 18px;
-      padding: 18px 20px;
-    }
-
-    .timeline-date {
+    .project-meta {
+      color: var(--accent, var(--teal));
       font-size: 0.78rem;
-      color: var(--accent);
       text-transform: uppercase;
       letter-spacing: 0.08em;
     }
 
-    .timeline-item h3 {
-      margin-top: 8px;
-      font-size: 1.08rem;
+    .project-card p {
+      color: var(--muted);
+      line-height: 1.65;
     }
 
-    .private-shell {
-      display: grid;
-      gap: 18px;
+    .project-tags span {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.46);
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+
+    .card-links a,
+    .output-links a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .output-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       margin-top: 18px;
     }
 
-    .login-box {
-      border: 1px solid rgba(245, 158, 11, 0.2);
-      background: rgba(245, 158, 11, 0.05);
+    .output-card {
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .output-type {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .output-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .warning {
+      margin-top: 18px;
+      padding: 16px 18px;
       border-radius: 18px;
-      padding: 18px;
-    }
-
-    .login-form {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .login-form input {
-      flex: 1 1 220px;
-      min-width: 0;
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      background: rgba(7, 17, 27, 0.72);
-      color: var(--text);
-      font: inherit;
-      outline: none;
-    }
-
-    .login-form input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 4px rgba(94, 234, 212, 0.12);
-    }
-
-    .login-form button {
-      border: 0;
-      cursor: pointer;
-    }
-
-    .error-msg {
-      display: none;
-      margin-top: 10px;
-      color: #fca5a5;
-    }
-
-    .error-msg.visible { display: block; }
-
-    #private-projects {
-      display: none;
-    }
-
-    #private-projects.visible {
-      display: block;
-      animation: fade-up 0.45s ease;
-    }
-
-    @keyframes fade-up {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+      border: 1px solid rgba(175, 60, 45, 0.18);
+      background: rgba(175, 60, 45, 0.06);
+      color: #6f2a22;
+      line-height: 1.65;
     }
 
     .footer {
-      margin-top: 28px;
+      margin-top: 26px;
       text-align: center;
       color: var(--muted);
-      font-size: 0.92rem;
+      font-size: 0.94rem;
     }
 
-    @media (max-width: 840px) {
-      .two-col { grid-template-columns: 1fr; }
-      .hero { padding: 26px; }
-      .panel { padding: 22px; }
+    @media (max-width: 940px) {
+      .hero-grid,
+      .two-col,
+      .tri-col {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
+  <div class="texture"></div>
   <main class="wrap">
     <section class="hero">
-      <p class="eyebrow">GitHub Public Hub</p>
-      <h1>Trabajo centralizado y visible en GitHub</h1>
-      <p class="lead">
-        Esta web es la portada publica de <strong>csilvasantin</strong>. A partir de aqui
-        queda registrado el trabajo activo, la base tecnica de acceso por GitHub y el
-        inventario de proyectos que estamos manteniendo en abierto.
-      </p>
-      <div class="hero-actions">
-        <a class="button" href="./registro/">Abrir registro publico</a>
-        <a class="link-button" href="https://github.com/csilvasantin" target="_blank" rel="noreferrer">Perfil GitHub</a>
-        <a class="link-button" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Repo GitHub Pages</a>
-      </div>
-      <div class="meta">
-        <span class="meta-pill">Actualizado: 19 marzo 2026</span>
-        <span class="meta-pill">SSH activo</span>
-        <span class="meta-pill">HTTPS activo con gh</span>
-        <span class="meta-pill">Fuente publica central</span>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Portal principal</p>
+          <h1>Vision global de todo lo que se esta haciendo</h1>
+          <p class="lead">
+            Esta portada pasa a ser el primer nivel del estudio. Desde aqui se ve el mapa de
+            proyectos, el flujo comun de trabajo y las salidas HTML publicas que permiten
+            comprobar si el sistema se esta ejecutando como toca.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/csilvasantin" target="_blank" rel="noreferrer">Abrir GitHub</a>
+            <a class="button-ghost" href="https://github.com/csilvasantin/onboarding" target="_blank" rel="noreferrer">Abrir onboarding</a>
+            <a class="button-ghost" href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer">Abrir EmpezarTrabajo</a>
+          </div>
+          <div class="hero-pills">
+            <span class="pill">1 2 3 comun en todos los repos</span>
+            <span class="pill">Cierre en HTML + URL publica</span>
+            <span class="pill">GitHub Pages como capa visible</span>
+          </div>
+        </div>
+        <aside class="dashboard-mark">
+          <div>
+            <p class="eyebrow">Estado del sistema</p>
+            <strong>Onboarding primero. Trabajo despues.</strong>
+          </div>
+          <p>
+            El portal no sustituye al contexto maestro. La regla sigue siendo: abrir
+            <strong>onboarding</strong>, hacer onboarding y despues entrar en el repo activo.
+          </p>
+        </aside>
       </div>
     </section>
 
-    <section class="sections">
-      <div class="two-col">
-        <section class="panel">
-          <p class="eyebrow">Registro central</p>
-          <h2>Que queda aqui registrado</h2>
-          <p>
-            Todo lo que construyamos debe tener una referencia publica en GitHub: repositorio,
-            estado, enlace operativo y una nota corta de contexto. El punto de entrada es
-            <a href="./registro/">/registro/</a>, donde iremos dejando la traza publica.
-          </p>
-          <ul>
-            <li>Repositorio fuente y enlace publico.</li>
-            <li>Estado del proyecto y proximo paso visible.</li>
-            <li>Entrada cronologica cuando abrimos una nueva linea de trabajo.</li>
-          </ul>
-        </section>
-
-        <section class="panel">
-          <p class="eyebrow">Acceso GitHub</p>
-          <h2>Doble carril: SSH y HTTPS</h2>
-          <p>
-            El equipo ya puede trabajar por <strong>SSH</strong> para operar repositorios con claves,
-            y por <strong>HTTPS</strong> con autenticacion gestionada por <code>gh</code>. Asi podemos
-            elegir el flujo mas conveniente sin perder trazabilidad.
-          </p>
-          <div class="tags" style="margin-top:16px;">
-            <span class="tag public">SSH verificado</span>
-            <span class="tag docs">HTTPS con GitHub CLI</span>
-            <span class="tag">Git identity lista</span>
-          </div>
-        </section>
-      </div>
+    <section class="sections two-col">
+      <section class="panel">
+        <p class="eyebrow">1 2 3 basico</p>
+        <h2>La secuencia que manda sobre todo lo demas</h2>
+        <div class="tri-col" style="margin-top:18px;">
+          <article class="route-card">
+            <div class="route-step">1</div>
+            <h3>Abrir y actualizar onboarding</h3>
+            <p>
+              El punto de entrada sigue siendo <strong>onboarding</strong>. Si algo no esta
+              claro, se vuelve ahi antes de improvisar.
+            </p>
+          </article>
+          <article class="route-card">
+            <div class="route-step">2</div>
+            <h3>Hacer onboarding y entrar en el repo correcto</h3>
+            <p>
+              La sesion no arranca desde cero. Primero se absorbe el contexto compartido y
+              despues se toca solo el proyecto implicado.
+            </p>
+          </article>
+          <article class="route-card">
+            <div class="route-step">3</div>
+            <h3>Cerrar con HTML y URL publica</h3>
+            <p>
+              Todo trabajo relevante debe acabar con una salida HTML visible y una URL publica
+              comprobable para verificar el resultado.
+            </p>
+          </article>
+        </div>
+      </section>
 
       <section class="panel">
-        <p class="eyebrow">Portafolio activo</p>
-        <h2>Entradas publicas destacadas</h2>
+        <p class="eyebrow">Puertas maestras</p>
+        <h2>Que abre el sistema desde arriba</h2>
+        <p class="panel-copy">
+          El estudio se organiza con dos puertas principales: una para contexto y otra para
+          ejecucion. Este portal queda por encima como mapa general.
+        </p>
         <div class="project-grid">
-          <a class="project-card" href="./registro/" style="--card-accent:#5eead4;">
-            <span class="tag public">Publico</span>
-            <h3>Registro</h3>
-            <p>Libro mayor publico para centralizar proyectos, decisiones de acceso y estado operativo.</p>
-            <div class="tags">
-              <span class="tag docs">Hub</span>
-              <span class="tag">Ops</span>
+          <a class="project-card" href="https://github.com/csilvasantin/onboarding" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+            <span class="project-meta">Contexto maestro</span>
+            <h3>onboarding</h3>
+            <p>Reglas comunes, estado actual, sesion de arranque y prioridad 1 2 3 para todas las IAs y maquinas.</p>
+            <div class="project-tags">
+              <span>Repo</span>
+              <span>Guia</span>
+              <span>Primero</span>
             </div>
           </a>
-
-          <a class="project-card" href="./agentic-team/" style="--card-accent:#60a5fa;">
-            <span class="tag public">Publico</span>
-            <h3>Agentic Team</h3>
-            <p>Arquitectura base para coordinar un equipo distribuido de agentes entre varios ordenadores.</p>
-            <div class="tags">
-              <span class="tag docs">Docs</span>
-              <span class="tag">Agents</span>
-            </div>
-          </a>
-
-          <a class="project-card" href="./agentic-team/executive-agents.html" style="--card-accent:#34d399;">
-            <span class="tag public">Publico</span>
-            <h3>Executive Agents</h3>
-            <p>Implementacion concreta de un equipo ejecutivo con CEO orquestador, CTO y CMO trabajando sobre el mismo objetivo.</p>
-            <div class="tags">
-              <span class="tag docs">Playbook</span>
-              <span class="tag">Strategy</span>
-            </div>
-          </a>
-
-          <a class="project-card" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer" style="--card-accent:#f59e0b;">
-            <span class="tag public">Publico</span>
-            <h3>GitHub Pages</h3>
-            <p>Repositorio central del sitio publico donde queda reflejado el trabajo y sus accesos.</p>
-            <div class="tags">
-              <span class="tag">Repo</span>
-              <span class="tag">Pages</span>
+          <a class="project-card" href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer" style="--accent:#af3c2d;">
+            <span class="project-meta">Arranque operativo</span>
+            <h3>EmpezarTrabajo</h3>
+            <p>Script de inicio de sesion, sincronizacion de repos y recordatorio de que todo pasa por onboarding antes de trabajar.</p>
+            <div class="project-tags">
+              <span>Repo</span>
+              <span>Inicio</span>
+              <span>Ops</span>
             </div>
           </a>
         </div>
       </section>
+    </section>
 
-      <div class="two-col">
-        <section class="panel">
-          <p class="eyebrow">Bitacora</p>
-          <h2>Movimientos recientes</h2>
-          <div class="timeline">
-            <article class="timeline-item">
-              <div class="timeline-date">20 marzo 2026</div>
-              <h3>Executive Agents publicado</h3>
-              <p>Se incorpora a la web publica la documentacion del flujo CEO, CMO y CTO con una pagina dedicada dentro de Agentic Team.</p>
-            </article>
-            <article class="timeline-item">
-              <div class="timeline-date">19 marzo 2026</div>
-              <h3>Base GitHub operativa</h3>
-              <p>Quedaron verificados GitHub CLI, autenticacion HTTPS, acceso SSH y la identidad global de Git para este ordenador.</p>
-            </article>
-            <article class="timeline-item">
-              <div class="timeline-date">19 marzo 2026</div>
-              <h3>Hub publico preparado</h3>
-              <p>La portada se convierte en acceso publico y el registro pasa a ser la referencia central para documentar el trabajo nuevo.</p>
-            </article>
+    <section class="panel" style="margin-top:18px;">
+      <p class="eyebrow">Mapa de proyectos</p>
+      <h2>Repos activos y para que sirve cada uno</h2>
+      <div class="project-grid">
+        <a class="project-card" href="https://github.com/csilvasantin/game-platform" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+          <span class="project-meta">Plataforma</span>
+          <h3>game-platform</h3>
+          <p>Base multi-cliente para el juego generico y la variante Altadis Xtancos sin duplicar arquitectura.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/game-platform" target="_blank" rel="noreferrer">Repositorio</a>
           </div>
-        </section>
+        </a>
 
-        <section class="panel">
-          <p class="eyebrow">Zona privada</p>
-          <h2>Workspace protegido</h2>
-          <p>
-            El panel privado sigue disponible para contenido interno o en progreso. Al desbloquearlo
-            se mantiene la sesion para navegar por las secciones protegidas existentes.
-          </p>
-          <div class="private-shell">
-            <div class="login-box">
-              <strong>Entrar al workspace privado</strong>
-              <form id="login-form" class="login-form" autocomplete="off">
-                <input type="password" id="password" placeholder="Contrasena">
-                <button class="button" type="submit">Desbloquear</button>
-              </form>
-              <div class="error-msg" id="error-msg">Contrasena incorrecta.</div>
-            </div>
-
-            <div id="private-projects">
-              <div class="project-grid">
-                <a class="project-card" href="./yarig-ai/" style="--card-accent:#56d4ff;">
-                  <span class="tag private">Privado</span>
-                  <h3>Yarig.ai</h3>
-                  <p>Cuaderno operativo del equipo de agentes con seguimiento diario, roles y decisiones internas.</p>
-                  <div class="tags">
-                    <span class="tag">Journal</span>
-                    <span class="tag">Ops</span>
-                  </div>
-                </a>
-
-                <a class="project-card" href="https://github.com/csilvasantin/AenaJones" target="_blank" rel="noreferrer" style="--card-accent:#fb923c;">
-                  <span class="tag public">Publico</span>
-                  <h3>AenaJones</h3>
-                  <p>Aventura interactiva ambientada en el universo AENA con enfoque narrativo y web.</p>
-                  <div class="tags">
-                    <span class="tag">JavaScript</span>
-                    <span class="tag">HTML</span>
-                  </div>
-                </a>
-              </div>
-            </div>
+        <a class="project-card" href="https://github.com/csilvasantin/diario" target="_blank" rel="noreferrer" style="--accent:#c2862f;">
+          <span class="project-meta">Memoria longitudinal</span>
+          <h3>diario</h3>
+          <p>Registro cronologico del trabajo con IA. Es la referencia principal para comprobar avances publicados en HTML.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/diario" target="_blank" rel="noreferrer">Repositorio</a>
+            <a href="https://csilvasantin.github.io/diario/" target="_blank" rel="noreferrer">HTML publica</a>
           </div>
-        </section>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/ClaudeBot" target="_blank" rel="noreferrer" style="--accent:#2f5d96;">
+          <span class="project-meta">Automatizacion</span>
+          <h3>ClaudeBot</h3>
+          <p>Bot para vigilar Claude Desktop y resolver continuaciones repetitivas en Windows y macOS.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/ClaudeBot" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/CodexBot" target="_blank" rel="noreferrer" style="--accent:#af3c2d;">
+          <span class="project-meta">Automatizacion</span>
+          <h3>CodexBot</h3>
+          <p>Bot de apoyo para reducir aprobaciones manuales y dar continuidad operativa al trabajo con Codex.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/CodexBot" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/xtanco-game" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+          <span class="project-meta">Producto visible</span>
+          <h3>xtanco-game</h3>
+          <p>Digital twin jugable en HTML5 Canvas con deploy simple y una URL publica ya lista para revisar.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/xtanco-game" target="_blank" rel="noreferrer">Repositorio</a>
+            <a href="https://csilvasantin.github.io/xtanco-game/" target="_blank" rel="noreferrer">HTML publica</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer" style="--accent:#c2862f;">
+          <span class="project-meta">Capa publica</span>
+          <h3>csilvasantin.github.io</h3>
+          <p>Portal de primer nivel donde se ve el mapa general, se concentran entradas publicas y se hace visible el estado del estudio.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
       </div>
     </section>
 
-    <p class="footer">csilvasantin.github.io funciona ahora como punto publico de referencia para el trabajo en GitHub.</p>
+    <section class="panel" style="margin-top:18px;">
+      <p class="eyebrow">HTML publicas</p>
+      <h2>Salidas visibles para comprobar que las cosas se estan haciendo bien</h2>
+      <div class="output-grid">
+        <article class="output-card">
+          <span class="output-type">Seguimiento</span>
+          <h3>diario</h3>
+          <p>Publica las novedades del trabajo en formato HTML y sirve como verificacion principal del cierre de una sesion.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/diario/" target="_blank" rel="noreferrer">Abrir diario</a>
+          </div>
+        </article>
+
+        <article class="output-card">
+          <span class="output-type">Producto</span>
+          <h3>xtanco-game</h3>
+          <p>Salida publica interactiva del juego digital twin para comprobar estado y direccion del producto.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/xtanco-game/" target="_blank" rel="noreferrer">Abrir xtanco-game</a>
+          </div>
+        </article>
+
+        <article class="output-card">
+          <span class="output-type">Portal</span>
+          <h3>Esta portada</h3>
+          <p>El primer nivel del dominio queda reservado para la vision global del estudio y el acceso rapido a los proyectos.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/" target="_blank" rel="noreferrer">Abrir portal principal</a>
+          </div>
+        </article>
+      </div>
+      <div class="warning">
+        Si una salida publica usa la clave <strong>Nomeacuerd0</strong>, se considera solo una
+        barrera ligera de conveniencia. No debe tratarse como proteccion real para informacion sensible.
+      </div>
+    </section>
+
+    <p class="footer">
+      Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
+    </p>
   </main>
-
-  <script>
-    const HASH = '09418087246c5efc32d92ed30f678fd02c0a4ade7dde8f2376da130991827a15';
-
-    async function sha256(str) {
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-      return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    async function unlockWorkspace(password) {
-      const hash = await sha256(password);
-      if (hash !== HASH) {
-        document.getElementById('error-msg').classList.add('visible');
-        return;
-      }
-
-      sessionStorage.setItem('auth', '1');
-      document.getElementById('error-msg').classList.remove('visible');
-      document.getElementById('private-projects').classList.add('visible');
-      document.getElementById('password').value = '';
-    }
-
-    document.getElementById('login-form').addEventListener('submit', async (event) => {
-      event.preventDefault();
-      await unlockWorkspace(document.getElementById('password').value);
-    });
-
-    if (sessionStorage.getItem('auth') === '1') {
-      document.getElementById('private-projects').classList.add('visible');
-    }
-  </script>
 </body>
 </html>
