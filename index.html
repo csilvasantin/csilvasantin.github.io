@@ -463,19 +463,19 @@
   <div id="lock-screen">
     <section class="lock-shell" aria-labelledby="lock-title">
       <p class="eyebrow">Acceso protegido</p>
-      <h1 id="lock-title" class="lock-title">Portal principal con clave</h1>
+      <h1 id="lock-title" class="lock-title">Portal principal restringido</h1>
       <p class="lock-copy">
-        La home raiz de <strong>csilvasantin.github.io</strong> queda cerrada con una contrasena
+        La home raiz de <strong>csilvasantin.github.io</strong> queda cerrada con una barrera
         ligera de acceso. Esto no sustituye una proteccion de servidor, pero evita que la portada
-        quede abierta sin filtro.
+        quede abierta sin filtro casual.
       </p>
       <div class="lock-grid">
         <article class="lock-panel">
           <span class="project-meta">Proteccion minima</span>
-          <strong>Clave de conveniencia</strong>
+          <strong>Acceso por validacion local</strong>
           <p>
-            La clave actual es <strong>Nomeacuerd0</strong>. Se guarda una sesion local en el navegador
-            para no pedirla en cada visita.
+            Si el acceso es correcto, el navegador guarda una sesion local para no pedir validacion
+            en cada visita desde este dispositivo.
           </p>
         </article>
         <article class="lock-panel">
@@ -488,10 +488,10 @@
         </article>
       </div>
       <form class="lock-form" id="lock-form">
-        <input id="lock-input" type="password" placeholder="Introduce la contrasena" autocomplete="current-password" />
+        <input id="lock-input" type="password" placeholder="Introduce el acceso" autocomplete="current-password" />
         <button class="button" type="submit">Entrar</button>
       </form>
-      <div id="lock-error" class="lock-error">La contrasena no es correcta.</div>
+      <div id="lock-error" class="lock-error">El acceso no es correcto.</div>
     </section>
   </div>
   <div class="texture"></div>
@@ -688,8 +688,8 @@
         </article>
       </div>
       <div class="warning">
-        Si una salida publica usa la clave <strong>Nomeacuerd0</strong>, se considera solo una
-        barrera ligera de conveniencia. No debe tratarse como proteccion real para informacion sensible.
+        Cualquier cierre ligero de acceso en estas paginas debe considerarse una barrera de
+        conveniencia. No debe tratarse como proteccion real para informacion sensible.
       </div>
     </section>
 
@@ -699,12 +699,20 @@
   </main>
   <script>
     const LOCK_STORAGE_KEY = "csilvasantin-home-unlocked";
-    const PASSWORD = "Nomeacuerd0";
+    const PASSWORD_HASH = "09418087246c5efc32d92ed30f678fd02c0a4ade7dde8f2376da130991827a15";
 
     const lockScreen = document.getElementById("lock-screen");
     const lockForm = document.getElementById("lock-form");
     const lockInput = document.getElementById("lock-input");
     const lockError = document.getElementById("lock-error");
+
+    async function sha256(value) {
+      const data = new TextEncoder().encode(value);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hashBuffer))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
 
     function unlockHome() {
       localStorage.setItem(LOCK_STORAGE_KEY, "1");
@@ -715,9 +723,10 @@
       unlockHome();
     }
 
-    lockForm.addEventListener("submit", (event) => {
+    lockForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (lockInput.value === PASSWORD) {
+      const candidateHash = await sha256(lockInput.value);
+      if (candidateHash === PASSWORD_HASH) {
         lockError.classList.remove("visible");
         unlockHome();
         return;
