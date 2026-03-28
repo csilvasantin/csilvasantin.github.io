@@ -48,6 +48,116 @@
       mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
     }
 
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top left, rgba(22, 124, 128, 0.18), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(175, 60, 45, 0.16), transparent 24%),
+        linear-gradient(180deg, rgba(250, 244, 233, 0.98) 0%, rgba(244, 235, 220, 0.98) 100%);
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    #lock-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-shell {
+      width: min(760px, 100%);
+      padding: 28px;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 241, 0.96);
+      box-shadow: 0 28px 80px rgba(93, 66, 21, 0.18);
+      backdrop-filter: blur(16px);
+    }
+
+    .lock-title {
+      max-width: 12ch;
+      font-size: clamp(2.2rem, 6vw, 4.4rem);
+      line-height: 0.94;
+      letter-spacing: -0.04em;
+    }
+
+    .lock-copy {
+      max-width: 56ch;
+      margin-top: 16px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .lock-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .lock-panel {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .lock-panel strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.08rem;
+    }
+
+    .lock-panel p {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .lock-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .lock-form input {
+      flex: 1 1 240px;
+      min-width: 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(65, 54, 37, 0.18);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    .lock-form input:focus {
+      border-color: rgba(22, 124, 128, 0.42);
+      box-shadow: 0 0 0 4px rgba(22, 124, 128, 0.12);
+    }
+
+    .lock-error {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(175, 60, 45, 0.18);
+      background: rgba(175, 60, 45, 0.06);
+      color: #6f2a22;
+      line-height: 1.6;
+    }
+
+    .lock-error.visible {
+      display: block;
+    }
+
     .wrap {
       position: relative;
       z-index: 1;
@@ -342,13 +452,48 @@
     @media (max-width: 940px) {
       .hero-grid,
       .two-col,
-      .tri-col {
+      .tri-col,
+      .lock-grid {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
+  <div id="lock-screen">
+    <section class="lock-shell" aria-labelledby="lock-title">
+      <p class="eyebrow">Acceso protegido</p>
+      <h1 id="lock-title" class="lock-title">Portal principal con clave</h1>
+      <p class="lock-copy">
+        La home raiz de <strong>csilvasantin.github.io</strong> queda cerrada con una contrasena
+        ligera de acceso. Esto no sustituye una proteccion de servidor, pero evita que la portada
+        quede abierta sin filtro.
+      </p>
+      <div class="lock-grid">
+        <article class="lock-panel">
+          <span class="project-meta">Proteccion minima</span>
+          <strong>Clave de conveniencia</strong>
+          <p>
+            La clave actual es <strong>Nomeacuerd0</strong>. Se guarda una sesion local en el navegador
+            para no pedirla en cada visita.
+          </p>
+        </article>
+        <article class="lock-panel">
+          <span class="project-meta">Nivel real</span>
+          <strong>Barrera ligera</strong>
+          <p>
+            Esta capa es solo front-end. Sirve para cerrar el acceso casual, no para proteger
+            informacion sensible.
+          </p>
+        </article>
+      </div>
+      <form class="lock-form" id="lock-form">
+        <input id="lock-input" type="password" placeholder="Introduce la contrasena" autocomplete="current-password" />
+        <button class="button" type="submit">Entrar</button>
+      </form>
+      <div id="lock-error" class="lock-error">La contrasena no es correcta.</div>
+    </section>
+  </div>
   <div class="texture"></div>
   <main class="wrap">
     <section class="hero">
@@ -552,5 +697,35 @@
       Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
     </p>
   </main>
+  <script>
+    const LOCK_STORAGE_KEY = "csilvasantin-home-unlocked";
+    const PASSWORD = "Nomeacuerd0";
+
+    const lockScreen = document.getElementById("lock-screen");
+    const lockForm = document.getElementById("lock-form");
+    const lockInput = document.getElementById("lock-input");
+    const lockError = document.getElementById("lock-error");
+
+    function unlockHome() {
+      localStorage.setItem(LOCK_STORAGE_KEY, "1");
+      lockScreen.classList.add("hidden");
+    }
+
+    if (localStorage.getItem(LOCK_STORAGE_KEY) === "1") {
+      unlockHome();
+    }
+
+    lockForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (lockInput.value === PASSWORD) {
+        lockError.classList.remove("visible");
+        unlockHome();
+        return;
+      }
+
+      lockError.classList.add("visible");
+      lockInput.select();
+    });
+  </script>
 </body>
 </html>
