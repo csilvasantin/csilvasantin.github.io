@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pulpo — Boardroom Arcade</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="sky" aria-hidden="true">
+      <span class="cloud cloud-left"></span>
+      <span class="cloud cloud-right"></span>
+      <span class="coin coin-left"></span>
+      <span class="coin coin-right"></span>
+      <span class="block block-left">?</span>
+      <span class="block block-right">?</span>
+    </div>
+
+    <main class="page-shell">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <img class="hero-logo" src="./assets/logo-pulpo-admira.svg" alt="Logo de Pulpo mezclando la nube verde de Admira con un pulpo" />
+          <p class="eyebrow">Boardroom Arcade</p>
+          <h1>Pulpo</h1>
+          <p class="hero-text">
+            Una startup donde humanos e IAs se coordinan como si fueran un equipo de videojuego.
+            Ocho asientos, una mesa central y un cerebro compartido para repartir trabajo complejo
+            entre especialistas.
+          </p>
+          <div class="hero-tags">
+            <span>CEO</span>
+            <span>CTO</span>
+            <span>CMO</span>
+            <span>Agents</span>
+          </div>
+        </div>
+
+        <div class="hud-panel">
+          <article class="hud-card">
+            <span>Modo</span>
+            <strong>Live</strong>
+          </article>
+          <article class="hud-card">
+            <span>Asientos</span>
+            <strong>8</strong>
+          </article>
+          <article class="hud-card">
+            <span>Estado</span>
+            <strong>Fase 0</strong>
+          </article>
+          <article class="hud-card">
+            <span>Objetivo</span>
+            <strong>MVP</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="boardroom-panel">
+        <div class="stage-topline">
+          <div>
+            <p class="eyebrow">Sala de reuniones</p>
+            <h2>Ocho puestos en una mesa viva</h2>
+          </div>
+          <div class="stage-badges">
+            <span>3 izquierda</span>
+            <span>3 derecha</span>
+            <span>2 cabeceras</span>
+          </div>
+        </div>
+
+        <div class="boardroom-stage">
+          <article class="seat head seat-ceo">
+            <span class="seat-role">CABECERA 01 · admira-mac-dg</span>
+            <strong>MacBook Air 16 (DG)</strong>
+            <p>Direccion general. Nodo de cabecera para vision, foco y decisiones estrategicas.</p>
+          </article>
+
+          <div class="column left-column">
+            <article class="seat seat-cto">
+              <span class="seat-role">IZQ 01 · admira-mac-01</span>
+              <strong>MacBook Air Luna (Cesar)</strong>
+              <p>Coordinacion y automatizacion. Equipo principal con Tailscale activo y conectado.</p>
+            </article>
+            <article class="seat seat-ops">
+              <span class="seat-role">IZQ 02 · admira-mac-02</span>
+              <strong>Mac Mini (Carlos)</strong>
+              <p>Onboarding y operaciones. SSH operativo y puerto 22 verificado en escucha local.</p>
+            </article>
+            <article class="seat seat-research">
+              <span class="seat-role">IZQ 03 · admira-mac-carla</span>
+              <strong>MacBook Air de Carla</strong>
+              <p>Desarrollo y operaciones. Tailscale activo, SSH activo y GitHub CLI instalado.</p>
+            </article>
+          </div>
+
+          <div class="table-core">
+            <div class="scanlines"></div>
+            <span class="core-kicker">Mesa central</span>
+            <h3>Pulpo Board</h3>
+            <p>
+              El cerebro coordina tareas grandes, reparte brazos de trabajo y consolida resultados.
+            </p>
+            <div class="core-metrics">
+              <article>
+                <span>Tareas</span>
+                <strong>4</strong>
+              </article>
+              <article>
+                <span>Ramas</span>
+                <strong>2</strong>
+              </article>
+              <article>
+                <span>Runes</span>
+                <strong>Live</strong>
+              </article>
+            </div>
+          </div>
+
+          <div class="column right-column">
+            <article class="seat seat-cmo">
+              <span class="seat-role">DER 01 · admira-mac-03</span>
+              <strong>MacBookAir de Carla</strong>
+              <p>Directora de Arte en el inventario de sede. Referencia visual y narrativa del equipo.</p>
+            </article>
+            <article class="seat seat-design">
+              <span class="seat-role">DER 02 · admira-mac-04</span>
+              <strong>MacBookAirLuna</strong>
+              <p>Director Tecnico en el inventario de sede. Nodo para arquitectura y decisiones de stack.</p>
+            </article>
+            <article class="seat seat-finance">
+              <span class="seat-role">DER 03 · admira-mac-05</span>
+              <strong>MacMini</strong>
+              <p>Director de Operaciones segun inventario. Nodo pensado para continuidad y despliegue.</p>
+            </article>
+          </div>
+
+          <article class="seat head seat-coordinator">
+            <span class="seat-role">CABECERA 02 · admira-win-01</span>
+            <strong>PC auxiliar</strong>
+            <p>Laboratorio y pruebas cruzadas. Nodo de soporte, ahora mismo pendiente de reactivacion.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="notes-grid">
+        <article class="note-card">
+          <p class="eyebrow">Identidad</p>
+          <h3>Nube Admira + pulpo</h3>
+          <p>
+            El nuevo logo mezcla la nube verde de Admira con un pulpo central para comunicar cerebro,
+            brazos en paralelo y coordinacion entre equipos y agentes.
+          </p>
+        </article>
+        <article class="note-card">
+          <p class="eyebrow">Concepto</p>
+          <h3>Startup convertida en escenario</h3>
+          <p>
+            No es un dashboard sin alma. Es una mesa de direccion donde cada asiento ya representa un
+            ordenador concreto de Admira Next con su papel dentro del sistema.
+          </p>
+        </article>
+        <article class="note-card">
+          <p class="eyebrow">Inspiracion</p>
+          <h3>XTANCO, pero en boardroom</h3>
+          <p>
+            Conserva la escenografia arcade y el caracter jugueton de Xtanco, pero cambia el local por
+            una sala de reuniones con jerarquia, colaboracion y estrategia.
+          </p>
+        </article>
+        <article class="note-card">
+          <p class="eyebrow">Siguiente paso</p>
+          <h3>MVP interactivo</h3>
+          <p>
+            Convertir esta sala en una demo navegable donde cada maquina tenga estado vivo, foco actual
+            y acciones asociadas a su nodo real.
+          </p>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
