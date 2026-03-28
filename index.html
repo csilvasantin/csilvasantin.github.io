@@ -488,7 +488,7 @@
         </article>
       </div>
       <form class="lock-form" id="lock-form">
-        <input id="lock-input" type="password" placeholder="Introduce el acceso" autocomplete="current-password" />
+        <input id="lock-input" type="password" placeholder="Validacion local" autocomplete="current-password" />
         <button class="button" type="submit">Entrar</button>
       </form>
       <div id="lock-error" class="lock-error">El acceso no es correcto.</div>
@@ -697,44 +697,6 @@
       Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
     </p>
   </main>
-  <script>
-    const LOCK_STORAGE_KEY = "csilvasantin-home-unlocked";
-    const PASSWORD_HASH = "09418087246c5efc32d92ed30f678fd02c0a4ade7dde8f2376da130991827a15";
-
-    const lockScreen = document.getElementById("lock-screen");
-    const lockForm = document.getElementById("lock-form");
-    const lockInput = document.getElementById("lock-input");
-    const lockError = document.getElementById("lock-error");
-
-    async function sha256(value) {
-      const data = new TextEncoder().encode(value);
-      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(hashBuffer))
-        .map((byte) => byte.toString(16).padStart(2, "0"))
-        .join("");
-    }
-
-    function unlockHome() {
-      localStorage.setItem(LOCK_STORAGE_KEY, "1");
-      lockScreen.classList.add("hidden");
-    }
-
-    if (localStorage.getItem(LOCK_STORAGE_KEY) === "1") {
-      unlockHome();
-    }
-
-    lockForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const candidateHash = await sha256(lockInput.value);
-      if (candidateHash === PASSWORD_HASH) {
-        lockError.classList.remove("visible");
-        unlockHome();
-        return;
-      }
-
-      lockError.classList.add("visible");
-      lockInput.select();
-    });
-  </script>
+  <script src="./assets/home-lock.js" defer></script>
 </body>
 </html>
