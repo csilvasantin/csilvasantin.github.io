@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lanetro | LaMetric ops</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+    :root {
+      --bg: #081017;
+      --surface: rgba(16, 26, 37, 0.84);
+      --surface-strong: #101b27;
+      --line: rgba(122, 211, 255, 0.18);
+      --text: #edf6ff;
+      --muted: #9db1c8;
+      --accent: #67e8f9;
+      --accent-2: #f59e0b;
+      --accent-3: #4ade80;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Space Grotesk', sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(103, 232, 249, 0.14), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(74, 222, 128, 0.10), transparent 28%),
+        linear-gradient(180deg, #04080d 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    .grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(157, 177, 200, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157, 177, 200, 0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 64px;
+    }
+
+    .hero, .panel, .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero {
+      border-radius: 30px;
+      padding: 30px;
+      overflow: hidden;
+    }
+
+    .eyebrow, .tag, .kpi-label, code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      font-size: 0.8rem;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 10ch;
+      font-size: clamp(3rem, 7vw, 5.7rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      line-height: 1.05;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .lead {
+      max-width: 64ch;
+      margin-top: 18px;
+      font-size: 1.05rem;
+    }
+
+    .hero-actions, .tag-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-actions { margin-top: 24px; }
+    .tag-row { margin-top: 18px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      color: #05131b;
+      background: linear-gradient(135deg, var(--accent), #2dd4bf);
+      box-shadow: 0 16px 36px rgba(103, 232, 249, 0.2);
+    }
+
+    .button-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .hero-grid, .two-col, .card-grid, .kpi-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: end;
+    }
+
+    .panel {
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .two-col {
+      grid-template-columns: 1.05fr 0.95fr;
+      margin-top: 20px;
+    }
+
+    .card-grid {
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      margin-top: 18px;
+    }
+
+    .card {
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      margin-top: 10px;
+      font-size: 1.14rem;
+    }
+
+    .card p {
+      margin-top: 10px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 18px;
+    }
+
+    .kpi {
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .kpi-label {
+      color: var(--accent-2);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .kpi strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.6rem;
+    }
+
+    .list {
+      margin: 16px 0 0;
+      padding-left: 18px;
+    }
+
+    .list li {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    pre {
+      margin: 16px 0 0;
+      overflow-x: auto;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(2, 6, 11, 0.72);
+      color: #dff7ff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin-top: 22px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid, .two-col, .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid"></div>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">LaMetric ops</p>
+          <h1>Lanetro</h1>
+          <p class="lead">
+            Kit operativo para escribir en el reloj de leds LaMetric, lanzar mensajes automatizados,
+            monitorizar el dispositivo desde el movil y preparar animaciones 37x8 listas para futuras demos.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Ver Pages</a>
+            <a class="button-ghost" href="../">Volver al hub</a>
+          </div>
+          <div class="tag-row">
+            <span class="tag">Tools</span>
+            <span class="tag">LaMetric</span>
+            <span class="tag">Camera bridge</span>
+            <span class="tag">Continuidad IA</span>
+          </div>
+        </div>
+        <aside class="panel">
+          <p class="eyebrow">Estado</p>
+          <h2>Proyecto utilitario, no repo cerrado</h2>
+          <p style="margin-top:14px;">
+            Ahora mismo `Lanetro` vive como scripts Python dentro del workspace `Admirito`.
+            La documentacion se ha consolidado para que Codex o Claude puedan retomarlo sin reconstruir el contexto desde cero.
+          </p>
+          <div class="kpi-grid">
+            <div class="kpi">
+              <span class="kpi-label">Scripts</span>
+              <strong>5</strong>
+            </div>
+            <div class="kpi">
+              <span class="kpi-label">Bridge</span>
+              <strong>HTTP</strong>
+            </div>
+            <div class="kpi">
+              <span class="kpi-label">Captura</span>
+              <strong>2 s</strong>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <div class="two-col">
+      <section class="panel">
+        <p class="eyebrow">Piezas</p>
+        <h2>Que hace cada script</h2>
+        <div class="card-grid">
+          <article class="card">
+            <span class="tag">Directo</span>
+            <h3>lametric_write.py</h3>
+            <p>Envia texto plano al widget del LaMetric por HTTP y es la via rapida para validar conectividad.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Observacion</span>
+            <h3>lametric_camera_bridge.py</h3>
+            <p>Levanta una web para el movil, usa la camara trasera y sube fotogramas de referencia al Mac.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Demo</span>
+            <h3>lametric_gate_counter.py</h3>
+            <p>Hace secuencias incrementales para mensajes tipo puertas de embarque.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Demo</span>
+            <h3>lametric_sleep_flights.py</h3>
+            <p>Genera mensajes temporales con hora y pais aleatorio para pruebas narrativas.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Frames</span>
+            <h3>lametric_rainbow_text.py</h3>
+            <p>Rasteriza texto en frames RGB `37x8` y sirve como base para futuras animaciones.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">Flujo</p>
+        <h2>Como retomarlo rapido</h2>
+        <ol class="list">
+          <li>Primero probar escritura directa con un texto corto.</li>
+          <li>Si hace falta ver el resultado real, arrancar el bridge de camara.</li>
+          <li>Usar las demos automatizadas solo cuando el canal directo ya responda.</li>
+          <li>Si se va a evolucionar el proyecto, mover secretos y host a entorno.</li>
+        </ol>
+        <pre>python3 tools/lametric_write.py "Hola Admira"
+python3 tools/lametric_camera_bridge.py
+python3 tools/lametric_gate_counter.py --start-gate 3 --stop-gate 7
+python3 tools/lametric_sleep_flights.py --minutes 10
+python3 tools/lametric_rainbow_text.py "ADMIRA"</pre>
+      </section>
+    </div>
+
+    <section class="panel" style="margin-top:20px;">
+      <p class="eyebrow">Arquitectura</p>
+      <h2>Control directo y observacion visual</h2>
+      <div class="card-grid">
+        <article class="card">
+          <span class="tag">Camino 1</span>
+          <h3>Escritura</h3>
+          <p>Los scripts de control directo envian un `POST` al widget instalado del LaMetric con frames de texto.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Camino 2</span>
+          <h3>Verificacion</h3>
+          <p>El bridge publica una pagina local para movil y guarda la ultima captura en el Mac para inspeccion remota.</p>
+        </article>
+        <article class="card">
+          <span class="tag">Deuda</span>
+          <h3>Falta unificar</h3>
+          <p>No existe aun una CLI `lanetro` ni una configuracion centralizada. Hoy sigue siendo un toolkit operativo disperso.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:20px;">
+      <p class="eyebrow">Proximos pasos</p>
+      <h2>Que haria en la siguiente iteracion</h2>
+      <ol class="list">
+        <li>Crear carpeta o repo dedicado `lanetro` con `README` unico.</li>
+        <li>Sacar `host`, `api_key` y `package` a variables de entorno.</li>
+        <li>Unificar comandos bajo una CLI corta.</li>
+        <li>Añadir historial de capturas y una mini galeria web.</li>
+      </ol>
+    </section>
+
+    <p class="footer">Lanetro queda documentado como proyecto operativo y retomable desde cualquier sesion futura.</p>
+  </main>
+</body>
+</html>
