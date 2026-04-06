@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cuadrante de Proyectos — csilvasantin</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #0a0a0a;
+    color: #1a1a1a;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .header .subtitle {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 16px;
+  }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-bottom: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #ccc;
+  }
+
+  .legend-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    border: 1px solid #444;
+  }
+
+  .legend-swatch.claude { background: #ffffff; }
+  .legend-swatch.codex { background: #b0b0b0; }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #666;
+    padding: 8px 16px;
+    border-bottom: 1px solid #333;
+    margin-bottom: 2px;
+  }
+
+  .project-row {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    transition: transform 0.1s;
+  }
+
+  .project-row:hover {
+    transform: translateX(4px);
+  }
+
+  .project-row.claude {
+    background: #ffffff;
+    color: #1a1a1a;
+  }
+
+  .project-row.codex {
+    background: #b0b0b0;
+    color: #1a1a1a;
+  }
+
+  .project-num {
+    font-size: 14px;
+    font-weight: 800;
+    width: 36px;
+    min-width: 36px;
+    text-align: right;
+    margin-right: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .claude .project-num { color: #d97706; }
+  .codex .project-num { color: #2563eb; }
+
+  .project-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin-right: 12px;
+    white-space: nowrap;
+  }
+
+  .project-desc {
+    font-size: 13px;
+    color: #555;
+    flex: 1;
+  }
+
+  .project-owner {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .claude .project-owner {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  .codex .project-owner {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 32px;
+    font-size: 12px;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Cuadrante de Proyectos</h1>
+  <div class="subtitle">csilvasantin &mdash; 36 repos &mdash; Actualizado 2026-04-06</div>
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-swatch claude"></div>
+      Par = Claude
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch codex"></div>
+      Impar = Codex
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Setup</div>
+  <div class="project-row claude"><span class="project-num">00</span><span class="project-name">onboarding</span><span class="project-desc">Fuente de verdad para nuevas IAs</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">01</span><span class="project-name">EmpezarTrabajo</span><span class="project-desc">Script de arranque de sesion</span><span class="project-owner">Codex</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">AdmiraNext</div>
+  <div class="project-row claude"><span class="project-num">02</span><span class="project-name">admiranext</span><span class="project-desc">Consejo de Direccion 16 agentes IA</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">03</span><span class="project-name">AdmiraNext-Team</span><span class="project-desc">Panel de estado del equipo</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">04</span><span class="project-name">ConsejoAdmiraNextGame</span><span class="project-desc">Aventura grafica SCUMM</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">05</span><span class="project-name">Admira-Next-Dream-Team</span><span class="project-desc">Estructura 8 C-levels</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">06</span><span class="project-name">nuevo-miembro-admiranext</span><span class="project-desc">Guia onboarding nuevos miembros</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">07</span><span class="project-name">admira-equipos</span><span class="project-desc">Inventario equipos por sede</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">08</span><span class="project-name">renderFarm</span><span class="project-desc">Render distribuido LTX-Video</span><span class="project-owner">Claude</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Yarig</div>
+  <div class="project-row codex"><span class="project-num">09</span><span class="project-name">Yarig.Telegram</span><span class="project-desc">Bot Telegram control Yarig.ai</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">10</span><span class="project-name">Yarig.aiTheGame</span><span class="project-desc">Digital twin isometrico v5.5</span><span class="project-owner">Claude</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Xtanco</div>
+  <div class="project-row codex"><span class="project-num">11</span><span class="project-name">xtanco-game</span><span class="project-desc">Motor base digital twin v4.9</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">12</span><span class="project-name">carla</span><span class="project-desc">Variante carla</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">13</span><span class="project-name">carlaxtanco</span><span class="project-desc">Variante carlaxtanco</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">14</span><span class="project-name">game-platform</span><span class="project-desc">Plataforma multi-cliente</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">15</span><span class="project-name">Control-de-Tienda</span><span class="project-desc">MVP gestion tienda</span><span class="project-owner">Codex</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Startup</div>
+  <div class="project-row claude"><span class="project-num">16</span><span class="project-name">pulpo</span><span class="project-desc">Orquestador multi-IA</span><span class="project-owner">Claude</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Herramientas</div>
+  <div class="project-row codex"><span class="project-num">17</span><span class="project-name">Memorizer</span><span class="project-desc">Agente de memoria personal</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">18</span><span class="project-name">diario</span><span class="project-desc">Registro diario de trabajo</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">19</span><span class="project-name">el-libro</span><span class="project-desc">Proyecto del libro</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">20</span><span class="project-name">ClaudeBot</span><span class="project-desc">Automatizacion Claude Desktop</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">21</span><span class="project-name">CodexBot</span><span class="project-desc">Automatizacion Codex</span><span class="project-owner">Codex</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Fun</div>
+  <div class="project-row claude"><span class="project-num">22</span><span class="project-name">Hacker</span><span class="project-desc">Broma Matrix SSH</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">23</span><span class="project-name">Spectrum</span><span class="project-desc">Juego ZX Spectrum</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">24</span><span class="project-name">Emulador-de-Spectrum</span><span class="project-desc">Decodificador cintas</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">25</span><span class="project-name">pong-tron</span><span class="project-desc">Pong</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">26</span><span class="project-name">Matrix</span><span class="project-desc">Proyecto Matrix</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">27</span><span class="project-name">ainimation</span><span class="project-desc">Animacion</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">28</span><span class="project-name">bitsandatoms</span><span class="project-desc">Experimento</span><span class="project-owner">Claude</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Aena</div>
+  <div class="project-row codex"><span class="project-num">29</span><span class="project-name">AenaJones</span><span class="project-desc">Proyecto Aena Jones</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">30</span><span class="project-name">AenaMallorca</span><span class="project-desc">Proyecto Aena Mallorca</span><span class="project-owner">Claude</span></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Infra & Web</div>
+  <div class="project-row codex"><span class="project-num">31</span><span class="project-name">csilvasantin.github.io</span><span class="project-desc">Landing/hub publico</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">32</span><span class="project-name">sitges</span><span class="project-desc">Mapa red local</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">33</span><span class="project-name">ai-workspace</span><span class="project-desc">Estructura carpetas IA</span><span class="project-owner">Codex</span></div>
+  <div class="project-row claude"><span class="project-num">34</span><span class="project-name">tech</span><span class="project-desc">Diario tech</span><span class="project-owner">Claude</span></div>
+  <div class="project-row codex"><span class="project-num">35</span><span class="project-name">desktop-tutorial</span><span class="project-desc">Tutorial GitHub</span><span class="project-owner">Codex</span></div>
+</div>
+
+<div class="footer">
+  Par (blanco) = Claude &bull; Impar (gris) = Codex &bull; Indice maestro: onboarding/PROJECTS.md
+</div>
+
+</body>
+</html>
