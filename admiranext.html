@@ -237,7 +237,7 @@
     <div class="container">
         <h1>AdmiraNext — Council Dashboard</h1>
         <div class="subtitle">
-            Estado en tiempo real del Consejo de Dirección · <span class="live">● LIVE</span>
+            Estado en tiempo real del Consejo de Dirección · <span class="live">● LIVE</span> · <span id="last-check-inline" style="color:#555;font-size:0.8rem;">comprobando...</span>
         </div>
 
         <div class="gen-toggle">
@@ -269,7 +269,7 @@
     </div>
 
     <script>
-    const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
+    const CONTROL_API = "/api/machines";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -431,6 +431,17 @@
         `;
 
         document.getElementById("last-check").textContent = new Date().toLocaleString("es-ES");
+        lastCheckTime = Date.now();
+    }
+
+    let lastCheckTime = null;
+
+    function updateCheckTicker() {
+        const el = document.getElementById("last-check-inline");
+        if (!lastCheckTime) return;
+        const secs = Math.floor((Date.now() - lastCheckTime) / 1000);
+        if (secs < 60) el.textContent = `hace ${secs}s`;
+        else el.textContent = `hace ${Math.floor(secs / 60)}m ${secs % 60}s`;
     }
 
     async function refresh() {
@@ -440,6 +451,7 @@
 
     refresh();
     setInterval(refresh, 15000);
+    setInterval(updateCheckTicker, 1000);
     </script>
 </body>
 </html>
