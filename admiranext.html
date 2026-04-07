@@ -270,6 +270,7 @@
 
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
+    const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/AdmiraNext-Team/main/data/machines.json";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -344,23 +345,39 @@
         render();
     }
 
+    function loadMachines(data) {
+        machineStatus = {};
+        let onlineMachines = 0;
+        (data.machines || []).forEach(m => {
+            const isOnline = m.status === "online" || m.status === "idle" || m.status === "busy";
+            machineStatus[m.id] = { status: m.status, name: m.name, online: isOnline };
+            if (isOnline) onlineMachines++;
+        });
+        return onlineMachines;
+    }
+
     async function fetchMachines() {
+        // Try local API first
         try {
-            const res = await fetch(CONTROL_API);
+            const res = await fetch(CONTROL_API, { signal: AbortSignal.timeout(4000) });
             const data = await res.json();
-            machineStatus = {};
-            let onlineMachines = 0;
-            (data.machines || []).forEach(m => {
-                const isOnline = m.status === "online" || m.status === "idle" || m.status === "busy";
-                machineStatus[m.id] = { status: m.status, name: m.name, online: isOnline };
-                if (isOnline) onlineMachines++;
-            });
+            loadMachines(data);
             apiOk = true;
-            return onlineMachines;
         } catch (e) {
             apiOk = false;
-            return 0;
         }
+        // Always merge GitHub data for machines not in local API
+        try {
+            const res = await fetch(GITHUB_FALLBACK + "?t=" + Date.now());
+            const data = await res.json();
+            (data.machines || []).forEach(m => {
+                if (!machineStatus[m.id]) {
+                    const isOnline = m.status === "online" || m.status === "idle" || m.status === "busy";
+                    machineStatus[m.id] = { status: m.status, name: m.name, online: isOnline };
+                }
+            });
+            if (!apiOk) apiOk = true;
+        } catch (e2) {}
     }
 
     function render() {
