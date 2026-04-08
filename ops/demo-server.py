@@ -63,8 +63,11 @@ def get_machine_ssh(machine_id):
     return None, None
 
 
+CONTROL_AGENT_PORT = 3030
+
+
 def take_screenshot(machine_id, full=False):
-    """Captura pantalla via SSH screencapture."""
+    """Captura pantalla: local con screencapture, remoto via control-agent."""
     user, ip = get_machine_ssh(machine_id)
     if not ip:
         return None
@@ -84,28 +87,21 @@ def take_screenshot(machine_id, full=False):
             pass
         return None
 
-    # Para maquinas remotas via SSH
-    try:
-        tmp_remote = f"/tmp/screenshot_{machine_id}.jpg"
-        quality = "100" if full else "50"
-        # Captura remota
-        subprocess.run(
-            ["ssh", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=no",
-             f"{user}@{ip}", f"screencapture -x -t jpg {tmp_remote}"],
-            timeout=8, capture_output=True
-        )
-        # Descarga
-        tmp_local = f"/tmp/screenshot_{machine_id}_local.jpg"
-        subprocess.run(
-            ["scp", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=no",
-             f"{user}@{ip}:{tmp_remote}", tmp_local],
-            timeout=8, capture_output=True
-        )
-        if os.path.exists(tmp_local):
-            with open(tmp_local, "rb") as f:
-                return f.read()
-    except Exception:
-        pass
+    # Para maquinas remotas: pedir al control-agent (puerto 3030) que ya tiene
+    # ScreenCaptureKit y permisos de Screen Recording
+    # Primero intentar snapshot directo del control-agent de esa máquina
+    for url in [
+        f"http://{ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
+        f"http://localhost:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
+    ]:
+        try:
+            req = urllib.request.Request(url)
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = resp.read()
+                if len(data) > 100:  # Imagen valida
+                    return data
+        except Exception:
+            continue
     return None
 
 
