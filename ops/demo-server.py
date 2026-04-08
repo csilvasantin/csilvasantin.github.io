@@ -87,18 +87,31 @@ def take_screenshot(machine_id, full=False):
             pass
         return None
 
-    # Para maquinas remotas: pedir al control-agent del Mac Mini (localhost:3030)
-    # que centraliza capturas de todas las maquinas via SSH+ScreenCaptureKit.
-    # Si falla, intentar el control-agent remoto de esa maquina.
-    for url in [
-        f"http://localhost:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
-        f"http://{ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
-    ]:
+    # Buscar screenshot en control-agents que tengan capturas frescas.
+    # Priorizar los que sabemos que funcionan, con timeout corto.
+    KNOWN_AGENTS = [
+        "100.75.118.75",   # Air Blanco — control-agent estable con mesh completo
+        "100.99.176.126",  # Air 16
+        "100.101.192.1",   # Pro Negro
+    ]
+    urls = []
+    # 1) El control-agent de esa misma maquina
+    if ip:
+        urls.append(f"http://{ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}")
+    # 2) Agentes conocidos como fallback (excluyendo el ya probado)
+    for agent_ip in KNOWN_AGENTS:
+        if agent_ip != ip:
+            urls.append(f"http://{agent_ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}")
+    # 3) Mac Mini local como ultimo recurso
+    urls.append(f"http://localhost:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}")
+
+    for url in urls:
         try:
             req = urllib.request.Request(url)
-            with urllib.request.urlopen(req, timeout=5) as resp:
+            with urllib.request.urlopen(req, timeout=3) as resp:
                 data = resp.read()
-                if len(data) > 100:  # Imagen valida
+                # Validar que sea JPEG real (empieza con FF D8)
+                if len(data) > 100 and data[:2] == b'\xff\xd8':
                     return data
         except Exception:
             continue
