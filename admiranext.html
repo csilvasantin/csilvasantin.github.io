@@ -626,12 +626,20 @@
 
             const existingThumb = document.getElementById(`thumb-${machineIdAttr}`);
             let thumbHtml;
-            if (demoMode && isOnline && machineIdAttr) {
+            if (demoMode && machineIdAttr) {
                 if (existingThumb && !existingThumb.classList.contains("offline")) {
-                    // Keep existing thumbnail — don't recreate it (avoids flicker)
+                    // Keep existing thumbnail — don't recreate (avoids flicker)
+                    // Save to cache while it's good
+                    lastThumbSrc[machineIdAttr] = existingThumb.src;
                     thumbHtml = existingThumb.outerHTML;
+                } else if (isOnline) {
+                    // Online, fetch fresh
+                    thumbHtml = `<img class="screen-thumb" id="thumb-${machineIdAttr}" src="http://localhost:3031/screenshot/${machineIdAttr}?t=${Date.now()}" alt="Pantalla" onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')" onerror="this.classList.add('offline')">`;
+                } else if (lastThumbSrc[machineIdAttr]) {
+                    // Offline but we have a cached screenshot — show it dimmed
+                    thumbHtml = `<img class="screen-thumb offline" id="thumb-${machineIdAttr}" src="${lastThumbSrc[machineIdAttr]}" alt="Ultimo previo" style="opacity:0.35;filter:grayscale(1)" onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona} (ultimo previo)')">`;
                 } else {
-                    thumbHtml = `<img class="screen-thumb" id="thumb-${machineIdAttr}" src="http://localhost:3031/screenshot/${machineIdAttr}?t=${Date.now()}" alt="Pantalla" onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')" onerror="this.classList.add('offline'); this.alt=''>`;
+                    thumbHtml = `<div class="screen-placeholder">⏻</div>`;
                 }
             } else {
                 thumbHtml = `<div class="screen-placeholder">${isOnline ? '...' : '⏻'}</div>`;
@@ -692,15 +700,13 @@
     let lastCheckTime = null;
 
     const DEMO_TOGGLE = "http://localhost:3031/toggle/";
+    // Cache last known good thumbnail src per machine (survives offline)
+    const lastThumbSrc = {};
 
-    async function togglePower(machineId, currentlyOnline) {
-        if (!machineId) { alert("Esta silla no tiene Mac asignado"); return; }
+    function togglePower(machineId, currentlyOnline) {
+        if (!machineId) return;
 
         const newStatus = currentlyOnline ? "offline" : "online";
-        const action = currentlyOnline ? "apagar" : "encender";
-        const machineName = machineStatus[machineId]?.name || machineId;
-
-        if (!confirm(`¿${action.charAt(0).toUpperCase() + action.slice(1)} ${machineName}?`)) return;
 
         // Feedback visual inmediato
         machineStatus[machineId] = {
@@ -710,33 +716,16 @@
         };
         render();
 
-        // En modo DEMO: POST al demo server local (override de Tailscale)
-        if (demoMode) {
-            try {
-                await fetch(DEMO_TOGGLE + machineId, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: newStatus }),
-                    signal: AbortSignal.timeout(3000)
-                });
-                return; // OK — el siguiente refresh leerá el override
-            } catch (e) {}
-        }
-
-        // Fuera de modo DEMO: intentar Mac Mini API
-        try {
-            const base = CONTROL_API.replace("/api/machines", "");
-            await fetch(`${base}/api/machines/${machineId}/status`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus, note: `${action} desde Council Dashboard` }),
-                signal: AbortSignal.timeout(4000)
-            });
-        } catch (e) {
-            console.warn("No se pudo sincronizar. Cambio solo visual.");
-        }
-
-        setTimeout(refresh, 1000);
+        // POST al demo server o Mac Mini (fire-and-forget, sin await)
+        const url = demoMode
+            ? DEMO_TOGGLE + machineId
+            : CONTROL_API.replace("/api/machines", "") + "/api/machines/" + machineId + "/status";
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus }),
+            signal: AbortSignal.timeout(3000)
+        }).catch(() => {});
     }
 
 
