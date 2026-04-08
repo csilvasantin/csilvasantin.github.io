@@ -691,10 +691,7 @@
 
     let lastCheckTime = null;
 
-    // APIs donde intentar cambiar estado (en orden de prioridad)
-    const STATUS_APIS = [
-        CONTROL_API.replace("/api/machines", ""),  // Mac Mini
-    ];
+    const DEMO_TOGGLE = "http://localhost:3031/toggle/";
 
     async function togglePower(machineId, currentlyOnline) {
         if (!machineId) { alert("Esta silla no tiene Mac asignado"); return; }
@@ -713,75 +710,35 @@
         };
         render();
 
-        // Intentar POST a cada API disponible
-        let pushed = false;
-        for (const base of STATUS_APIS) {
+        // En modo DEMO: POST al demo server local (override de Tailscale)
+        if (demoMode) {
             try {
-                const res = await fetch(`${base}/api/machines/${machineId}/status`, {
+                await fetch(DEMO_TOGGLE + machineId, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: newStatus, note: `${action} desde Council Dashboard` }),
-                    signal: AbortSignal.timeout(4000)
+                    body: JSON.stringify({ status: newStatus }),
+                    signal: AbortSignal.timeout(3000)
                 });
-                if (res.ok) { pushed = true; break; }
+                return; // OK — el siguiente refresh leerá el override
             } catch (e) {}
         }
 
-        // Fallback: actualizar GitHub JSON via API
-        if (!pushed) {
-            try {
-                pushed = await updateGitHubMachines(machineId, newStatus);
-            } catch (e) {}
+        // Fuera de modo DEMO: intentar Mac Mini API
+        try {
+            const base = CONTROL_API.replace("/api/machines", "");
+            await fetch(`${base}/api/machines/${machineId}/status`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus, note: `${action} desde Council Dashboard` }),
+                signal: AbortSignal.timeout(4000)
+            });
+        } catch (e) {
+            console.warn("No se pudo sincronizar. Cambio solo visual.");
         }
 
-        if (!pushed) {
-            console.warn("No se pudo sincronizar con ninguna API. Cambio solo visual.");
-        }
-
-        // Refrescar para confirmar estado
         setTimeout(refresh, 1000);
     }
 
-    async function updateGitHubMachines(machineId, newStatus) {
-        // Leer archivo actual de GitHub
-        const apiUrl = "https://api.github.com/repos/csilvasantin/AdmiraNext-Team/contents/data/machines.json";
-        const res = await fetch(apiUrl, { signal: AbortSignal.timeout(5000) });
-        if (!res.ok) return false;
-
-        const fileData = await res.json();
-        const content = JSON.parse(atob(fileData.content));
-        const now = new Date().toISOString().replace(/\.\d+Z$/, "Z");
-
-        // Actualizar la maquina
-        const machine = content.machines.find(m => m.id === machineId);
-        if (!machine) return false;
-        machine.status = newStatus;
-        machine.lastSeen = now;
-        machine.currentFocus = newStatus === "online"
-            ? "Encendido desde Council Dashboard"
-            : "Apagado desde Council Dashboard";
-        content.updatedAt = now;
-
-        // PUT actualizado (requiere token — solo funciona si hay PAT configurado)
-        const token = localStorage.getItem("gh_pat");
-        if (!token) {
-            console.info("Sin GitHub PAT. Usa localStorage.setItem('gh_pat','ghp_...') para habilitar push directo.");
-            return false;
-        }
-        const putRes = await fetch(apiUrl, {
-            method: "PUT",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: `Toggle ${machineId} -> ${newStatus} desde dashboard`,
-                content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2) + "\n"))),
-                sha: fileData.sha
-            })
-        });
-        return putRes.ok;
-    }
 
     // Screenshot overlay
     function openScreenOverlay(machineId, label) {
