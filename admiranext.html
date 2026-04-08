@@ -704,6 +704,7 @@
 
     let lastCheckTime = null;
 
+    const DEMO_POWER = "http://localhost:3031/power/";
     const DEMO_TOGGLE = "http://localhost:3031/toggle/";
     // Cache last known good thumbnail src per machine (survives offline)
     const lastThumbSrc = {};
@@ -712,6 +713,7 @@
         if (!machineId) return;
 
         const newStatus = currentlyOnline ? "offline" : "online";
+        const action = currentlyOnline ? "sleep" : "wake";
 
         // Feedback visual inmediato
         machineStatus[machineId] = {
@@ -721,16 +723,30 @@
         };
         render();
 
-        // POST al demo server o Mac Mini (fire-and-forget, sin await)
-        const url = demoMode
-            ? DEMO_TOGGLE + machineId
-            : CONTROL_API.replace("/api/machines", "") + "/api/machines/" + machineId + "/status";
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus }),
-            signal: AbortSignal.timeout(3000)
-        }).catch(() => {});
+        if (demoMode) {
+            // Enviar comando real de power (sleep/wake) + toggle override
+            fetch(DEMO_POWER + machineId, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action }),
+                signal: AbortSignal.timeout(10000)
+            }).catch(() => {});
+            // Toggle override como backup inmediato
+            fetch(DEMO_TOGGLE + machineId, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+                signal: AbortSignal.timeout(3000)
+            }).catch(() => {});
+        } else {
+            const base = CONTROL_API.replace("/api/machines", "");
+            fetch(`${base}/api/machines/${machineId}/status`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+                signal: AbortSignal.timeout(4000)
+            }).catch(() => {});
+        }
     }
 
 
