@@ -119,32 +119,34 @@ def take_screenshot(machine_id, full=False):
 
 
 def send_sleep(machine_id):
-    """Envia pmset sleepnow via SSH."""
+    """Envia pmset sleepnow via SSH (no necesita sudo en macOS)."""
     user, ip = get_machine_ssh(machine_id)
     if not ip:
         return False
+    # No dormir el Mac Mini (es el servidor central)
+    if machine_id == "admira-macmini" or ip == "100.74.101.14":
+        return False
     try:
-        subprocess.run(
-            ["ssh", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=no",
-             f"{user}@{ip}", "sudo pmset sleepnow"],
-            timeout=8, capture_output=True
+        result = subprocess.run(
+            ["ssh", "-o", "ConnectTimeout=5", "-o", "StrictHostKeyChecking=no",
+             f"{user}@{ip}", "pmset sleepnow"],
+            timeout=10, capture_output=True, text=True
         )
-        return True
+        return "Sleeping" in result.stdout or result.returncode == 0
     except Exception:
         return False
 
 
 def send_wake(machine_id):
-    """Envia WoL o intenta SSH para despertar."""
+    """Despierta Mac via SSH (Tailscale mantiene conexion incluso en sleep)."""
     user, ip = get_machine_ssh(machine_id)
     if not ip:
         return False
-    # Intentar SSH (si esta dormida pero no apagada, puede despertar)
     try:
         subprocess.run(
-            ["ssh", "-o", "ConnectTimeout=3", "-o", "StrictHostKeyChecking=no",
+            ["ssh", "-o", "ConnectTimeout=10", "-o", "StrictHostKeyChecking=no",
              f"{user}@{ip}", "caffeinate -u -t 5"],
-            timeout=8, capture_output=True
+            timeout=15, capture_output=True
         )
         return True
     except Exception:
