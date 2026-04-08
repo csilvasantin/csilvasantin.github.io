@@ -722,27 +722,20 @@
         };
         render();
 
-        if (demoMode) {
-            // En modo DEMO: usar demo-server local (SSH directo a las maquinas)
-            try {
-                await fetch(`http://localhost:3032/power/${machineId}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action }),
-                    signal: AbortSignal.timeout(15000)
-                });
-            } catch (_) {}
-        } else {
-            // Modo normal: intentar control-agent del Mac Mini
-            const base = CONTROL_API.replace("/api/machines", "");
-            try {
-                await fetch(`${base}/api/machines/${machineId}/power`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action }),
-                    signal: AbortSignal.timeout(12000)
-                });
-            } catch (_) {}
+        // Usar siempre la API HTTPS del Mac Mini (Tailscale Funnel)
+        // para evitar bloqueo de mixed content (HTTPS page -> HTTP localhost)
+        const base = CONTROL_API.replace("/api/machines", "");
+        try {
+            const res = await fetch(`${base}/api/machines/${machineId}/power`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action }),
+                signal: AbortSignal.timeout(15000)
+            });
+            const data = await res.json();
+            console.log("Power:", data);
+        } catch (e) {
+            console.error("Power error:", e.message);
         }
     }
 
