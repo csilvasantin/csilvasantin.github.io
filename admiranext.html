@@ -118,7 +118,7 @@
             text-transform: uppercase;
             letter-spacing: 0.3px;
             white-space: nowrap;
-            transform: translateX(-50%);
+            transform: translate(-50%, -100%);
             transition: all 0.3s ease;
             border: 1px solid rgba(0,0,0,0.3);
             text-shadow: 0 1px 1px rgba(0,0,0,0.3);
@@ -477,28 +477,28 @@
     // 1 consejero = 1 máquina. machineId null = sin máquina asignada (gris)
     const NAMEPLATE_POS = {
         leyendas: [
-            // Racional (left/red)
-            { role: "CEO", persona: "Steve Jobs",      x: 17, y: 88, machineId: "admira-macbookair16" },
-            { role: "CTO", persona: "Steve Wozniak",   x: 22, y: 60, machineId: "admira-macbookpronegro14" },
-            { role: "COO", persona: "Tim Cook",        x: 37, y: 52, machineId: "admira-macbookairplata" },
-            { role: "CFO", persona: "Warren Buffett",  x: 37, y: 38, machineId: "admira-macmini" },
+            // Racional (left/red) — posiciones sobre la cabeza de cada personaje
+            { role: "CEO", persona: "Steve Jobs",      x: 20, y: 68, machineId: "admira-macbookair16" },
+            { role: "CTO", persona: "Steve Wozniak",   x: 25, y: 42, machineId: "admira-macbookpronegro14" },
+            { role: "COO", persona: "Tim Cook",        x: 38, y: 33, machineId: "admira-macbookairplata" },
+            { role: "CFO", persona: "Warren Buffett",  x: 48, y: 22, machineId: "admira-macmini" },
             // Creativo (right/blue)
-            { role: "CCO", persona: "Walt Disney",     x: 53, y: 52, machineId: "admira-macbookairblanco" },
-            { role: "CDO", persona: "Dieter Rams",     x: 63, y: 55, machineId: "admira-macbookairazul" },
-            { role: "CXO", persona: "Howard Schultz",  x: 72, y: 60, machineId: null },
-            { role: "CSO", persona: "George Lucas",    x: 83, y: 88, machineId: "admira-macbook-carla" },
+            { role: "CCO", persona: "Walt Disney",     x: 58, y: 33, machineId: "admira-macbookairblanco" },
+            { role: "CDO", persona: "Dieter Rams",     x: 68, y: 37, machineId: "admira-macbookairazul" },
+            { role: "CXO", persona: "Howard Schultz",  x: 78, y: 42, machineId: null },
+            { role: "CSO", persona: "George Lucas",    x: 85, y: 68, machineId: "admira-macbook-carla" },
         ],
         coetaneos: [
             // Racional (left/red)
-            { role: "CEO", persona: "Elon Musk",       x: 17, y: 88, machineId: "admira-macbookair16" },
-            { role: "CTO", persona: "Jensen Huang",    x: 24, y: 62, machineId: "admira-macbookpronegro14" },
-            { role: "COO", persona: "Gwynne Shotwell", x: 35, y: 52, machineId: "admira-macbookairplata" },
-            { role: "CFO", persona: "Ruth Porat",      x: 42, y: 52, machineId: "admira-macmini" },
+            { role: "CEO", persona: "Elon Musk",       x: 20, y: 68, machineId: "admira-macbookair16" },
+            { role: "CTO", persona: "Jensen Huang",    x: 25, y: 42, machineId: "admira-macbookpronegro14" },
+            { role: "COO", persona: "Gwynne Shotwell", x: 38, y: 33, machineId: "admira-macbookairplata" },
+            { role: "CFO", persona: "Ruth Porat",      x: 48, y: 22, machineId: "admira-macmini" },
             // Creativo (right/blue)
-            { role: "CCO", persona: "John Lasseter",   x: 53, y: 52, machineId: "admira-macbookairblanco" },
-            { role: "CDO", persona: "Jony Ive",        x: 63, y: 58, machineId: "admira-macbookairazul" },
-            { role: "CXO", persona: "Carlos Ratti",    x: 75, y: 62, machineId: null },
-            { role: "CSO", persona: "Ryan Reynolds",   x: 85, y: 88, machineId: "admira-macbook-carla" },
+            { role: "CCO", persona: "John Lasseter",   x: 58, y: 33, machineId: "admira-macbookairblanco" },
+            { role: "CDO", persona: "Jony Ive",        x: 68, y: 37, machineId: "admira-macbookairazul" },
+            { role: "CXO", persona: "Carlos Ratti",    x: 78, y: 42, machineId: null },
+            { role: "CSO", persona: "Ryan Reynolds",   x: 85, y: 68, machineId: "admira-macbook-carla" },
         ],
     };
 
