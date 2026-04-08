@@ -704,16 +704,15 @@
 
     let lastCheckTime = null;
 
-    const DEMO_POWER = "http://localhost:3031/power/";
     const DEMO_TOGGLE = "http://localhost:3031/toggle/";
     // Cache last known good thumbnail src per machine (survives offline)
     const lastThumbSrc = {};
 
-    function togglePower(machineId, currentlyOnline) {
+    async function togglePower(machineId, currentlyOnline) {
         if (!machineId) return;
 
-        const newStatus = currentlyOnline ? "offline" : "online";
         const action = currentlyOnline ? "sleep" : "wake";
+        const newStatus = currentlyOnline ? "offline" : "online";
 
         // Feedback visual inmediato
         machineStatus[machineId] = {
@@ -723,29 +722,32 @@
         };
         render();
 
-        if (demoMode) {
-            // Enviar comando real de power (sleep/wake) + toggle override
-            fetch(DEMO_POWER + machineId, {
+        const base = CONTROL_API.replace("/api/machines", "");
+
+        // Siempre intentar el endpoint real de power (sleep/wake SSH + WoL)
+        try {
+            await fetch(`${base}/api/machines/${machineId}/power`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action }),
-                signal: AbortSignal.timeout(10000)
-            }).catch(() => {});
-            // Toggle override como backup inmediato
-            fetch(DEMO_TOGGLE + machineId, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
-                signal: AbortSignal.timeout(3000)
-            }).catch(() => {});
-        } else {
-            const base = CONTROL_API.replace("/api/machines", "");
-            fetch(`${base}/api/machines/${machineId}/status`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
-                signal: AbortSignal.timeout(4000)
-            }).catch(() => {});
+                signal: AbortSignal.timeout(12000)
+            });
+        } catch (_) {
+            // Si el Mac Mini no responde en modo DEMO, usar demo-server local
+            if (demoMode) {
+                fetch(`http://localhost:3031/power/${machineId}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action }),
+                    signal: AbortSignal.timeout(10000)
+                }).catch(() => {});
+                fetch(DEMO_TOGGLE + machineId, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: newStatus }),
+                    signal: AbortSignal.timeout(3000)
+                }).catch(() => {});
+            }
         }
     }
 
