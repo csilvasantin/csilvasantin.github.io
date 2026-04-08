@@ -214,6 +214,46 @@
         }
         .machine-tag.online { background: rgba(68, 187, 68, 0.12); color: #44bb44; }
 
+        /* Power toggle button */
+        .power-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .power-btn:hover { transform: scale(1.15); }
+        .power-btn.on {
+            border-color: #44bb44;
+            background: rgba(68, 187, 68, 0.15);
+            box-shadow: 0 0 10px rgba(68, 187, 68, 0.4);
+        }
+        .power-btn.off {
+            border-color: #555;
+            background: rgba(85, 85, 85, 0.15);
+        }
+        .power-btn.loading {
+            pointer-events: none;
+            opacity: 0.5;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .power-btn .power-icon {
+            width: 14px; height: 14px;
+        }
+        .power-btn.on .power-icon { filter: drop-shadow(0 0 3px #44bb44); }
+
         /* Nameplate colors */
         .nameplate-gold .member-name { color: #DAA520; }
         .nameplate-gray .member-name { color: #555; }
@@ -402,9 +442,15 @@
             const machineStatusText = machine ? machine.status : "";
             if (isOnline) onlineCount++; else offlineCount++;
 
+            const powerSvg = `<svg class="power-icon" viewBox="0 0 24 24" fill="none" stroke="${isOnline ? '#44bb44' : '#666'}" stroke-width="2.5" stroke-linecap="round"><path d="M12 2v6"/><path d="M16.24 7.76a6 6 0 1 1-8.49 0"/></svg>`;
+            const btnClass = isOnline ? "on" : "off";
+            const machineIdAttr = member.machineId || "";
+
             const html = `
                 <div class="member-row ${isOnline ? 'nameplate-gold' : 'nameplate-gray'}">
-                    <div class="status-dot ${isOnline ? 'online' : 'offline'}"></div>
+                    <button class="power-btn ${btnClass}" onclick="togglePower('${machineIdAttr}', ${isOnline})" title="${isOnline ? 'Apagar' : 'Encender'} ${machineName}">
+                        ${powerSvg}
+                    </button>
                     <span class="member-icon">${member.icon}</span>
                     <div class="member-info">
                         <div class="member-name">${member.name} — ${member.persona}</div>
@@ -452,6 +498,98 @@
     }
 
     let lastCheckTime = null;
+
+    // APIs donde intentar cambiar estado (en orden de prioridad)
+    const STATUS_APIS = [
+        CONTROL_API.replace("/api/machines", ""),  // Mac Mini
+    ];
+
+    async function togglePower(machineId, currentlyOnline) {
+        if (!machineId) { alert("Esta silla no tiene Mac asignado"); return; }
+
+        const newStatus = currentlyOnline ? "offline" : "online";
+        const action = currentlyOnline ? "apagar" : "encender";
+        const machineName = machineStatus[machineId]?.name || machineId;
+
+        if (!confirm(`¿${action.charAt(0).toUpperCase() + action.slice(1)} ${machineName}?`)) return;
+
+        // Feedback visual inmediato
+        machineStatus[machineId] = {
+            ...machineStatus[machineId],
+            status: newStatus,
+            online: !currentlyOnline
+        };
+        render();
+
+        // Intentar POST a cada API disponible
+        let pushed = false;
+        for (const base of STATUS_APIS) {
+            try {
+                const res = await fetch(`${base}/api/machines/${machineId}/status`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: newStatus, note: `${action} desde Council Dashboard` }),
+                    signal: AbortSignal.timeout(4000)
+                });
+                if (res.ok) { pushed = true; break; }
+            } catch (e) {}
+        }
+
+        // Fallback: actualizar GitHub JSON via API
+        if (!pushed) {
+            try {
+                pushed = await updateGitHubMachines(machineId, newStatus);
+            } catch (e) {}
+        }
+
+        if (!pushed) {
+            console.warn("No se pudo sincronizar con ninguna API. Cambio solo visual.");
+        }
+
+        // Refrescar para confirmar estado
+        setTimeout(refresh, 1000);
+    }
+
+    async function updateGitHubMachines(machineId, newStatus) {
+        // Leer archivo actual de GitHub
+        const apiUrl = "https://api.github.com/repos/csilvasantin/AdmiraNext-Team/contents/data/machines.json";
+        const res = await fetch(apiUrl, { signal: AbortSignal.timeout(5000) });
+        if (!res.ok) return false;
+
+        const fileData = await res.json();
+        const content = JSON.parse(atob(fileData.content));
+        const now = new Date().toISOString().replace(/\.\d+Z$/, "Z");
+
+        // Actualizar la maquina
+        const machine = content.machines.find(m => m.id === machineId);
+        if (!machine) return false;
+        machine.status = newStatus;
+        machine.lastSeen = now;
+        machine.currentFocus = newStatus === "online"
+            ? "Encendido desde Council Dashboard"
+            : "Apagado desde Council Dashboard";
+        content.updatedAt = now;
+
+        // PUT actualizado (requiere token — solo funciona si hay PAT configurado)
+        const token = localStorage.getItem("gh_pat");
+        if (!token) {
+            console.info("Sin GitHub PAT. Usa localStorage.setItem('gh_pat','ghp_...') para habilitar push directo.");
+            return false;
+        }
+        const putRes = await fetch(apiUrl, {
+            method: "PUT",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: `Toggle ${machineId} -> ${newStatus} desde dashboard`,
+                content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2) + "\n"))),
+                sha: fileData.sha
+            })
+        });
+        return putRes.ok;
+    }
 
     function updateCheckTicker() {
         const el = document.getElementById("last-check-inline");
