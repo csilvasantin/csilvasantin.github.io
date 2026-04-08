@@ -444,8 +444,8 @@
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
     const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/AdmiraNext-Team/main/data/machines.json";
-    const DEMO_API = "http://localhost:3031/status";
-    const DEMO_PING = "http://localhost:3031/ping";
+    const DEMO_API = "http://localhost:3032/status";
+    const DEMO_PING = "http://localhost:3032/ping";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -579,7 +579,7 @@
                 const res = await fetch(DEMO_PING, { signal: AbortSignal.timeout(2000) });
                 if (!res.ok) throw new Error();
             } catch (e) {
-                alert("Demo server no detectado.\\n\\nEjecuta en terminal:\\npython ops/demo-server.py");
+                alert("AdmiraNext Demo Server no detectado.\\n\\nEjecuta en terminal:\\npython3 ops/demo-server.py");
                 return;
             }
             demoMode = true;
@@ -636,7 +636,7 @@
             if (demoMode && machineIdAttr) {
                 const cachedSrc = lastThumbSrc[machineIdAttr];
                 const thumbSrc = isOnline
-                    ? (cachedSrc || `http://localhost:3031/screenshot/${machineIdAttr}?t=${Date.now()}`)
+                    ? (cachedSrc || `http://localhost:3032/screenshot/${machineIdAttr}?t=${Date.now()}`)
                     : cachedSrc;
 
                 if (thumbSrc) {
@@ -704,7 +704,7 @@
 
     let lastCheckTime = null;
 
-    const DEMO_TOGGLE = "http://localhost:3031/toggle/";
+    const DEMO_TOGGLE = "http://localhost:3032/toggle/";
     // Cache last known good thumbnail src per machine (survives offline)
     const lastThumbSrc = {};
 
@@ -735,7 +735,7 @@
         } catch (_) {
             // Si el Mac Mini no responde en modo DEMO, usar demo-server local
             if (demoMode) {
-                fetch(`http://localhost:3031/power/${machineId}`, {
+                fetch(`http://localhost:3032/power/${machineId}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action }),
@@ -757,13 +757,13 @@
         const overlay = document.getElementById("screen-overlay");
         const img = document.getElementById("screen-overlay-img");
         const lbl = document.getElementById("screen-overlay-label");
-        img.src = `http://localhost:3031/screenshot/${machineId}?t=${Date.now()}&full=1`;
+        img.src = `http://localhost:3032/screenshot/${machineId}?t=${Date.now()}&full=1`;
         lbl.textContent = label;
         overlay.classList.add("visible");
         // Auto-refresh fullscreen image every 5s
         overlay._refreshInterval = setInterval(() => {
             if (overlay.classList.contains("visible")) {
-                img.src = `http://localhost:3031/screenshot/${machineId}?t=${Date.now()}&full=1`;
+                img.src = `http://localhost:3032/screenshot/${machineId}?t=${Date.now()}&full=1`;
             }
         }, 5000);
     }
