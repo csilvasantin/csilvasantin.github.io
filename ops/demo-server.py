@@ -87,12 +87,12 @@ def take_screenshot(machine_id, full=False):
             pass
         return None
 
-    # Para maquinas remotas: pedir al control-agent (puerto 3030) que ya tiene
-    # ScreenCaptureKit y permisos de Screen Recording
-    # Primero intentar snapshot directo del control-agent de esa máquina
+    # Para maquinas remotas: pedir al control-agent del Mac Mini (localhost:3030)
+    # que centraliza capturas de todas las maquinas via SSH+ScreenCaptureKit.
+    # Si falla, intentar el control-agent remoto de esa maquina.
     for url in [
-        f"http://{ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
         f"http://localhost:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
+        f"http://{ip}:{CONTROL_AGENT_PORT}/api/screenshots/{machine_id}",
     ]:
         try:
             req = urllib.request.Request(url)
