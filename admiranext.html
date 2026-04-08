@@ -267,6 +267,48 @@
         }
         #last-check { color: #555; }
 
+        /* Demo mode toggle */
+        .demo-toggle {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #666;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .demo-toggle:hover { border-color: #555; color: #aaa; }
+        .demo-toggle.active {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border-color: #e74c3c;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
+            animation: demo-pulse 2s infinite;
+        }
+        @keyframes demo-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(231, 76, 60, 0.7); }
+        }
+        .demo-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+        .demo-toggle.active .demo-dot {
+            background: #fff;
+            animation: pulse 1s infinite;
+        }
+
         @media (max-width: 768px) {
             .status-grid { grid-template-columns: 1fr; }
             .gen-btn { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
@@ -308,9 +350,15 @@
         </div>
     </div>
 
+    <button class="demo-toggle" id="demo-btn" onclick="toggleDemo()">
+        <span class="demo-dot"></span> DEMO
+    </button>
+
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
     const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/AdmiraNext-Team/main/data/machines.json";
+    const DEMO_API = "http://localhost:3031/status";
+    const DEMO_PING = "http://localhost:3031/ping";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -396,8 +444,24 @@
         return onlineMachines;
     }
 
+    let demoMode = false;
+    let demoInterval = null;
+
     async function fetchMachines() {
-        // Try local API first
+        // DEMO MODE: use localhost Tailscale bridge (fastest)
+        if (demoMode) {
+            try {
+                const res = await fetch(DEMO_API + "?t=" + Date.now(), { signal: AbortSignal.timeout(2000) });
+                const data = await res.json();
+                loadMachines(data);
+                apiOk = true;
+                return;
+            } catch (e) {
+                // Demo server down, fall through to normal flow
+            }
+        }
+
+        // Try Mac Mini API
         try {
             const res = await fetch(CONTROL_API, { signal: AbortSignal.timeout(4000) });
             const data = await res.json();
@@ -418,6 +482,31 @@
             });
             if (!apiOk) apiOk = true;
         } catch (e2) {}
+    }
+
+    async function toggleDemo() {
+        const btn = document.getElementById("demo-btn");
+        if (!demoMode) {
+            // Check if demo server is running
+            try {
+                const res = await fetch(DEMO_PING, { signal: AbortSignal.timeout(2000) });
+                if (!res.ok) throw new Error();
+            } catch (e) {
+                alert("Demo server no detectado.\\n\\nEjecuta en terminal:\\npython ops/demo-server.py");
+                return;
+            }
+            demoMode = true;
+            btn.classList.add("active");
+            // Fast polling: every 3 seconds
+            clearInterval(demoInterval);
+            demoInterval = setInterval(refresh, 3000);
+            refresh();
+        } else {
+            demoMode = false;
+            btn.classList.remove("active");
+            clearInterval(demoInterval);
+            demoInterval = null;
+        }
     }
 
     function render() {
