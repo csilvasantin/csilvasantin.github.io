@@ -624,9 +624,18 @@
             const btnClass = isOnline ? "on" : "off";
             const machineIdAttr = member.machineId || "";
 
-            const thumbHtml = demoMode && isOnline && machineIdAttr
-                ? `<img class="screen-thumb" id="thumb-${machineIdAttr}" src="http://localhost:3031/screenshot/${machineIdAttr}?t=${Date.now()}" alt="Pantalla" onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')" onerror="this.classList.add('offline'); this.alt=''">`
-                : `<div class="screen-placeholder">${isOnline ? '...' : '⏻'}</div>`;
+            const existingThumb = document.getElementById(`thumb-${machineIdAttr}`);
+            let thumbHtml;
+            if (demoMode && isOnline && machineIdAttr) {
+                if (existingThumb && !existingThumb.classList.contains("offline")) {
+                    // Keep existing thumbnail — don't recreate it (avoids flicker)
+                    thumbHtml = existingThumb.outerHTML;
+                } else {
+                    thumbHtml = `<img class="screen-thumb" id="thumb-${machineIdAttr}" src="http://localhost:3031/screenshot/${machineIdAttr}?t=${Date.now()}" alt="Pantalla" onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')" onerror="this.classList.add('offline'); this.alt=''>`;
+                }
+            } else {
+                thumbHtml = `<div class="screen-placeholder">${isOnline ? '...' : '⏻'}</div>`;
+            }
 
             const html = `
                 <div class="member-row ${isOnline ? 'nameplate-gold' : 'nameplate-gray'}">
@@ -804,16 +813,19 @@
         if (e.key === "Escape") closeScreenOverlay();
     });
 
-    // Refresh thumbnails every 10s in demo mode
+    // Refresh thumbnails every 10s in demo mode — preload to avoid flicker
     let thumbInterval = null;
     function startThumbRefresh() {
         if (thumbInterval) return;
         thumbInterval = setInterval(() => {
-            document.querySelectorAll(".screen-thumb").forEach(img => {
-                if (!img.classList.contains("offline")) {
-                    const base = img.src.split("?")[0];
-                    img.src = base + "?t=" + Date.now();
-                }
+            document.querySelectorAll(".screen-thumb").forEach(visible => {
+                if (visible.classList.contains("offline")) return;
+                const base = visible.src.split("?")[0];
+                const newUrl = base + "?t=" + Date.now();
+                // Preload: only swap when the new image is ready
+                const preload = new Image();
+                preload.onload = () => { visible.src = newUrl; };
+                preload.src = newUrl;
             });
         }, 10000);
     }
