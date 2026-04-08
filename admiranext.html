@@ -484,7 +484,7 @@
             { role: "CFO", persona: "Warren Buffett",  x: 45, y: 25, machineId: "admira-macmini" },
             // Creativo (right/blue)
             { role: "CCO", persona: "Walt Disney",     x: 58, y: 23, machineId: "admira-macbookairblanco" },
-            { role: "CDO", persona: "Dieter Rams",     x: 68, y: 27, machineId: "admira-macbookairazul" },
+            { role: "CDO", persona: "Dieter Rams",     x: 72, y: 27, machineId: "admira-macbookairazul" },
             { role: "CXO", persona: "Howard Schultz",  x: 82, y: 32, machineId: null },
             { role: "CSO", persona: "George Lucas",    x: 92, y: 38, machineId: "admira-macbook-carla" },
         ],
@@ -496,7 +496,7 @@
             { role: "CFO", persona: "Ruth Porat",      x: 45, y: 25, machineId: "admira-macmini" },
             // Creativo (right/blue)
             { role: "CCO", persona: "John Lasseter",   x: 58, y: 23, machineId: "admira-macbookairblanco" },
-            { role: "CDO", persona: "Jony Ive",        x: 68, y: 27, machineId: "admira-macbookairazul" },
+            { role: "CDO", persona: "Jony Ive",        x: 72, y: 27, machineId: "admira-macbookairazul" },
             { role: "CXO", persona: "Carlos Ratti",    x: 82, y: 32, machineId: null },
             { role: "CSO", persona: "Ryan Reynolds",   x: 92, y: 38, machineId: "admira-macbook-carla" },
         ],
@@ -505,6 +505,9 @@
     let machineStatus = {};
     let apiOk = false;
     let currentGen = "leyendas";
+    // Maquinas dormidas manualmente desde el dashboard (display sleep)
+    // El Mac sigue en Tailscale como "online" pero la pantalla esta apagada
+    const sleepingMachines = new Set();
 
     function setGen(gen) {
         currentGen = gen;
@@ -524,8 +527,12 @@
         machineStatus = {};
         let onlineMachines = 0;
         (data.machines || []).forEach(m => {
-            const isOnline = m.status === "online" || m.status === "idle" || m.status === "busy";
-            machineStatus[m.id] = { status: m.status, name: m.name, online: isOnline };
+            let isOnline = m.status === "online" || m.status === "idle" || m.status === "busy";
+            // Respetar override de display sleep (pantalla apagada desde dashboard)
+            if (sleepingMachines.has(m.id)) {
+                isOnline = false;
+            }
+            machineStatus[m.id] = { status: isOnline ? m.status : "offline", name: m.name, online: isOnline };
             if (isOnline) onlineMachines++;
         });
         return onlineMachines;
@@ -713,6 +720,13 @@
 
         const action = currentlyOnline ? "sleep" : "wake";
         const newStatus = currentlyOnline ? "offline" : "online";
+
+        // Actualizar estado de sleeping
+        if (action === "sleep") {
+            sleepingMachines.add(machineId);
+        } else {
+            sleepingMachines.delete(machineId);
+        }
 
         // Feedback visual inmediato
         machineStatus[machineId] = {
