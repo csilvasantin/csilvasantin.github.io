@@ -355,6 +355,24 @@
             color: #aaa;
             font-size: 0.85rem;
             font-weight: 600;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .screen-overlay-time {
+            display: inline-block;
+            padding: 0.15rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 0.5rem;
+        }
+        .screen-overlay-time.live {
+            background: rgba(68,187,68,0.25);
+            color: #44bb44;
+        }
+        .screen-overlay-time.stale {
+            background: rgba(255,165,0,0.2);
+            color: #ffa500;
         }
         .screen-overlay-close {
             position: absolute;
@@ -630,11 +648,15 @@
         const filtered = COUNCIL.filter(m => m.gen === currentGen);
         const creativoEl = document.getElementById("creativo-members");
         const racionalEl = document.getElementById("racional-members");
-        // Save existing thumbnail srcs before destroying DOM
+        // Save existing thumbnail srcs and update timestamps
         document.querySelectorAll(".screen-thumb").forEach(img => {
             const mid = img.id.replace("thumb-", "");
-            if (mid && img.src && !img.classList.contains("offline")) {
+            if (mid && img.src) {
                 lastThumbSrc[mid] = img.src;
+                // Si esta live, actualizar timestamp
+                if (img.classList.contains("live")) {
+                    lastThumbTime[mid] = new Date();
+                }
             }
         });
 
@@ -738,6 +760,8 @@
     const DEMO_TOGGLE = "https://macmini.tail48b61c.ts.net/demo/toggle/";
     // Cache last known good thumbnail src per machine (survives offline)
     const lastThumbSrc = {};
+    // Timestamp de la ultima captura buena por maquina
+    const lastThumbTime = {};
 
     async function togglePower(machineId, currentlyOnline) {
         if (!machineId) return;
@@ -784,15 +808,34 @@
         const overlay = document.getElementById("screen-overlay");
         const img = document.getElementById("screen-overlay-img");
         const lbl = document.getElementById("screen-overlay-label");
+        const machine = machineStatus[machineId];
+        const isOnline = machine && machine.online;
+
         img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
-        lbl.textContent = label;
+
+        // Build label with timestamp
+        let timeHtml = '';
+        if (isOnline) {
+            const now = new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+            timeHtml = `<span class="screen-overlay-time live">EN VIVO · ${now}</span>`;
+        } else if (lastThumbTime[machineId]) {
+            const t = lastThumbTime[machineId];
+            const timeStr = t.toLocaleString("es-ES", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+            timeHtml = `<span class="screen-overlay-time stale">Ultima captura · ${timeStr}</span>`;
+        }
+        lbl.innerHTML = `${label} ${timeHtml}`;
+
         overlay.classList.add("visible");
-        // Auto-refresh fullscreen image every 5s
-        overlay._refreshInterval = setInterval(() => {
-            if (overlay.classList.contains("visible")) {
-                img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
-            }
-        }, 5000);
+        // Auto-refresh fullscreen image every 5s (only if online)
+        if (isOnline) {
+            overlay._refreshInterval = setInterval(() => {
+                if (overlay.classList.contains("visible")) {
+                    img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
+                    const now = new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
+                    lbl.innerHTML = `${label} <span class="screen-overlay-time live">EN VIVO · ${now}</span>`;
+                }
+            }, 5000);
+        }
     }
 
     function closeScreenOverlay() {
