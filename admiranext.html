@@ -268,34 +268,55 @@
         #last-check { color: #555; }
 
         /* Screenshot thumbnails */
+        .screen-wrap {
+            position: relative;
+            width: 56px;
+            height: 36px;
+            flex-shrink: 0;
+        }
         .screen-thumb {
             width: 56px;
             height: 36px;
             border-radius: 4px;
             object-fit: cover;
             cursor: pointer;
-            flex-shrink: 0;
             border: 1px solid #333;
             background: #111;
-            transition: all 0.3s;
+            transition: all 0.4s;
             image-rendering: auto;
+            filter: grayscale(1) brightness(0.6);
         }
-        .screen-thumb:hover {
+        .screen-thumb.live {
+            filter: none;
+            border-color: #44bb44;
+            box-shadow: 0 0 6px rgba(68,187,68,0.3);
+        }
+        .screen-wrap:hover .screen-thumb {
             transform: scale(1.3);
             border-color: #666;
             box-shadow: 0 0 12px rgba(255,255,255,0.15);
             z-index: 10;
             position: relative;
         }
-        .screen-thumb.offline {
-            opacity: 0.3;
-            cursor: default;
+        .screen-wrap:hover .screen-thumb.live {
+            border-color: #44bb44;
+            box-shadow: 0 0 16px rgba(68,187,68,0.4);
         }
-        .screen-thumb.offline:hover {
-            transform: none;
-            border-color: #333;
-            box-shadow: none;
+        .screen-time {
+            position: absolute;
+            bottom: 1px;
+            right: 2px;
+            font-size: 0.4rem;
+            font-weight: 700;
+            color: #fff;
+            background: rgba(68,187,68,0.8);
+            padding: 0 3px;
+            border-radius: 2px;
+            line-height: 1.4;
+            pointer-events: none;
+            display: none;
         }
+        .screen-thumb.live + .screen-time { display: block; }
         .screen-placeholder {
             width: 56px;
             height: 36px;
@@ -642,19 +663,22 @@
             let thumbHtml;
             if (demoMode && machineIdAttr) {
                 const cachedSrc = lastThumbSrc[machineIdAttr];
-                const thumbSrc = isOnline
-                    ? (cachedSrc || `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineIdAttr}?t=${Date.now()}`)
-                    : cachedSrc;
-
-                if (thumbSrc) {
-                    const dimStyle = isOnline ? '' : ' style="opacity:0.35;filter:grayscale(1)"';
-                    const offlineCls = isOnline ? '' : ' offline';
-                    thumbHtml = `<img class="screen-thumb${offlineCls}" id="thumb-${machineIdAttr}" src="${thumbSrc}" alt="Pantalla"${dimStyle} onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')" onerror="this.style.display='none'">`;
-                } else {
-                    thumbHtml = `<div class="screen-placeholder">⏻</div>`;
-                }
+                const thumbSrc = cachedSrc || `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineIdAttr}?t=${Date.now()}`;
+                const liveCls = isOnline ? ' live' : '';
+                const now = new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit"});
+                thumbHtml = `<div class="screen-wrap">
+                    <img class="screen-thumb${liveCls}" id="thumb-${machineIdAttr}" src="${thumbSrc}" alt="Pantalla"
+                         onclick="event.stopPropagation(); openScreenOverlay('${machineIdAttr}', '${member.name} — ${member.persona}')"
+                         onerror="this.style.display='none'">
+                    <span class="screen-time">${now}</span>
+                </div>`;
+            } else if (machineIdAttr && lastThumbSrc[machineIdAttr]) {
+                // Fuera de demo pero con captura previa guardada: mostrar en gris
+                thumbHtml = `<div class="screen-wrap">
+                    <img class="screen-thumb" src="${lastThumbSrc[machineIdAttr]}" alt="Pantalla" onerror="this.style.display='none'">
+                </div>`;
             } else {
-                thumbHtml = `<div class="screen-placeholder">${isOnline ? '...' : '⏻'}</div>`;
+                thumbHtml = `<div class="screen-placeholder">⏻</div>`;
             }
 
             const html = `
