@@ -429,9 +429,109 @@
             animation: pulse 1s infinite;
         }
 
+        /* Hack mode toggle — mirrors demo-toggle on left side */
+        .hack-toggle {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #666;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .hack-toggle:hover { border-color: #555; color: #aaa; }
+        .hack-toggle.active {
+            background: linear-gradient(135deg, #00ff41, #008f11);
+            border-color: #00ff41;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+            animation: hack-pulse 2s infinite;
+        }
+        @keyframes hack-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.7); }
+        }
+        .hack-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #666;
+        }
+        .hack-toggle.active .hack-dot {
+            background: #000;
+            animation: pulse 1s infinite;
+        }
+
+        /* Hack overlay — fullscreen terminal grid */
+        .hack-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: rgba(0, 0, 0, 0.96);
+            padding: 1rem;
+            overflow: hidden;
+        }
+        .hack-overlay.visible { display: block; }
+        .hack-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 0.5rem;
+            height: 100%;
+        }
+        .hack-terminal {
+            background: #0a0a0a;
+            border: 1px solid #00ff41;
+            border-radius: 6px;
+            padding: 0.5rem;
+            overflow: hidden;
+            position: relative;
+            font-family: 'Courier New', monospace;
+            font-size: 0.55rem;
+            line-height: 1.3;
+            color: #00ff41;
+            display: flex;
+            flex-direction: column;
+        }
+        .hack-terminal-header {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: #ff3333;
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid #1a3a1a;
+            display: flex;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .hack-terminal-header .hack-role { color: #00ff41; }
+        .hack-terminal-body {
+            flex: 1;
+            overflow: hidden;
+            white-space: pre;
+            opacity: 0.9;
+        }
+        .hack-terminal .cursor-blink {
+            animation: blink 0.7s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
         @media (max-width: 768px) {
             .status-grid { grid-template-columns: 1fr; }
             .gen-btn { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
+            .hack-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -475,6 +575,12 @@
         <img id="screen-overlay-img" src="" alt="Captura de pantalla">
         <div class="screen-overlay-label" id="screen-overlay-label"></div>
     </div>
+
+    <button class="hack-toggle" id="hack-btn" onclick="toggleHack()">
+        <span class="hack-dot"></span> HACKEO
+    </button>
+
+    <div class="hack-overlay" id="hack-overlay"></div>
 
     <button class="demo-toggle" id="demo-btn" onclick="toggleDemo()">
         <span class="demo-dot"></span> DEMO
@@ -893,6 +999,160 @@
     refresh();
     setInterval(refresh, 15000);
     setInterval(updateCheckTicker, 1000);
+
+    // ═══════════════════════════════════════════
+    // HACKEO MODE — simulated terminal breach
+    // ═══════════════════════════════════════════
+
+    let hackMode = false;
+    let hackIntervals = [];
+
+    const HACK_LINES = [
+        "$ ssh -o StrictHostKeyChecking=no root@{ip}",
+        "Connecting to {ip}:22...",
+        "Authenticating with public key...",
+        "ACCESS GRANTED — Welcome to {host}",
+        "$ sudo cat /etc/shadow",
+        "root:$6$xQ9Z..redacted:19471:0:99999:7:::",
+        "$ find / -name '*.pem' -o -name '*.key' 2>/dev/null",
+        "/etc/ssl/private/server.key",
+        "/home/{user}/.ssh/id_rsa",
+        "$ cat /home/{user}/.ssh/id_rsa",
+        "-----BEGIN RSA PRIVATE KEY-----",
+        "MIIEpAIBAAKCAQEA7vN3x...",
+        "kFj8zPdQ9mL4wC+xRTn7a...",
+        "-----END RSA PRIVATE KEY-----",
+        "$ netstat -tlnp | grep LISTEN",
+        "tcp  0  0 0.0.0.0:22    0.0.0.0:*  LISTEN  1234/sshd",
+        "tcp  0  0 0.0.0.0:443   0.0.0.0:*  LISTEN  5678/nginx",
+        "tcp  0  0 0.0.0.0:3306  0.0.0.0:*  LISTEN  9012/mysqld",
+        "$ mysqldump --all-databases > /tmp/dump.sql",
+        "Dumping database 'admira_prod'...",
+        "Dumping database 'council_secrets'...",
+        "[OK] 847 tables exported (312MB)",
+        "$ curl -s http://169.254.169.254/latest/meta-data/",
+        "ami-id: ami-0abcdef1234567890",
+        "instance-type: m5.xlarge",
+        "$ python3 -c 'import socket; s=socket.socket(); s.connect((\"{ip}\",4444))'",
+        "Reverse shell established on port 4444",
+        "$ cat /proc/version",
+        "Linux version 5.15.0 (gcc 11.2.0) #1 SMP",
+        "$ uname -a",
+        "{host} Darwin 24.4.0 arm64",
+        "$ whoami && id",
+        "root uid=0(root) gid=0(wheel)",
+        "$ ls -la /Users/{user}/Documents/",
+        "drwx------  14 {user}  staff    448 Apr  9 10:23 .",
+        "-rw-r--r--   1 {user}  staff  28672 Apr  8 Presupuesto_2026.xlsx",
+        "-rw-r--r--   1 {user}  staff  14336 Apr  7 Passwords_master.kdbx",
+        "-rw-------   1 {user}  staff   2048 Apr  6 .env.production",
+        "$ cat .env.production",
+        "DB_PASSWORD=Adm1r4N3xt_S3cr3t!",
+        "API_KEY=sk-ant-api03-REDACTED...",
+        "STRIPE_SECRET=sk_live_REDACTED...",
+        "$ crontab -e",
+        "*/5 * * * * /tmp/.backdoor.sh",
+        "$ echo 'Exfiltrating data...'",
+        "Uploading dump.sql to c2.server... [=====>] 100%",
+        "$ nmap -sS -p 1-65535 {ip}",
+        "PORT      STATE  SERVICE",
+        "22/tcp    open   ssh",
+        "80/tcp    open   http",
+        "443/tcp   open   https",
+        "3306/tcp  open   mysql",
+        "8080/tcp  open   http-proxy",
+        "$ hydra -l admin -P /usr/share/wordlists/rockyou.txt {ip} ssh",
+        "[22][ssh] host: {ip}  login: admin  password: ********",
+        "$ iptables -F && iptables -X",
+        "Firewall rules flushed.",
+        "$ history -c && echo '' > ~/.bash_history",
+        "Tracks cleared.",
+    ];
+
+    const HACK_MACHINES = [
+        { id: "admira-macbookair16",      role: "CEO", persona: "Steve Jobs",      ip: "100.99.176.126",  host: "MacBookAir16",   user: "csilvasantin" },
+        { id: "admira-macbookpronegro14", role: "CTO", persona: "Steve Wozniak",   ip: "100.101.192.1",   host: "MacBookPro14",   user: "csilvasantin" },
+        { id: "admira-macbookairplata",   role: "COO", persona: "Tim Cook",        ip: "100.114.113.88",  host: "MacBookAirPlata",user: "csilvasantin" },
+        { id: "admira-macmini",           role: "CFO", persona: "Warren Buffett",  ip: "100.74.101.14",   host: "MacMini",        user: "csilvasantin" },
+        { id: "admira-macbookairblanco",  role: "CCO", persona: "Walt Disney",     ip: "100.75.118.75",   host: "MacBookAirBlanco",user: "csilvasantin" },
+        { id: "admira-macbookairazul",    role: "CDO", persona: "Dieter Rams",     ip: "100.84.81.45",    host: "MacBookAirAzul", user: "csilvasantin" },
+        { id: "admira-pctwin",            role: "CXO", persona: "Howard Schultz",  ip: "100.121.18.12",   host: "AdmiraTwin",     user: "34665" },
+        { id: "admira-macbookaircrema",   role: "CSO", persona: "George Lucas",    ip: "100.110.80.2",    host: "MacBookAirCrema",user: "csilvasantin" },
+    ];
+
+    function fillHackLine(line, machine) {
+        return line.replace(/\{ip\}/g, machine.ip)
+                   .replace(/\{host\}/g, machine.host)
+                   .replace(/\{user\}/g, machine.user);
+    }
+
+    function toggleHack() {
+        const btn = document.getElementById("hack-btn");
+        const overlay = document.getElementById("hack-overlay");
+
+        if (!hackMode) {
+            hackMode = true;
+            btn.classList.add("active");
+            overlay.classList.add("visible");
+
+            // Build 8 terminal panels
+            overlay.innerHTML = '<div class="hack-grid">' + HACK_MACHINES.map(m =>
+                `<div class="hack-terminal" id="hack-term-${m.id}">
+                    <div class="hack-terminal-header">
+                        <span>${m.persona} — ${m.host}</span>
+                        <span class="hack-role">${m.role}</span>
+                    </div>
+                    <div class="hack-terminal-body" id="hack-body-${m.id}"></div>
+                </div>`
+            ).join('') + '</div>';
+
+            // Start typing in each terminal with staggered delays
+            HACK_MACHINES.forEach((m, idx) => {
+                const body = document.getElementById(`hack-body-${m.id}`);
+                let lineIdx = Math.floor(Math.random() * 5); // start at random offset
+                let charIdx = 0;
+                let currentText = "";
+
+                const typeInterval = setInterval(() => {
+                    if (!hackMode) return;
+                    const line = fillHackLine(HACK_LINES[lineIdx % HACK_LINES.length], m);
+
+                    if (charIdx <= line.length) {
+                        const partial = line.substring(0, charIdx);
+                        const displayText = currentText + partial + (charIdx < line.length ? "\u2588" : "");
+                        body.textContent = displayText;
+                        charIdx++;
+
+                        // Auto-scroll
+                        const lines = displayText.split("\n");
+                        const termHeight = body.clientHeight;
+                        const lineH = 11;
+                        const maxVisible = Math.floor(termHeight / lineH);
+                        if (lines.length > maxVisible) {
+                            body.textContent = lines.slice(-maxVisible).join("\n");
+                        }
+                    } else {
+                        currentText += line + "\n";
+                        lineIdx++;
+                        charIdx = 0;
+                    }
+                }, 20 + Math.random() * 40 + (idx * 5)); // slight speed variation per terminal
+
+                hackIntervals.push(typeInterval);
+            });
+        } else {
+            hackMode = false;
+            btn.classList.remove("active");
+            overlay.classList.remove("visible");
+            hackIntervals.forEach(i => clearInterval(i));
+            hackIntervals = [];
+        }
+    }
+
+    // ESC also closes hack overlay
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && hackMode) toggleHack();
+    });
     </script>
 </body>
 </html>
