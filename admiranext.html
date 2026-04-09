@@ -444,8 +444,8 @@
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
     const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/AdmiraNext-Team/main/data/machines.json";
-    const DEMO_API = "http://localhost:3032/status";
-    const DEMO_PING = "http://localhost:3032/ping";
+    const DEMO_API = "https://macmini.tail48b61c.ts.net/demo/status";
+    const DEMO_PING = "https://macmini.tail48b61c.ts.net/demo/ping";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -643,7 +643,7 @@
             if (demoMode && machineIdAttr) {
                 const cachedSrc = lastThumbSrc[machineIdAttr];
                 const thumbSrc = isOnline
-                    ? (cachedSrc || `http://localhost:3032/screenshot/${machineIdAttr}?t=${Date.now()}`)
+                    ? (cachedSrc || `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineIdAttr}?t=${Date.now()}`)
                     : cachedSrc;
 
                 if (thumbSrc) {
@@ -711,7 +711,7 @@
 
     let lastCheckTime = null;
 
-    const DEMO_TOGGLE = "http://localhost:3032/toggle/";
+    const DEMO_TOGGLE = "https://macmini.tail48b61c.ts.net/demo/toggle/";
     // Cache last known good thumbnail src per machine (survives offline)
     const lastThumbSrc = {};
 
@@ -759,13 +759,13 @@
         const overlay = document.getElementById("screen-overlay");
         const img = document.getElementById("screen-overlay-img");
         const lbl = document.getElementById("screen-overlay-label");
-        img.src = `http://localhost:3032/screenshot/${machineId}?t=${Date.now()}&full=1`;
+        img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
         lbl.textContent = label;
         overlay.classList.add("visible");
         // Auto-refresh fullscreen image every 5s
         overlay._refreshInterval = setInterval(() => {
             if (overlay.classList.contains("visible")) {
-                img.src = `http://localhost:3032/screenshot/${machineId}?t=${Date.now()}&full=1`;
+                img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
             }
         }, 5000);
     }
