@@ -1001,16 +1001,17 @@
     setInterval(updateCheckTicker, 1000);
 
     // ═══════════════════════════════════════════
-    // HACKEO MODE — simulated terminal breach
+    // HACKEO MODE — real terminal breach on council machines
     // ═══════════════════════════════════════════
 
     let hackMode = false;
     let hackIntervals = [];
+    const HACK_API = DEMO_API.replace("/status", "");  // http://localhost:3032
 
     const HACK_LINES = [
         "$ ssh -o StrictHostKeyChecking=no root@{ip}",
         "Connecting to {ip}:22...",
-        "Authenticating with public key...",
+        "Authenticating with stolen RSA key...",
         "ACCESS GRANTED — Welcome to {host}",
         "$ sudo cat /etc/shadow",
         "root:$6$xQ9Z..redacted:19471:0:99999:7:::",
@@ -1030,13 +1031,8 @@
         "Dumping database 'admira_prod'...",
         "Dumping database 'council_secrets'...",
         "[OK] 847 tables exported (312MB)",
-        "$ curl -s http://169.254.169.254/latest/meta-data/",
-        "ami-id: ami-0abcdef1234567890",
-        "instance-type: m5.xlarge",
         "$ python3 -c 'import socket; s=socket.socket(); s.connect((\"{ip}\",4444))'",
         "Reverse shell established on port 4444",
-        "$ cat /proc/version",
-        "Linux version 5.15.0 (gcc 11.2.0) #1 SMP",
         "$ uname -a",
         "{host} Darwin 24.4.0 arm64",
         "$ whoami && id",
@@ -1045,24 +1041,17 @@
         "drwx------  14 {user}  staff    448 Apr  9 10:23 .",
         "-rw-r--r--   1 {user}  staff  28672 Apr  8 Presupuesto_2026.xlsx",
         "-rw-r--r--   1 {user}  staff  14336 Apr  7 Passwords_master.kdbx",
-        "-rw-------   1 {user}  staff   2048 Apr  6 .env.production",
         "$ cat .env.production",
         "DB_PASSWORD=Adm1r4N3xt_S3cr3t!",
         "API_KEY=sk-ant-api03-REDACTED...",
         "STRIPE_SECRET=sk_live_REDACTED...",
-        "$ crontab -e",
-        "*/5 * * * * /tmp/.backdoor.sh",
         "$ echo 'Exfiltrating data...'",
         "Uploading dump.sql to c2.server... [=====>] 100%",
         "$ nmap -sS -p 1-65535 {ip}",
         "PORT      STATE  SERVICE",
         "22/tcp    open   ssh",
-        "80/tcp    open   http",
         "443/tcp   open   https",
         "3306/tcp  open   mysql",
-        "8080/tcp  open   http-proxy",
-        "$ hydra -l admin -P /usr/share/wordlists/rockyou.txt {ip} ssh",
-        "[22][ssh] host: {ip}  login: admin  password: ********",
         "$ iptables -F && iptables -X",
         "Firewall rules flushed.",
         "$ history -c && echo '' > ~/.bash_history",
@@ -1086,16 +1075,18 @@
                    .replace(/\{user\}/g, machine.user);
     }
 
-    function toggleHack() {
+    async function toggleHack() {
         const btn = document.getElementById("hack-btn");
         const overlay = document.getElementById("hack-overlay");
 
         if (!hackMode) {
+            // === ACTIVATE HACK ===
             hackMode = true;
             btn.classList.add("active");
+            btn.querySelector(".hack-dot").style.background = "#000";
             overlay.classList.add("visible");
 
-            // Build 8 terminal panels
+            // Build 8 terminal panels (local visual)
             overlay.innerHTML = '<div class="hack-grid">' + HACK_MACHINES.map(m =>
                 `<div class="hack-terminal" id="hack-term-${m.id}">
                     <div class="hack-terminal-header">
@@ -1106,28 +1097,23 @@
                 </div>`
             ).join('') + '</div>';
 
-            // Start typing in each terminal with staggered delays
+            // Start local terminal animation
             HACK_MACHINES.forEach((m, idx) => {
                 const body = document.getElementById(`hack-body-${m.id}`);
-                let lineIdx = Math.floor(Math.random() * 5); // start at random offset
+                let lineIdx = Math.floor(Math.random() * 5);
                 let charIdx = 0;
                 let currentText = "";
 
                 const typeInterval = setInterval(() => {
                     if (!hackMode) return;
                     const line = fillHackLine(HACK_LINES[lineIdx % HACK_LINES.length], m);
-
                     if (charIdx <= line.length) {
                         const partial = line.substring(0, charIdx);
                         const displayText = currentText + partial + (charIdx < line.length ? "\u2588" : "");
                         body.textContent = displayText;
                         charIdx++;
-
-                        // Auto-scroll
                         const lines = displayText.split("\n");
-                        const termHeight = body.clientHeight;
-                        const lineH = 11;
-                        const maxVisible = Math.floor(termHeight / lineH);
+                        const maxVisible = Math.floor(body.clientHeight / 11);
                         if (lines.length > maxVisible) {
                             body.textContent = lines.slice(-maxVisible).join("\n");
                         }
@@ -1136,16 +1122,45 @@
                         lineIdx++;
                         charIdx = 0;
                     }
-                }, 20 + Math.random() * 40 + (idx * 5)); // slight speed variation per terminal
+                }, 20 + Math.random() * 40 + (idx * 5));
 
                 hackIntervals.push(typeInterval);
             });
+
+            // Launch hack on REAL machines via demo server
+            try {
+                await fetch(HACK_API + "/hack", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    signal: AbortSignal.timeout(5000)
+                });
+                console.log("HACK: launched on real machines");
+            } catch (e) {
+                console.warn("HACK: could not reach demo server, local animation only", e.message);
+            }
+
         } else {
+            // === DEACTIVATE HACK — restore previous state ===
             hackMode = false;
             btn.classList.remove("active");
             overlay.classList.remove("visible");
             hackIntervals.forEach(i => clearInterval(i));
             hackIntervals = [];
+
+            // Stop hack on REAL machines (closes Terminal, kills script)
+            try {
+                await fetch(HACK_API + "/hack/stop", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    signal: AbortSignal.timeout(5000)
+                });
+                console.log("HACK: stopped on real machines, restoring state");
+            } catch (e) {
+                console.warn("HACK: could not reach demo server for stop", e.message);
+            }
+
+            // Refresh dashboard to restore council view
+            await refresh();
         }
     }
 
