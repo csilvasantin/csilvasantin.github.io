@@ -813,17 +813,23 @@
 
         img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
 
-        // Build label with timestamp
-        let timeHtml = '';
-        if (isOnline) {
+        // Build label: always show a timestamp
+        function buildLabel() {
             const now = new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-            timeHtml = `<span class="screen-overlay-time live">EN VIVO · ${now}</span>`;
-        } else if (lastThumbTime[machineId]) {
-            const t = lastThumbTime[machineId];
-            const timeStr = t.toLocaleString("es-ES", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
-            timeHtml = `<span class="screen-overlay-time stale">Ultima captura · ${timeStr}</span>`;
+            if (isOnline) {
+                return `${label} <span class="screen-overlay-time live">EN VIVO · ${now}</span>`;
+            }
+            if (lastThumbTime[machineId]) {
+                const t = lastThumbTime[machineId];
+                const timeStr = t.toLocaleString("es-ES", {day:"numeric", month:"short", hour:"2-digit", minute:"2-digit"});
+                return `${label} <span class="screen-overlay-time stale">Ultima captura · ${timeStr}</span>`;
+            }
+            return `${label} <span class="screen-overlay-time stale">Captura guardada</span>`;
         }
-        lbl.innerHTML = `${label} ${timeHtml}`;
+        lbl.innerHTML = buildLabel();
+
+        // If online: mark timestamp now (in case it wasnt set yet)
+        if (isOnline) lastThumbTime[machineId] = new Date();
 
         overlay.classList.add("visible");
         // Auto-refresh fullscreen image every 5s (only if online)
@@ -831,8 +837,7 @@
             overlay._refreshInterval = setInterval(() => {
                 if (overlay.classList.contains("visible")) {
                     img.src = `https://macmini.tail48b61c.ts.net/demo/screenshot/${machineId}?t=${Date.now()}&full=1`;
-                    const now = new Date().toLocaleTimeString("es-ES", {hour:"2-digit", minute:"2-digit", second:"2-digit"});
-                    lbl.innerHTML = `${label} <span class="screen-overlay-time live">EN VIVO · ${now}</span>`;
+                    lbl.innerHTML = buildLabel();
                 }
             }, 5000);
         }
