@@ -490,31 +490,69 @@
             height: 100%;
         }
         .hack-terminal {
-            background: #0a0a0a;
-            border: 1px solid #00ff41;
             border-radius: 6px;
             padding: 0.5rem;
             overflow: hidden;
             position: relative;
-            font-family: 'Courier New', monospace;
             font-size: 0.55rem;
             line-height: 1.3;
-            color: #00ff41;
             display: flex;
             flex-direction: column;
+            /* defaults — overridden per-style */
+            background: #0a0a0a;
+            border: 1px solid #00ff41;
+            font-family: 'Courier New', monospace;
+            color: #00ff41;
         }
         .hack-terminal-header {
             font-size: 0.6rem;
             font-weight: 700;
-            color: #ff3333;
             margin-bottom: 0.3rem;
             padding-bottom: 0.3rem;
-            border-bottom: 1px solid #1a3a1a;
             display: flex;
             justify-content: space-between;
             flex-shrink: 0;
         }
-        .hack-terminal-header .hack-role { color: #00ff41; }
+
+        /* Style 0: Classic green-on-black (Matrix) */
+        .hack-style-0 { background: #0a0a0a; border-color: #00ff41; color: #00ff41; font-family: 'Courier New', monospace; }
+        .hack-style-0 .hack-terminal-header { color: #ff3333; border-bottom: 1px solid #1a3a1a; }
+        .hack-style-0 .hack-role { color: #00ff41; }
+
+        /* Style 1: Homebrew (amber on dark brown) */
+        .hack-style-1 { background: #1a0f00; border-color: #ff9900; color: #ffaa00; font-family: 'Monaco', 'Menlo', monospace; }
+        .hack-style-1 .hack-terminal-header { color: #ff6600; border-bottom: 1px solid #3a2a00; }
+        .hack-style-1 .hack-role { color: #ffcc00; }
+
+        /* Style 2: Ocean (cyan on deep navy) */
+        .hack-style-2 { background: #0a0a1e; border-color: #00ccff; color: #00ddff; font-family: 'Andale Mono', monospace; }
+        .hack-style-2 .hack-terminal-header { color: #ff66aa; border-bottom: 1px solid #0a1a3a; }
+        .hack-style-2 .hack-role { color: #00ffff; }
+
+        /* Style 3: Dracula (purple on dark) */
+        .hack-style-3 { background: #0d0b1a; border-color: #bd93f9; color: #f8f8f2; font-family: 'Courier New', monospace; }
+        .hack-style-3 .hack-terminal-header { color: #ff5555; border-bottom: 1px solid #2a1a3a; }
+        .hack-style-3 .hack-role { color: #bd93f9; }
+
+        /* Style 4: Retro CRT (bright green, scanline look) */
+        .hack-style-4 { background: #001100; border-color: #33ff33; color: #33ff33; font-family: 'Lucida Console', monospace; text-shadow: 0 0 3px #33ff33; }
+        .hack-style-4 .hack-terminal-header { color: #ffff33; border-bottom: 1px solid #003300; }
+        .hack-style-4 .hack-role { color: #66ff66; }
+
+        /* Style 5: Solarized Dark */
+        .hack-style-5 { background: #002b36; border-color: #268bd2; color: #839496; font-family: 'Menlo', 'Monaco', monospace; }
+        .hack-style-5 .hack-terminal-header { color: #cb4b16; border-bottom: 1px solid #073642; }
+        .hack-style-5 .hack-role { color: #2aa198; }
+
+        /* Style 6: Blood (red on black — Terminator) */
+        .hack-style-6 { background: #0a0000; border-color: #cc0000; color: #ff3333; font-family: 'Courier New', monospace; }
+        .hack-style-6 .hack-terminal-header { color: #ff0000; border-bottom: 1px solid #3a0000; }
+        .hack-style-6 .hack-role { color: #ff6666; }
+
+        /* Style 7: Tron (neon blue on dark) */
+        .hack-style-7 { background: #050a14; border-color: #00d4ff; color: #6fefff; font-family: 'Andale Mono', 'Monaco', monospace; text-shadow: 0 0 2px #00d4ff; }
+        .hack-style-7 .hack-terminal-header { color: #ff8800; border-bottom: 1px solid #0a1a2a; }
+        .hack-style-7 .hack-role { color: #00d4ff; }
         .hack-terminal-body {
             flex: 1;
             overflow: hidden;
@@ -1086,9 +1124,9 @@
             btn.querySelector(".hack-dot").style.background = "#000";
             overlay.classList.add("visible");
 
-            // Build 8 terminal panels (local visual)
-            overlay.innerHTML = '<div class="hack-grid">' + HACK_MACHINES.map(m =>
-                `<div class="hack-terminal" id="hack-term-${m.id}">
+            // Build 8 terminal panels — each with a unique visual style
+            overlay.innerHTML = '<div class="hack-grid">' + HACK_MACHINES.map((m, i) =>
+                `<div class="hack-terminal hack-style-${i}" id="hack-term-${m.id}">
                     <div class="hack-terminal-header">
                         <span>${m.persona} — ${m.host}</span>
                         <span class="hack-role">${m.role}</span>
@@ -1097,12 +1135,18 @@
                 </div>`
             ).join('') + '</div>';
 
-            // Start local terminal animation
+            // Typing speeds per terminal (ms per char) — from fast hacker to slow methodical
+            const HACK_SPEEDS = [15, 35, 8, 50, 22, 12, 45, 28];
+            // Each terminal starts at a different line offset for varied content
+            const HACK_OFFSETS = [0, 7, 14, 3, 21, 10, 5, 18];
+
+            // Start local terminal animation — each with unique speed & content offset
             HACK_MACHINES.forEach((m, idx) => {
                 const body = document.getElementById(`hack-body-${m.id}`);
-                let lineIdx = Math.floor(Math.random() * 5);
+                let lineIdx = HACK_OFFSETS[idx];
                 let charIdx = 0;
                 let currentText = "";
+                const speed = HACK_SPEEDS[idx] + Math.random() * 10;
 
                 const typeInterval = setInterval(() => {
                     if (!hackMode) return;
@@ -1122,7 +1166,7 @@
                         lineIdx++;
                         charIdx = 0;
                     }
-                }, 20 + Math.random() * 40 + (idx * 5));
+                }, speed);
 
                 hackIntervals.push(typeInterval);
             });
