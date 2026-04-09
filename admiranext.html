@@ -736,11 +736,12 @@
         };
         render();
 
-        // Usar siempre la API HTTPS del Mac Mini (Tailscale Funnel)
-        // para evitar bloqueo de mixed content (HTTPS page -> HTTP localhost)
-        const base = CONTROL_API.replace("/api/machines", "");
+        // En modo Demo usar el demo server, si no la API principal
+        const powerUrl = demoMode
+            ? `${DEMO_API.replace("/status", "")}/power/${machineId}`
+            : `${CONTROL_API.replace("/api/machines", "")}/api/machines/${machineId}/power`;
         try {
-            const res = await fetch(`${base}/api/machines/${machineId}/power`, {
+            const res = await fetch(powerUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action }),
