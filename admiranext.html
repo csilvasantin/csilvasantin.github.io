@@ -622,7 +622,7 @@
         if (!demoMode) {
             // Check if demo server is running
             try {
-                const res = await fetch(DEMO_PING, { signal: AbortSignal.timeout(2000) });
+                const res = await fetch(DEMO_PING, { signal: AbortSignal.timeout(8000) });
                 if (!res.ok) throw new Error();
             } catch (e) {
                 alert("AdmiraNext Demo Server no detectado.\\n\\nEjecuta en terminal:\\npython3 ops/demo-server.py");
