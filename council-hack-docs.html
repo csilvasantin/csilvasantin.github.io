@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdmiraNext Council — Hack Simulation Docs</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0a14; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+        h1 { color: #e74c3c; font-size: 2rem; margin-bottom: 0.5rem; }
+        h2 { color: #daa520; font-size: 1.3rem; margin: 2rem 0 0.8rem; border-bottom: 1px solid #333; padding-bottom: 0.4rem; }
+        h3 { color: #3498db; font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+        .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+        .date { color: #555; font-size: 0.8rem; }
+        p { margin-bottom: 0.8rem; color: #bbb; }
+        code { background: #1a1a2e; padding: 0.15rem 0.4rem; border-radius: 3px; font-family: 'Courier New', monospace; color: #00ff41; font-size: 0.9rem; }
+        pre { background: #1a1a2e; padding: 1rem; border-radius: 6px; overflow-x: auto; margin: 0.8rem 0 1.2rem; border: 1px solid #333; }
+        pre code { padding: 0; background: none; }
+        table { width: 100%; border-collapse: collapse; margin: 0.8rem 0 1.2rem; font-size: 0.85rem; }
+        th { background: #1a1a2e; color: #daa520; text-align: left; padding: 0.6rem 0.8rem; border: 1px solid #333; }
+        td { padding: 0.5rem 0.8rem; border: 1px solid #222; }
+        tr:hover { background: rgba(255,255,255,0.03); }
+        .tag { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; }
+        .tag-green { background: rgba(0,255,65,0.15); color: #00ff41; }
+        .tag-red { background: rgba(231,76,60,0.15); color: #e74c3c; }
+        .tag-yellow { background: rgba(218,165,32,0.15); color: #daa520; }
+        .tag-blue { background: rgba(52,152,219,0.15); color: #3498db; }
+        .tag-purple { background: rgba(189,147,249,0.15); color: #bd93f9; }
+        a { color: #3498db; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .warning { background: rgba(231,76,60,0.1); border-left: 3px solid #e74c3c; padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+        .info { background: rgba(52,152,219,0.1); border-left: 3px solid #3498db; padding: 0.8rem 1rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+        .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .section-card { background: #1a1a2e; padding: 1rem; border-radius: 6px; border: 1px solid #333; }
+        .section-card h4 { color: #daa520; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        @media (max-width: 600px) { .section-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<h1>AdmiraNext Council — Hack Simulation</h1>
+<div class="subtitle">Documentacion tecnica para el equipo · Actualizado <span class="date">10 abril 2026</span></div>
+
+<h2>Que es</h2>
+<p>Una simulacion cinematografica de hackeo que se lanza simultaneamente en los 8 equipos del Consejo de Direccion. Cada maquina muestra contenido unico: escena de pelicula, lenguajes de programacion, grupo hacker, velocidad de scroll y perfil de Terminal distintos.</p>
+
+<h2>Como lanzar</h2>
+
+<div class="section-grid">
+    <div class="section-card">
+        <h4>Desde la web</h4>
+        <p>Abrir <a href="https://csilvasantin.github.io/admiranext.html">admiranext.html</a> y pulsar el boton <span class="tag tag-red">HACKEO</span> abajo a la izquierda.</p>
+        <p>Requiere que el demo server del Mac Mini este activo.</p>
+    </div>
+    <div class="section-card">
+        <h4>Desde terminal</h4>
+        <p>Funciona desde cualquier maquina con Tailscale (PC, Mac, etc.):</p>
+        <pre><code>bash launch_remote.sh</code></pre>
+        <p>Para parar:</p>
+        <pre><code>bash stop_remote.sh</code></pre>
+    </div>
+</div>
+
+<h2>Fases del show (~3-4 minutos)</h2>
+
+<table>
+    <tr><th>#</th><th>Fase</th><th>Duracion</th><th>Descripcion</th></tr>
+    <tr><td>1</td><td>Escena de pelicula</td><td>~3s</td><td>Arte ASCII de una escena iconica (WOPR, HAL 9000, T-800, Blade Runner, Nostromo, Death Star, Matrix, Tron)</td></tr>
+    <tr><td>2</td><td>Hardware Fingerprint</td><td>~8s</td><td>Lee datos REALES del equipo: Model, Chip, Serial, UUID, WiFi, macOS</td></tr>
+    <tr><td>3</td><td>Exploit Framework</td><td>~10s</td><td>Barras de progreso cargando modulos de ataque</td></tr>
+    <tr><td>4</td><td>Network Map</td><td>~12s</td><td>Mapa ASCII de los 8 consejeros con IPs, marca "YOU ARE HERE"</td></tr>
+    <tr><td>5</td><td>Data Exfiltration</td><td>~15s</td><td>Barras de progreso por DB + tabla de archivos sensibles</td></tr>
+    <tr><td>6</td><td>Persistence</td><td>~5s</td><td>Panel de movimiento lateral y backdoor</td></tr>
+    <tr><td>7</td><td>Loop infinito</td><td>-</td><td>135 citas sci-fi + 12 ASCII arts rotando con lluvia de codigo</td></tr>
+</table>
+
+<h2>Lluvia de codigo — 6 columnas</h2>
+<p>Entre cada fase, la pantalla se llena con 6 columnas de codigo real, cada una en un color distinto:</p>
+
+<table>
+    <tr><th>Color</th><th>Columna</th><th>Contenido</th></tr>
+    <tr><td><span class="tag tag-green">Verde</span></td><td>Lenguaje clasico 1</td><td>Assembly, C, C++, Pascal, JavaScript</td></tr>
+    <tr><td><span style="color:#00ddff;">Cyan</span></td><td>Lenguaje clasico 2</td><td>(otro del grupo anterior)</td></tr>
+    <tr><td><span style="color:#daa520;">Amarillo</span></td><td>Lingo</td><td>Macromedia Director (1988-2017)</td></tr>
+    <tr><td><span class="tag tag-purple">Magenta</span></td><td>Lenguaje moderno</td><td>Rust, Go, Swift, Kotlin, TypeScript, Zig, Python, Ruby</td></tr>
+    <tr><td><span style="color:#fff;">Blanco</span></td><td>IA / ML</td><td>PyTorch, TensorFlow, LangChain, Scikit-learn</td></tr>
+    <tr><td><span class="tag tag-red">Rojo</span></td><td>Machine Code</td><td>Opcodes x86-64</td></tr>
+</table>
+<p>Cabecera con nombre del lenguaje, creador y fecha de creacion.</p>
+
+<h2>Consejo — Maquinas — Perfiles</h2>
+
+<table>
+    <tr><th>Silla</th><th>Leyenda</th><th>Maquina</th><th>Terminal</th><th>Pelicula</th><th>Velocidad</th></tr>
+    <tr><td><span class="tag tag-red">CEO</span></td><td>Steve Jobs</td><td>MacBook Air 16</td><td>Homebrew</td><td>WarGames</td><td>0.01s</td></tr>
+    <tr><td><span class="tag tag-red">CTO</span></td><td>Steve Wozniak</td><td>MacBook Pro Negro 14</td><td>Red Sands</td><td>2001</td><td>0.02s</td></tr>
+    <tr><td><span class="tag tag-red">COO</span></td><td>Tim Cook</td><td>MacBook Air Plata</td><td>Ocean</td><td>Terminator</td><td>0.03s</td></tr>
+    <tr><td><span class="tag tag-red">CFO</span></td><td>Warren Buffett</td><td>Mac Mini</td><td>Pro</td><td>Blade Runner</td><td>0.04s</td></tr>
+    <tr><td><span class="tag tag-blue">CCO</span></td><td>Walt Disney</td><td>MacBook Air Blanco</td><td>Novel</td><td>Alien</td><td>0.05s</td></tr>
+    <tr><td><span class="tag tag-blue">CDO</span></td><td>Dieter Rams</td><td>MacBook Air Azul</td><td>Silver Aerogel</td><td>Star Wars</td><td>0.06s</td></tr>
+    <tr><td><span class="tag tag-blue">CXO</span></td><td>Howard Schultz</td><td>AdmiraTwin (PC)</td><td>Grass</td><td>Matrix</td><td>0.07s</td></tr>
+    <tr><td><span class="tag tag-blue">CSO</span></td><td>George Lucas</td><td>MacBook Air Crema</td><td>Man Page</td><td>Tron</td><td>0.08s</td></tr>
+</table>
+
+<h2>Audio</h2>
+<p>Sonido de modem 56k al inicio de cada maquina, con variacion de frecuencia unica (8 perfiles distintos: desde modem clasico hasta sci-fi agudo).</p>
+
+<h2>Repositorios</h2>
+
+<table>
+    <tr><th>Repo</th><th>Archivo</th><th>Descripcion</th></tr>
+    <tr><td><a href="https://github.com/csilvasantin/Hacker">Hacker</a></td><td>launch_remote.sh</td><td>Lanza hack en todas las maquinas via SSH</td></tr>
+    <tr><td></td><td>stop_remote.sh</td><td>Para hack y cierra Terminal en todas</td></tr>
+    <tr><td></td><td>controller.sh</td><td>Controlador legacy con teclas Z/Q</td></tr>
+    <tr><td><a href="https://github.com/csilvasantin/AdmiraNext-Team">AdmiraNext-Team</a></td><td>ops/hack-sim.sh</td><td>Script principal de la simulacion</td></tr>
+    <tr><td></td><td>ops/hack-open-terminal.sh</td><td>Abre Terminal con perfil unico</td></tr>
+    <tr><td></td><td>ops/modem-sound.py</td><td>Sonido modem con variacion por seed</td></tr>
+    <tr><td></td><td>ops/demo-server.py</td><td>Servidor demo (Mac Mini, puerto 3032)</td></tr>
+    <tr><td><a href="https://github.com/csilvasantin/csilvasantin.github.io">csilvasantin.github.io</a></td><td>admiranext.html</td><td>Dashboard con boton HACKEO</td></tr>
+</table>
+
+<h2>Requisitos por maquina</h2>
+
+<div class="info">
+    <strong>Para que el hack funcione en tu Mac:</strong>
+    <ul style="margin-top:0.5rem; padding-left:1.2rem; color:#bbb;">
+        <li>Tailscale instalado y conectado</li>
+        <li>SSH habilitado (Ajustes > General > Compartir > Inicio de sesion remoto)</li>
+        <li>Clave SSH del PC Windows en <code>~/.ssh/authorized_keys</code></li>
+        <li>Permisos de Accesibilidad para Terminal (para fullscreen)</li>
+    </ul>
+</div>
+
+<h3>Clave SSH del PC Windows (copiar en authorized_keys)</h3>
+<pre><code>ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMq4yq+lHxOZj00VR/zJJZOifMGUps3bUZigIs/oYcNH admiratwin-windows</code></pre>
+
+<h3>Clave SSH del Mac Mini (copiar en authorized_keys)</h3>
+<pre><code>ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM4kZtaWgCQ/SrvznW9S3re5IDqwU4ZVgb+d4xAw5Fs1 MacMini-MacMini.local</code></pre>
+
+<h2>Pendientes</h2>
+
+<div class="warning">
+    <strong>Tareas pendientes en el Mac Mini (Gran de Gracia 51):</strong>
+    <ul style="margin-top:0.5rem; padding-left:1.2rem; color:#ccc;">
+        <li>Desactivar Tailscale SSH y activar SSH nativo de macOS</li>
+        <li>Verificar y reconfigurar Tailscale Funnel para <code>/demo</code></li>
+        <li>Crear LaunchAgent para auto-arranque de demo-server.py</li>
+    </ul>
+    <p style="color:#999; margin-top:0.5rem;">Hasta entonces, el boton HACKEO de la web no puede controlar las maquinas reales. Usar <code>launch_remote.sh</code> / <code>stop_remote.sh</code> desde terminal.</p>
+</div>
+
+<h2>Troubleshooting</h2>
+<table>
+    <tr><th>Problema</th><th>Solucion</th></tr>
+    <tr><td>No se pone fullscreen</td><td>Activar Accesibilidad para Terminal en Ajustes > Privacidad</td></tr>
+    <tr><td>SSH rechazado</td><td>Anadir clave publica a <code>~/.ssh/authorized_keys</code></td></tr>
+    <tr><td>Script viejo cacheado</td><td>Borrar <code>/tmp/hack-sim.sh</code> y relanzar, o subir por SCP directo</td></tr>
+    <tr><td>Maquina no responde</td><td>Verificar <code>tailscale status</code> y SSH manual</td></tr>
+    <tr><td>Boton HACKEO no funciona</td><td>Demo server del Mac Mini no accesible. Usar terminal</td></tr>
+</table>
+
+<div style="margin-top:3rem; padding-top:1rem; border-top:1px solid #222; color:#555; font-size:0.8rem; text-align:center;">
+    AdmiraNext Council · Hack Simulation v2.0 · 10 abril 2026
+</div>
+
+</div>
+</body>
+</html>
