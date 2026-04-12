@@ -100,6 +100,21 @@
       border-radius: 14px;
       padding: 16px 22px;
       min-width: 140px;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      user-select: none;
+    }
+    .stat:hover {
+      transform: translateY(-2px);
+      border-color: var(--teal);
+    }
+    .stat.active {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+    .stat.active .stat-number,
+    .stat.active .stat-label {
+      color: #fff;
     }
     .stat-number {
       font-size: 1.8rem;
@@ -254,26 +269,26 @@
     <p class="subtitle">Ordenados por numero de commits. Cada commit representa una unidad de trabajo real en el repositorio.</p>
 
     <div class="stats-bar">
-      <div class="stat">
+      <div class="stat active" data-filter="todos" onclick="filtrar('todos', this)">
         <div class="stat-number">38</div>
         <div class="stat-label">Repositorios</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-filter="activos" onclick="filtrar('activos', this)">
         <div class="stat-number">17</div>
         <div class="stat-label">Activos</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-filter="archivados" onclick="filtrar('archivados', this)">
         <div class="stat-number">21</div>
         <div class="stat-label">Archivados</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-filter="todos" onclick="filtrar('todos', this)" style="cursor:default;">
         <div class="stat-number">1.252</div>
         <div class="stat-label">Commits totales</div>
       </div>
     </div>
 
-    <p class="eyebrow" style="margin-bottom:12px;">Proyectos activos</p>
-    <table>
+    <p class="eyebrow" id="titulo-activos" style="margin-bottom:12px;">Proyectos activos</p>
+    <table id="tabla-activos">
       <thead>
         <tr>
           <th>#</th>
@@ -463,8 +478,8 @@
       </tbody>
     </table>
 
-    <p class="eyebrow" style="margin-top:48px;margin-bottom:12px;">Proyectos archivados</p>
-    <table>
+    <p class="eyebrow" id="titulo-archivados" style="margin-top:48px;margin-bottom:12px;">Proyectos archivados</p>
+    <table id="tabla-archivados">
       <thead>
         <tr>
           <th>#</th>
@@ -642,5 +657,34 @@
       Ranking de dedicacion de csilvasantin. Datos basados en commits de GitHub. Actualizado 12 abr 2026.
     </footer>
   </div>
+  <script>
+    function filtrar(tipo, el) {
+      // Actualizar botón activo
+      document.querySelectorAll('.stat').forEach(function(s) { s.classList.remove('active'); });
+      el.classList.add('active');
+
+      var activos = document.getElementById('tabla-activos');
+      var archivados = document.getElementById('tabla-archivados');
+      var tituloAct = document.getElementById('titulo-activos');
+      var tituloArch = document.getElementById('titulo-archivados');
+
+      if (tipo === 'todos') {
+        activos.style.display = '';
+        archivados.style.display = '';
+        tituloAct.style.display = '';
+        tituloArch.style.display = '';
+      } else if (tipo === 'activos') {
+        activos.style.display = '';
+        tituloAct.style.display = '';
+        archivados.style.display = 'none';
+        tituloArch.style.display = 'none';
+      } else if (tipo === 'archivados') {
+        activos.style.display = 'none';
+        tituloAct.style.display = 'none';
+        archivados.style.display = '';
+        tituloArch.style.display = '';
+      }
+    }
+  </script>
 </body>
 </html>
