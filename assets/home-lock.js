@@ -75,25 +75,26 @@
   };
 
   // Inicializar Google Identity Services
-  if (CLIENT_ID !== "PENDING_CLIENT_ID.apps.googleusercontent.com") {
-    window.addEventListener("load", function () {
-      if (typeof google !== "undefined" && google.accounts) {
-        google.accounts.id.initialize({
-          client_id: CLIENT_ID,
-          callback: window.handleGoogleSignIn,
-          auto_select: true
+  function initGIS() {
+    if (typeof google !== "undefined" && google.accounts) {
+      google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: window.handleGoogleSignIn,
+        auto_select: true
+      });
+      var btnContainer = document.getElementById("google-signin-btn");
+      if (btnContainer) {
+        google.accounts.id.renderButton(btnContainer, {
+          theme: "outline",
+          size: "large",
+          text: "signin_with",
+          shape: "pill",
+          width: 280
         });
-        const btnContainer = document.getElementById("google-signin-btn");
-        if (btnContainer) {
-          google.accounts.id.renderButton(btnContainer, {
-            theme: "outline",
-            size: "large",
-            text: "signin_with",
-            shape: "pill",
-            width: 280
-          });
-        }
       }
-    });
+    } else {
+      setTimeout(initGIS, 200);
+    }
   }
+  initGIS();
 })();
