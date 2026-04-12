@@ -911,23 +911,40 @@
     })();
 
     /* --- Botón Actualizar --- */
+    var ACTUALIZAR_URL = 'http://localhost:7891';
+
     function lanzarActualizacion() {
       var btn = document.getElementById('btn-actualizar');
-      btn.textContent = '\u23f3 Actualizando\u2026';
+      var pill = document.getElementById('pill-ultima');
+      btn.textContent = '\u23f3 Guardando cambios\u2026';
       btn.disabled = true;
-      fetch('./assets/actualizacion.log?t=' + Date.now())
-        .then(function(r) { return r.ok ? r.text() : ''; })
-        .then(function(log) {
-          var lineas = log.trim().split('\n');
-          var ultimas = lineas.slice(-6).join('\n');
+
+      fetch(ACTUALIZAR_URL + '/actualizar')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
           btn.innerHTML = '&#x21bb; Actualizar Tareas';
           btn.disabled = false;
-          alert('Ultima actualizacion:\n\n' + (ultimas || 'Sin registros aun.\n\nEl script se ejecuta cada hora automaticamente.\nTambien puedes lanzarlo manualmente desde Terminal:\n\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh'));
+          if (d.status === 'ok') {
+            var msg = d.repos > 0
+              ? '\u2705 Actualizado: ' + d.repos + ' repos con cambios subidos a GitHub.'
+              : '\u2705 Todo al dia. No habia cambios pendientes.';
+            if (pill) {
+              pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
+            }
+            alert(msg);
+          } else {
+            alert('\u26a0\ufe0f Error: ' + (d.msg || 'Error desconocido'));
+          }
         })
-        .catch(function() {
+        .catch(function () {
           btn.innerHTML = '&#x21bb; Actualizar Tareas';
           btn.disabled = false;
-          alert('El script se ejecuta cada hora automaticamente.\n\nPara lanzar manualmente:\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh');
+          alert(
+            '\u26a0\ufe0f El servidor de actualizacion no esta corriendo.\n\n' +
+            'Este boton NO esta guardando nada.\n\n' +
+            'Para activarlo, ejecuta en Terminal:\n' +
+            'python3 ~/GitHub/00.-csilvasantin.github.io/assets/actualizar-server.py'
+          );
         });
     }
   </script>
