@@ -665,6 +665,7 @@
             <a class="button-ghost" href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer">Abrir EmpezarTrabajo</a>
           </div>
           <div class="hero-pills">
+            <span class="pill" id="pill-ultima" style="background:var(--teal);color:#fff;">&#x23f1; Cargando...</span>
             <span class="pill">1 2 3 comun en todos los repos</span>
             <span class="pill">Cierre en HTML + URL publica</span>
             <span class="pill">GitHub Pages como capa visible</span>
@@ -887,9 +888,24 @@
   </main>
   <script src="./assets/home-lock.js?v=16"></script>
   <script>
+    /* --- Mostrar hora de última actualización --- */
+    (function () {
+      var pill = document.getElementById('pill-ultima');
+      if (!pill) return;
+      fetch('./assets/ultima-actualizacion.json?t=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
+        })
+        .catch(function () {
+          pill.textContent = '\u23f1 Sin datos de actualizacion';
+        });
+    })();
+
+    /* --- Botón Actualizar --- */
     function lanzarActualizacion() {
       var btn = document.getElementById('btn-actualizar');
-      btn.textContent = '⏳ Actualizando…';
+      btn.textContent = '\u23f3 Actualizando\u2026';
       btn.disabled = true;
       fetch('./assets/actualizacion.log?t=' + Date.now())
         .then(function(r) { return r.ok ? r.text() : ''; })
@@ -898,12 +914,12 @@
           var ultimas = lineas.slice(-6).join('\n');
           btn.innerHTML = '&#x21bb; Actualizar';
           btn.disabled = false;
-          alert('Última actualización:\n\n' + (ultimas || 'Sin registros aún.\n\nEl script se ejecuta cada hora automáticamente.\nTambién puedes lanzarlo manualmente desde Terminal:\n\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh'));
+          alert('Ultima actualizacion:\n\n' + (ultimas || 'Sin registros aun.\n\nEl script se ejecuta cada hora automaticamente.\nTambien puedes lanzarlo manualmente desde Terminal:\n\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh'));
         })
         .catch(function() {
           btn.innerHTML = '&#x21bb; Actualizar';
           btn.disabled = false;
-          alert('El script se ejecuta cada hora automáticamente.\n\nPara lanzar manualmente:\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh');
+          alert('El script se ejecuta cada hora automaticamente.\n\nPara lanzar manualmente:\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh');
         });
     }
   </script>

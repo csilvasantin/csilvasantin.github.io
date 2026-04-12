@@ -64,3 +64,15 @@ echo "---" >> "$LOG_FILE"
 
 # Mantener log limpio (últimas 500 líneas)
 tail -500 "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
+
+# Escribir timestamp JSON para el portal
+ESTADO_FILE="$GITHUB_DIR/00.-csilvasantin.github.io/assets/ultima-actualizacion.json"
+cat > "$ESTADO_FILE" <<EOJSON
+{"fecha":"$FECHA","hora":"$HORA","repos":$REPOS_TOCADOS}
+EOJSON
+
+# Commit y push del propio portal (log + estado)
+cd "$GITHUB_DIR/00.-csilvasantin.github.io" || exit
+git add assets/actualizacion.log assets/ultima-actualizacion.json 2>/dev/null
+git commit -m "Actualización automática $FECHA $HORA — $REPOS_TOCADOS repos" 2>/dev/null
+git push 2>/dev/null
