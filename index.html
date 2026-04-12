@@ -470,30 +470,8 @@
         ligera de acceso. Esto no sustituye una proteccion de servidor, pero evita que la portada
         quede abierta sin filtro casual.
       </p>
-      <div class="lock-grid">
-        <article class="lock-panel">
-          <span class="project-meta">Proteccion minima</span>
-          <strong>Acceso por validacion local</strong>
-          <p>
-            Si el acceso es correcto, el navegador guarda una sesion local para no pedir validacion
-            en cada visita desde este dispositivo.
-          </p>
-        </article>
-        <article class="lock-panel">
-          <span class="project-meta">Nivel real</span>
-          <strong>Barrera ligera</strong>
-          <p>
-            Esta capa es solo front-end. Sirve para cerrar el acceso casual, no para proteger
-            informacion sensible.
-          </p>
-        </article>
-      </div>
-      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:20px 0 16px;"></div>
-      <p style="text-align:center;color:var(--muted);font-size:.82rem;margin:0 0 16px;">o accede con contraseña</p>
-      <form class="lock-form" id="lock-form">
-        <input id="lock-input" type="password" placeholder="Validacion local" autocomplete="current-password" />
-        <button class="button" type="submit">Entrar</button>
-      </form>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:28px 0 16px;"></div>
+      <p style="text-align:center;color:var(--muted);font-size:.82rem;margin:0;">Solo cuentas autorizadas de Google pueden acceder.</p>
       <div id="lock-error" class="lock-error">El acceso no es correcto.</div>
     </section>
   </div>
@@ -735,6 +713,6 @@
       Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
     </p>
   </main>
-  <script src="./assets/home-lock.js?v=3"></script>
+  <script src="./assets/home-lock.js?v=4"></script>
 </body>
 </html>
