@@ -53,6 +53,7 @@ class Handler(BaseHTTPRequestHandler):
                     "fecha": estado.get("fecha", ""),
                     "hora": estado.get("hora", ""),
                     "repos": estado.get("repos", 0),
+                    "lista": estado.get("lista", []),
                     "log": result.stdout[-500:] if result.stdout else "",
                 }
                 print(f"[{datetime.now():%H:%M:%S}] Hecho: {estado.get('repos', 0)} repos")

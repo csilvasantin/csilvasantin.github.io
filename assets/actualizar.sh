@@ -10,6 +10,7 @@ FECHA=$(date '+%Y-%m-%d')
 HORA=$(date '+%H:%M')
 RESUMEN=""
 REPOS_TOCADOS=0
+REPOS_LISTA=""
 
 echo "[$FECHA $HORA] Inicio de actualización" >> "$LOG_FILE"
 
@@ -27,6 +28,8 @@ for repo_dir in "$GITHUB_DIR"/*/; do
 
   if [ -n "$cambios_unstaged" ] || [ -n "$cambios_staged" ] || [ -n "$archivos_untracked" ]; then
     REPOS_TOCADOS=$((REPOS_TOCADOS + 1))
+    [ -n "$REPOS_LISTA" ] && REPOS_LISTA="$REPOS_LISTA,"
+    REPOS_LISTA="$REPOS_LISTA\"$repo_name\""
 
     # Recoger resumen de lo que cambió
     ficheros_mod=$(git diff --name-only 2>/dev/null | head -10)
@@ -68,7 +71,7 @@ tail -500 "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
 # Escribir timestamp JSON para el portal
 ESTADO_FILE="$GITHUB_DIR/00.-csilvasantin.github.io/assets/ultima-actualizacion.json"
 cat > "$ESTADO_FILE" <<EOJSON
-{"fecha":"$FECHA","hora":"$HORA","repos":$REPOS_TOCADOS}
+{"fecha":"$FECHA","hora":"$HORA","repos":$REPOS_TOCADOS,"lista":[$REPOS_LISTA]}
 EOJSON
 
 # Commit y push del propio portal (log + estado)

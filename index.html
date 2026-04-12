@@ -925,8 +925,9 @@
           btn.innerHTML = '&#x21bb; Actualizar Tareas';
           btn.disabled = false;
           if (d.status === 'ok') {
+            var nombres = d.lista && d.lista.length ? '\n\n' + d.lista.map(function(r){ return '  \u2022 ' + r; }).join('\n') : '';
             var msg = d.repos > 0
-              ? '\u2705 Actualizado: ' + d.repos + ' repos con cambios subidos a GitHub.'
+              ? '\u2705 Actualizado: ' + d.repos + ' repos con cambios subidos a GitHub.' + nombres
               : '\u2705 Todo al dia. No habia cambios pendientes.';
             if (pill) {
               pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
