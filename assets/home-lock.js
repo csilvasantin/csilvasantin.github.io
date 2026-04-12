@@ -55,11 +55,11 @@
     });
 
     google.accounts.id.renderButton(btnContainer, {
-      theme: "outline",
+      theme: "filled_black",
       size: "large",
-      text: "signin_with",
+      text: "signin",
       shape: "pill",
-      width: 280
+      width: 220
     });
   }
 
