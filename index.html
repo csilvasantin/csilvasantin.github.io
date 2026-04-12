@@ -57,10 +57,7 @@
       align-items: center;
       justify-content: center;
       padding: 24px;
-      background:
-        radial-gradient(circle at top left, rgba(22, 124, 128, 0.18), transparent 24%),
-        radial-gradient(circle at bottom right, rgba(175, 60, 45, 0.16), transparent 24%),
-        linear-gradient(180deg, rgba(250, 244, 233, 0.98) 0%, rgba(244, 235, 220, 0.98) 100%);
+      background: #000 url('./assets/lock-bg.jpg') center/cover no-repeat;
       transition: opacity 0.35s ease, visibility 0.35s ease;
     }
 
@@ -74,10 +71,11 @@
       width: min(760px, 100%);
       padding: 28px;
       border-radius: 28px;
-      border: 1px solid var(--line);
-      background: rgba(255, 250, 241, 0.96);
-      box-shadow: 0 28px 80px rgba(93, 66, 21, 0.18);
+      border: 1px solid rgba(180, 255, 180, 0.12);
+      background: rgba(0, 0, 0, 0.72);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(16px);
+      color: #e0ffe0;
     }
 
     .lock-title {
@@ -85,12 +83,13 @@
       font-size: clamp(2.2rem, 6vw, 4.4rem);
       line-height: 0.94;
       letter-spacing: -0.04em;
+      color: #e0ffe0;
     }
 
     .lock-copy {
       max-width: 56ch;
       margin-top: 16px;
-      color: var(--muted);
+      color: rgba(180, 255, 180, 0.7);
       line-height: 1.75;
     }
 
@@ -144,14 +143,18 @@
       box-shadow: 0 0 0 4px rgba(22, 124, 128, 0.12);
     }
 
+    #lock-screen .eyebrow {
+      color: rgba(180, 255, 180, 0.6);
+    }
+
     .lock-error {
       display: none;
       margin-top: 12px;
       padding: 12px 14px;
       border-radius: 14px;
-      border: 1px solid rgba(175, 60, 45, 0.18);
-      background: rgba(175, 60, 45, 0.06);
-      color: #6f2a22;
+      border: 1px solid rgba(255, 100, 80, 0.3);
+      background: rgba(255, 60, 40, 0.12);
+      color: #ff9080;
       line-height: 1.6;
     }
 
@@ -471,7 +474,7 @@
         quede abierta sin filtro casual.
       </p>
       <div id="google-signin-btn" style="display:flex;justify-content:center;margin:28px 0 16px;"></div>
-      <p style="text-align:center;color:var(--muted);font-size:.82rem;margin:0;">Solo cuentas autorizadas de Google pueden acceder.</p>
+      <p style="text-align:center;color:rgba(180,255,180,0.5);font-size:.82rem;margin:0;">Solo cuentas autorizadas de Google pueden acceder.</p>
       <div id="lock-error" class="lock-error">El acceso no es correcto.</div>
     </section>
   </div>
@@ -713,6 +716,6 @@
       Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
     </p>
   </main>
-  <script src="./assets/home-lock.js?v=4"></script>
+  <script src="./assets/home-lock.js?v=5"></script>
 </body>
 </html>
