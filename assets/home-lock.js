@@ -51,7 +51,7 @@
     google.accounts.id.initialize({
       client_id: CLIENT_ID,
       callback: window.handleGoogleSignIn,
-      auto_select: true
+      auto_select: false
     });
 
     google.accounts.id.renderButton(btnContainer, {
