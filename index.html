@@ -661,6 +661,7 @@
           <div class="hero-actions">
             <a class="button" href="https://github.com/csilvasantin" target="_blank" rel="noreferrer">Abrir GitHub</a>
             <a class="button-ghost" href="https://github.com/csilvasantin/onboarding" target="_blank" rel="noreferrer">Abrir onboarding</a>
+            <button class="button-ghost" id="btn-actualizar" onclick="lanzarActualizacion()" style="cursor:pointer;border:none;">&#x21bb; Actualizar</button>
             <a class="button-ghost" href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer">Abrir EmpezarTrabajo</a>
           </div>
           <div class="hero-pills">
@@ -885,5 +886,26 @@
     </p>
   </main>
   <script src="./assets/home-lock.js?v=16"></script>
+  <script>
+    function lanzarActualizacion() {
+      var btn = document.getElementById('btn-actualizar');
+      btn.textContent = '⏳ Actualizando…';
+      btn.disabled = true;
+      fetch('./assets/actualizacion.log?t=' + Date.now())
+        .then(function(r) { return r.ok ? r.text() : ''; })
+        .then(function(log) {
+          var lineas = log.trim().split('\n');
+          var ultimas = lineas.slice(-6).join('\n');
+          btn.innerHTML = '&#x21bb; Actualizar';
+          btn.disabled = false;
+          alert('Última actualización:\n\n' + (ultimas || 'Sin registros aún.\n\nEl script se ejecuta cada hora automáticamente.\nTambién puedes lanzarlo manualmente desde Terminal:\n\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh'));
+        })
+        .catch(function() {
+          btn.innerHTML = '&#x21bb; Actualizar';
+          btn.disabled = false;
+          alert('El script se ejecuta cada hora automáticamente.\n\nPara lanzar manualmente:\nbash ~/GitHub/00.-csilvasantin.github.io/assets/actualizar.sh');
+        });
+    }
+  </script>
 </body>
 </html>
