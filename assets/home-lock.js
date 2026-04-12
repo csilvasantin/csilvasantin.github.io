@@ -77,21 +77,10 @@
     }
   };
 
-  // Intentar renderizar el boton de Google cada 300ms hasta lograrlo
-  var attempts = 0;
-  var maxAttempts = 50; // 15 segundos max
-
-  function tryRenderGoogleButton() {
-    attempts++;
-    if (attempts > maxAttempts) return;
-
-    if (typeof google === "undefined" || !google.accounts || !google.accounts.id) {
-      setTimeout(tryRenderGoogleButton, 300);
-      return;
-    }
-
+  function renderGoogleButton() {
     var btnContainer = document.getElementById("google-signin-btn");
     if (!btnContainer) return;
+    if (typeof google === "undefined" || !google.accounts || !google.accounts.id) return;
 
     google.accounts.id.initialize({
       client_id: CLIENT_ID,
@@ -108,5 +97,9 @@
     });
   }
 
-  tryRenderGoogleButton();
+  // GIS llama a este callback global cuando termina de cargar
+  window.onGoogleLibraryLoad = renderGoogleButton;
+
+  // Por si GIS ya cargo antes que este script
+  renderGoogleButton();
 })();
