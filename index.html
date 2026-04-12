@@ -683,26 +683,7 @@
           <div style="padding-top:16px;border-top:1px solid rgba(0,0,0,.08);">
             <a href="ranking.html" target="_blank" style="display:block;text-decoration:none;font-weight:600;margin-bottom:12px;color:var(--teal);">Ver ranking completo de proyectos &rarr;</a>
             <p class="eyebrow" style="margin-bottom:8px;">Ultimos Proyectos</p>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <a href="https://github.com/csilvasantin/03-ControlCodexClaude" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit;font-weight:500;">03-ControlCodexClaude</a>
-              <a href="https://csilvasantin.github.io/03-ControlCodexClaude/" target="_blank" rel="noreferrer" class="pill" style="text-decoration:none;font-size:.75rem;">HTML publica</a>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <a href="https://github.com/csilvasantin/AdmiraGrok" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit;font-weight:500;">AdmiraGrok</a>
-              <a href="https://csilvasantin.github.io/AdmiraGrok/" target="_blank" rel="noreferrer" class="pill" style="text-decoration:none;font-size:.75rem;">HTML publica</a>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <a href="https://github.com/csilvasantin/Memorizer" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit;font-weight:500;">Memorizer</a>
-              <a href="https://csilvasantin.github.io/Memorizer/" target="_blank" rel="noreferrer" class="pill" style="text-decoration:none;font-size:.75rem;">HTML publica</a>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-              <a href="https://github.com/csilvasantin/Admira-Next-Dream-Team" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit;font-weight:500;">Admira-Next-Dream-Team</a>
-              <a href="https://csilvasantin.github.io/Admira-Next-Dream-Team/" target="_blank" rel="noreferrer" class="pill" style="text-decoration:none;font-size:.75rem;">HTML publica</a>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <a href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer" style="text-decoration:none;color:inherit;font-weight:500;">EmpezarTrabajo</a>
-              <a href="https://csilvasantin.github.io/EmpezarTrabajo/" target="_blank" rel="noreferrer" class="pill" style="text-decoration:none;font-size:.75rem;">HTML publica</a>
-            </div>
+            <div id="ultimos-proyectos-lista">Cargando...</div>
           </div>
         </aside>
       </div>
@@ -910,6 +891,40 @@
         });
     })();
 
+    /* --- Cargar últimos proyectos dinámicamente --- */
+    (function () {
+      var cont = document.getElementById('ultimos-proyectos-lista');
+      if (!cont) return;
+      fetch('./assets/ultimos-proyectos.json?t=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .then(function (lista) {
+          cont.innerHTML = '';
+          lista.forEach(function (repo, i) {
+            var div = document.createElement('div');
+            div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (i < lista.length - 1 ? '6px' : '0');
+            var a = document.createElement('a');
+            a.href = 'https://github.com/csilvasantin/' + repo;
+            a.target = '_blank';
+            a.rel = 'noreferrer';
+            a.style.cssText = 'text-decoration:none;color:inherit;font-weight:500;';
+            a.textContent = repo;
+            var pill = document.createElement('a');
+            pill.href = 'https://csilvasantin.github.io/' + repo + '/';
+            pill.target = '_blank';
+            pill.rel = 'noreferrer';
+            pill.className = 'pill';
+            pill.style.cssText = 'text-decoration:none;font-size:.75rem;';
+            pill.textContent = 'HTML publica';
+            div.appendChild(a);
+            div.appendChild(pill);
+            cont.appendChild(div);
+          });
+        })
+        .catch(function () {
+          cont.textContent = 'No se pudo cargar la lista';
+        });
+    })();
+
     /* --- Botón Actualizar --- */
     var ACTUALIZAR_URL = 'http://localhost:7891';
 
@@ -933,6 +948,8 @@
               pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
             }
             alert(msg);
+            // Recargar lista de últimos proyectos
+            setTimeout(function(){ location.reload(); }, 500);
           } else {
             alert('\u26a0\ufe0f Error: ' + (d.msg || 'Error desconocido'));
           }

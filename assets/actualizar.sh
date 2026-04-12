@@ -70,12 +70,39 @@ tail -500 "$LOG_FILE" > "$LOG_FILE.tmp" && mv "$LOG_FILE.tmp" "$LOG_FILE"
 
 # Escribir timestamp JSON para el portal
 ESTADO_FILE="$GITHUB_DIR/00.-csilvasantin.github.io/assets/ultima-actualizacion.json"
+RECIENTES_FILE="$GITHUB_DIR/00.-csilvasantin.github.io/assets/ultimos-proyectos.json"
+
 cat > "$ESTADO_FILE" <<EOJSON
 {"fecha":"$FECHA","hora":"$HORA","repos":$REPOS_TOCADOS,"lista":[$REPOS_LISTA]}
 EOJSON
 
-# Commit y push del propio portal (log + estado)
+# Actualizar lista rolling de últimos proyectos tocados (máx 5, sin duplicados)
+if [ "$REPOS_TOCADOS" -gt 0 ]; then
+  # Usar python3 para merge sin duplicados manteniendo orden
+  python3 -c "
+import json, sys
+nuevos = [$REPOS_LISTA]
+try:
+    with open('$RECIENTES_FILE') as f:
+        anteriores = json.load(f)
+except:
+    anteriores = []
+# Nuevos primero, luego anteriores sin duplicar
+vistos = set()
+resultado = []
+for r in nuevos + anteriores:
+    if r not in vistos:
+        vistos.add(r)
+        resultado.append(r)
+    if len(resultado) >= 5:
+        break
+with open('$RECIENTES_FILE', 'w') as f:
+    json.dump(resultado, f)
+"
+fi
+
+# Commit y push del propio portal (log + estado + recientes)
 cd "$GITHUB_DIR/00.-csilvasantin.github.io" || exit
-git add assets/actualizacion.log assets/ultima-actualizacion.json 2>/dev/null
+git add assets/actualizacion.log assets/ultima-actualizacion.json assets/ultimos-proyectos.json 2>/dev/null
 git commit -m "Actualización automática $FECHA $HORA — $REPOS_TOCADOS repos" 2>/dev/null
 git push 2>/dev/null
