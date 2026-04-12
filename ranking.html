@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admira Next | Ranking de proyectos</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --bg: #f6efe4;
+      --bg-strong: #efe2cc;
+      --surface: rgba(255, 250, 241, 0.82);
+      --surface-strong: #fffaf1;
+      --ink: #1e1f1f;
+      --muted: #60594f;
+      --line: rgba(65, 54, 37, 0.14);
+      --teal: #167c80;
+      --red: #af3c2d;
+      --gold: #c2862f;
+      --blue: #2f5d96;
+      --shadow: 0 22px 60px rgba(93, 66, 21, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: 'Space Grotesk', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(22, 124, 128, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(175, 60, 45, 0.10), transparent 30%),
+        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .texture {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(65, 54, 37, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 54, 37, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+      position: relative;
+    }
+
+    .back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .back:hover { color: var(--ink); }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin: 0 0 8px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 1.05rem;
+      margin: 0 0 32px;
+      line-height: 1.5;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px 22px;
+      min-width: 140px;
+    }
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin: 36px 0 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    thead {
+      background: var(--bg-strong);
+    }
+
+    th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: .92rem;
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td { background: rgba(22, 124, 128, 0.04); }
+
+    .rank {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--gold);
+      font-size: .85rem;
+      width: 40px;
+    }
+
+    .repo-name {
+      font-weight: 600;
+    }
+    .repo-name a { text-decoration: none; }
+    .repo-name a:hover { text-decoration: underline; }
+
+    .repo-desc {
+      color: var(--muted);
+      font-size: .82rem;
+      margin-top: 2px;
+    }
+
+    .commits {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: .9rem;
+    }
+
+    .bar-cell { width: 160px; }
+    .bar-bg {
+      width: 100%;
+      height: 8px;
+      background: var(--line);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+    }
+
+    .pill {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: var(--surface-strong);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .pill:hover { background: var(--bg-strong); }
+    .pill-dim { opacity: .4; }
+
+    .badge-archived {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .65rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--line);
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    .date {
+      font-size: .82rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .links { white-space: nowrap; }
+    .links a { margin-right: 6px; }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-top: 48px;
+      padding: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 768px) {
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(5), td:nth-child(5) { display: none; }
+      .stats-bar { gap: 12px; }
+      .stat { min-width: 100px; padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="texture"></div>
+  <div class="container">
+    <a href="index.html" class="back">&larr; Volver al portal</a>
+
+    <p class="eyebrow">Ranking de dedicacion</p>
+    <h1>Todos los proyectos</h1>
+    <p class="subtitle">Ordenados por numero de commits. Cada commit representa una unidad de trabajo real en el repositorio.</p>
+
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-number">38</div>
+        <div class="stat-label">Repositorios</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">17</div>
+        <div class="stat-label">Activos</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">21</div>
+        <div class="stat-label">Archivados</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">1.252</div>
+        <div class="stat-label">Commits totales</div>
+      </div>
+    </div>
+
+    <p class="eyebrow" style="margin-bottom:12px;">Proyectos activos</p>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Proyecto</th>
+          <th>Commits</th>
+          <th class="bar-cell">Dedicacion</th>
+          <th>Ultima actividad</th>
+          <th>Enlaces</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank">1</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/03-ControlCodexClaude" target="_blank">03-ControlCodexClaude</a></div></td>
+          <td class="commits">364</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div></td>
+          <td class="date">12 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/03-ControlCodexClaude/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/03-ControlCodexClaude" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">2</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/01.-AdmiraXperience-Game" target="_blank">01-AdmiraXperience-Game</a></div></td>
+          <td class="commits">270</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:74%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/01.-AdmiraXperience-Game" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">3</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/diario" target="_blank">diario</a></div>
+            <div class="repo-desc">Diario de trabajo diario con Claude</div>
+          </td>
+          <td class="commits">43</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:12%"></div></div></td>
+          <td class="date">10 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/diario/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/diario" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">4</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/onboarding" target="_blank">onboarding</a></div>
+          </td>
+          <td class="commits">20</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:5%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/onboarding" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">5</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/Memorizer" target="_blank">Memorizer</a></div>
+            <div class="repo-desc">Personal memory agent: organizes daily information from Telegram using Claude API</div>
+          </td>
+          <td class="commits">18</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:5%"></div></div></td>
+          <td class="date">11 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/Memorizer" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">6</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/Hacker" target="_blank">Hacker</a></div>
+          </td>
+          <td class="commits">17</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:5%"></div></div></td>
+          <td class="date">10 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/Hacker" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">7</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/02.-YarigTelegram" target="_blank">02-YarigTelegram</a></div>
+            <div class="repo-desc">Control completo de Yarig.ai desde Telegram</div>
+          </td>
+          <td class="commits">15</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:4%"></div></div></td>
+          <td class="date">8 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/02.-YarigTelegram" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">8</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/admiranext" target="_blank">admiranext</a></div>
+            <div class="repo-desc">Consejo de Direccion con 16 agentes IA</div>
+          </td>
+          <td class="commits">12</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/admiranext" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">9</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/admira-equipos" target="_blank">admira-equipos</a></div>
+            <div class="repo-desc">Inventario de equipos por sede de Admira</div>
+          </td>
+          <td class="commits">9</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/admira-equipos" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">10</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/nuevo-miembro-admiranext" target="_blank">nuevo-miembro-admiranext</a></div>
+            <div class="repo-desc">Guia de onboarding para nuevos miembros</div>
+          </td>
+          <td class="commits">6</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/nuevo-miembro-admiranext/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/nuevo-miembro-admiranext" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">11</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/StreamDeck" target="_blank">StreamDeck</a></div>
+          </td>
+          <td class="commits">5</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">7 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/StreamDeck" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">12</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/renderFarm" target="_blank">renderFarm</a></div>
+            <div class="repo-desc">Distributed video render farm for Admira Next</div>
+          </td>
+          <td class="commits">5</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/renderFarm" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">13</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank">EmpezarTrabajo</a></div>
+          </td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">14</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/ai-workspace" target="_blank">ai-workspace</a></div>
+            <div class="repo-desc">AI workspace — synchronized folder structure across machines</div>
+          </td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/ai-workspace" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">15</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/desktop-tutorial" target="_blank">desktop-tutorial</a></div>
+          </td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://github.com/csilvasantin/desktop-tutorial" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">16</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/Admira-Next-Dream-Team" target="_blank">Admira-Next-Dream-Team</a></div>
+            <div class="repo-desc">Repositorio base para Admira Next Dream Team</div>
+          </td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">6 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/Admira-Next-Dream-Team/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/Admira-Next-Dream-Team" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">17</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/AdmiraGrok" target="_blank">AdmiraGrok</a></div>
+          </td>
+          <td class="commits">1</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="date">12 abr 2026</td>
+          <td class="links"><a href="https://csilvasantin.github.io/AdmiraGrok/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/AdmiraGrok" target="_blank" class="pill">Repo</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="eyebrow" style="margin-top:48px;margin-bottom:12px;">Proyectos archivados</p>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Proyecto</th>
+          <th>Commits</th>
+          <th class="bar-cell">Dedicacion</th>
+          <th>Enlaces</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="rank">1</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/ConsejoAdmiraNextGame" target="_blank">ConsejoAdmiraNextGame</a></div>
+            <div class="repo-desc">Panel AdmiraNext como aventura grafica point-and-click estilo LucasArts</div>
+          </td>
+          <td class="commits">156</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:100%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/ConsejoAdmiraNextGame/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/ConsejoAdmiraNextGame" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">2</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/Matrix" target="_blank">Matrix</a></div></td>
+          <td class="commits">48</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:31%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/Matrix/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/Matrix" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">3</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/AenaJones" target="_blank">AenaJones</a></div></td>
+          <td class="commits">48</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:31%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/AenaJones/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/AenaJones" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">4</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/AenaMallorca" target="_blank">AenaMallorca</a></div></td>
+          <td class="commits">47</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:30%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/AenaMallorca/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/AenaMallorca" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">5</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/carlaxtanco" target="_blank">carlaxtanco</a></div>
+          </td>
+          <td class="commits">35</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:22%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/carlaxtanco/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/carlaxtanco" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">6</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/Yarig.aiTheGame" target="_blank">Yarig.aiTheGame</a></div>
+            <div class="repo-desc">Digital Twin de productividad en juego isometrico</div>
+          </td>
+          <td class="commits">17</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:11%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/Yarig.aiTheGame" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">7</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/ClaudeBot" target="_blank">ClaudeBot</a></div></td>
+          <td class="commits">10</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:6%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/ClaudeBot/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/ClaudeBot" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">8</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/CodexBot" target="_blank">CodexBot</a></div></td>
+          <td class="commits">10</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:6%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/CodexBot/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/CodexBot" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">9</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/el-libro" target="_blank">el-libro</a></div></td>
+          <td class="commits">7</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:4%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/el-libro/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/el-libro" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">10</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/tech" target="_blank">tech</a></div></td>
+          <td class="commits">5</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/tech/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/tech" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">11</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/Spectrum" target="_blank">Spectrum</a></div></td>
+          <td class="commits">4</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:3%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/Spectrum/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/Spectrum" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">12</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/bitsandatoms" target="_blank">bitsandatoms</a></div></td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/bitsandatoms/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/bitsandatoms" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">13</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/carla" target="_blank">carla</a></div></td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/carla/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/carla" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">14</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/sitges" target="_blank">sitges</a></div></td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/sitges" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">15</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/game-platform" target="_blank">game-platform</a></div></td>
+          <td class="commits">3</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:2%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/game-platform" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">16</td>
+          <td>
+            <div class="repo-name"><a href="https://github.com/csilvasantin/pulpo" target="_blank">pulpo</a></div>
+            <div class="repo-desc">Orquestador multi-IA — startup Dream Team</div>
+          </td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/pulpo" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">17</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/pong-tron" target="_blank">pong-tron</a></div></td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/pong-tron/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/pong-tron" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">18</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/Emulador-de-Spectrum" target="_blank">Emulador-de-Spectrum</a></div></td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/Emulador-de-Spectrum" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">19</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/Control-de-Tienda" target="_blank">Control-de-Tienda</a></div></td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/Control-de-Tienda" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">20</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/ainimation" target="_blank">ainimation</a></div></td>
+          <td class="commits">2</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:1%"></div></div></td>
+          <td class="links"><a href="https://github.com/csilvasantin/ainimation" target="_blank" class="pill">Repo</a></td>
+        </tr>
+        <tr>
+          <td class="rank">21</td>
+          <td><div class="repo-name"><a href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank">csilvasantin.github.io</a></div>
+            <div class="repo-desc">Portal principal de trabajo</div>
+          </td>
+          <td class="commits">0</td>
+          <td class="bar-cell"><div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div></td>
+          <td class="links"><a href="https://csilvasantin.github.io/" target="_blank" class="pill">HTML</a><a href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" class="pill">Repo</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <footer>
+      Ranking de dedicacion de csilvasantin. Datos basados en commits de GitHub. Actualizado 12 abr 2026.
+    </footer>
+  </div>
+</body>
+</html>
