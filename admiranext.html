@@ -654,7 +654,7 @@
 <body>
     <div class="container">
         <h1>AdmiraNext Council Dashboard</h1>
-        <div style="text-align:center;font-size:0.7rem;color:#555;margin-top:-0.3rem;margin-bottom:0.3rem;">v26.11.04.2</div>
+        <div style="text-align:center;font-size:0.7rem;color:#555;margin-top:-0.3rem;margin-bottom:0.3rem;">v26.22.04.1</div>
         <div class="subtitle">
             Estado en tiempo real del Consejo de Dirección · <span class="live">● LIVE</span> · <span id="last-check-inline" style="color:#555;font-size:0.8rem;">comprobando...</span>
         </div>
@@ -683,7 +683,7 @@
         </div>
 
         <div class="footer">
-            AdmiraNext v26.11.04.2 · Última comprobación: <span id="last-check">—</span>
+            AdmiraNext v26.22.04.1 · Última comprobación: <span id="last-check">—</span>
         </div>
     </div>
 
@@ -1325,6 +1325,32 @@
     window.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && hackMode) toggleHack();
     });
+
+    // Al cargar: sincronizar con el servidor. Si un hack quedó activo de
+    // una sesión anterior, marcamos el botón como "activo" para que el
+    // siguiente click pare los Terminales en los consejeros en vez de
+    // relanzar otra oleada encima.
+    (async () => {
+        try {
+            const r = await fetch(HACK_API + "/hack/status?t=" + Date.now(), {
+                signal: AbortSignal.timeout(3000)
+            });
+            if (!r.ok) return;
+            const d = await r.json();
+            if (d && d.active === true) {
+                hackMode = true;
+                const btn = document.getElementById("hack-btn");
+                if (btn) {
+                    btn.classList.add("active");
+                    const dot = btn.querySelector(".hack-dot");
+                    if (dot) dot.style.background = "#000";
+                }
+                console.log("HACK: server reports active — next click will STOP");
+            }
+        } catch (e) {
+            // server inaccesible: mantener hackMode=false (default)
+        }
+    })();
     </script>
 </body>
 </html>
