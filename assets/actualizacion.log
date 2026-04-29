@@ -1,23 +1,3 @@
----
-[2026-04-23 09:00] Inicio de actualización
-  ✓ 00.-csilvasantin.github.io — commit + push
-[2026-04-23 09:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-04-23 09:00] Fin de actualización
----
-[2026-04-23 10:00] Inicio de actualización
-  ✓ 00.-csilvasantin.github.io — commit + push
-[2026-04-23 10:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-04-23 10:00] Fin de actualización
----
-[2026-04-23 11:00] Inicio de actualización
-  ✓ 00.-csilvasantin.github.io — commit + push
-[2026-04-23 11:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-04-23 11:00] Fin de actualización
----
-[2026-04-23 12:00] Inicio de actualización
   ✓ 00.-csilvasantin.github.io — commit + push
 [2026-04-23 12:00] 1 repos actualizados:
 - 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
@@ -499,3 +479,22 @@ entrenar_corpus.json.bak
 [2026-04-29 08:00] Fin de actualización
 ---
 [2026-04-29 09:00] Inicio de actualización
+  ✓ 00.-csilvasantin.github.io — commit + push
+  ✓ ConsejoAdmiraNextGame — commit + push
+[2026-04-29 09:00] 2 repos actualizados:
+- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
+- ConsejoAdmiraNextGame: modificados: council-api.py
+council-scumm.html
+package.json
+public/council-scumm.html nuevos: .council-daily/state.json
+audio/2026-04-29_CEO_El_Diseno_del_Dia_a_Dia.m4a
+node_modules/.bin/playwright-core
+node_modules/.package-lock.json
+node_modules/playwright-core/LICENSE
+node_modules/playwright-core/NOTICE
+node_modules/playwright-core/README.md
+node_modules/playwright-core/ThirdPartyNotices.txt
+node_modules/playwright-core/bin/install_media_pack.ps1
+node_modules/playwright-core/bin/install_webkit_wsl.ps1
+[2026-04-29 09:00] Fin de actualización
+---
