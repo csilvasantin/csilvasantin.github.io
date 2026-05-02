@@ -34,6 +34,7 @@
 
 | Proyecto | URL pública | Repo |
 |----------|------------|------|
+| Robot as a Service (RaaS) | https://csilvasantin.github.io/raas/ | csilvasantin.github.io |
 | Council Dashboard | https://csilvasantin.github.io/admiranext.html | csilvasantin.github.io |
 | Control Codex & Claude | https://csilvasantin.github.io/03-ControlCodexClaude/ | 03-ControlCodexClaude |
 
