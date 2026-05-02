@@ -19,9 +19,7 @@
       --green: #21795f;
       --shadow: 0 22px 60px rgba(23, 31, 42, 0.14);
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       color: var(--ink);
@@ -32,201 +30,55 @@
         linear-gradient(135deg, #fbf7ef 0%, var(--paper) 52%, #edf6f7 100%);
       min-height: 100vh;
     }
-
     a { color: inherit; }
-
-    .shell {
-      width: min(1080px, calc(100% - 28px));
-      margin: 0 auto;
-      padding: 18px 0 44px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      padding-bottom: 18px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 900;
-      text-decoration: none;
-    }
-
+    .shell { width: min(1080px, calc(100% - 28px)); margin: 0 auto; padding: 18px 0 44px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-bottom: 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 900; text-decoration: none; }
     .mark {
-      width: 44px;
-      height: 44px;
-      display: grid;
-      place-items: center;
-      border-radius: 10px;
-      color: white;
+      width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; color: white;
       background: conic-gradient(from 20deg, var(--red), var(--yellow), var(--cyan), var(--blue), var(--red));
       box-shadow: var(--shadow);
     }
-
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
     .button {
-      min-height: 42px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px 14px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 800;
-      color: white;
-      background: var(--ink);
+      min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 10px 14px;
+      border-radius: 8px; text-decoration: none; font-weight: 800; color: white; background: var(--ink);
     }
-
-    .hero {
-      padding: 54px 0 46px;
-      border-top: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .eyebrow,
-    .version,
-    .label {
+    .button.blue { background: var(--blue); }
+    .hero { padding: 54px 0 46px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .eyebrow, .version, .label {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      font-size: 0.76rem;
-      font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.76rem; font-weight: 800;
     }
-
     .eyebrow { color: var(--blue); margin-bottom: 14px; }
-
-    h1,
-    h2,
-    h3,
-    p { margin: 0; }
-
-    h1 {
-      max-width: 12ch;
-      font-size: clamp(3.4rem, 8vw, 7.6rem);
-      line-height: 0.88;
-      letter-spacing: 0;
-    }
-
-    h2 {
-      font-size: clamp(2rem, 4vw, 3.8rem);
-      line-height: 1;
-      letter-spacing: 0;
-    }
-
+    h1, h2, h3, p { margin: 0; }
+    h1 { max-width: 12ch; font-size: clamp(3.4rem, 8vw, 7.6rem); line-height: 0.88; letter-spacing: 0; }
+    h2 { font-size: clamp(2rem, 4vw, 3.8rem); line-height: 1; letter-spacing: 0; }
     h3 { font-size: 1.25rem; }
-
-    .lead {
-      max-width: 780px;
-      margin-top: 22px;
-      color: var(--muted);
-      font-size: 1.12rem;
-      line-height: 1.78;
-    }
-
-    .version {
-      display: inline-flex;
-      width: fit-content;
-      margin-top: 22px;
-      padding: 8px 10px;
-      border-radius: 6px;
-      color: var(--ink);
-      background: var(--yellow);
-    }
-
-    section.band {
-      padding: 46px 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .section-head {
-      display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
-      gap: 24px;
-      align-items: end;
-      margin-bottom: 22px;
-    }
-
-    .section-head p,
-    li {
-      color: var(--muted);
-      line-height: 1.72;
-      font-size: 1.02rem;
-    }
-
-    .grid,
-    .grid-3 {
-      display: grid;
-      gap: 16px;
-    }
-
+    .lead { max-width: 780px; margin-top: 22px; color: var(--muted); font-size: 1.12rem; line-height: 1.78; }
+    .version { display: inline-flex; width: fit-content; margin-top: 22px; padding: 8px 10px; border-radius: 6px; color: var(--ink); background: var(--yellow); }
+    section.band { padding: 46px 0; border-bottom: 1px solid var(--line); }
+    .section-head { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 24px; align-items: end; margin-bottom: 22px; }
+    .section-head p, li { color: var(--muted); line-height: 1.72; font-size: 1.02rem; }
+    .grid, .grid-3 { display: grid; gap: 16px; }
     .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-
-    .panel,
-    .rule {
-      padding: 22px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface);
-      box-shadow: 0 12px 34px rgba(23, 31, 42, 0.08);
-    }
-
-    .panel p,
-    .rule p {
-      margin-top: 10px;
-      color: var(--muted);
-      line-height: 1.68;
-    }
-
+    .panel, .rule { padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); box-shadow: 0 12px 34px rgba(23, 31, 42, 0.08); }
+    .panel p, .rule p { margin-top: 10px; color: var(--muted); line-height: 1.68; }
     .label { color: var(--green); margin-bottom: 10px; }
-
-    ul,
-    ol {
-      margin: 14px 0 0;
-      padding-left: 20px;
-    }
-
+    ul, ol { margin: 14px 0 0; padding-left: 20px; }
     li + li { margin-top: 8px; }
-
     .release {
-      padding: 30px;
-      border-radius: 8px;
-      color: white;
-      background:
-        linear-gradient(135deg, rgba(228, 72, 61, 0.22), rgba(16, 166, 181, 0.18)),
-        #111519;
+      padding: 30px; border-radius: 8px; color: white;
+      background: linear-gradient(135deg, rgba(228, 72, 61, 0.22), rgba(16, 166, 181, 0.18)), #111519;
       box-shadow: var(--shadow);
     }
-
     .release p { color: rgba(255, 255, 255, 0.76); line-height: 1.72; margin-top: 12px; }
-
-    code {
-      padding: 2px 6px;
-      border-radius: 5px;
-      background: rgba(21, 23, 25, 0.08);
-    }
-
-    .telegram {
-      border-left: 6px solid var(--cyan);
-    }
-
-    footer {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
-      padding-top: 24px;
-      color: var(--muted);
-    }
-
+    code { padding: 2px 6px; border-radius: 5px; background: rgba(21, 23, 25, 0.08); }
+    .telegram { border-left: 6px solid var(--cyan); }
+    footer { display: flex; justify-content: space-between; gap: 18px; flex-wrap: wrap; padding-top: 24px; color: var(--muted); }
     @media (max-width: 880px) {
-      .section-head,
-      .grid,
-      .grid-3 { grid-template-columns: 1fr; }
+      .section-head, .grid, .grid-3 { grid-template-columns: 1fr; }
       .topbar { align-items: flex-start; flex-direction: column; }
     }
   </style>
@@ -238,7 +90,10 @@
         <span class="mark">PX</span>
         <span>Pixer.ia</span>
       </a>
-      <a class="button" href="../">Volver al portal</a>
+      <div class="actions">
+        <a class="button blue" href="../app/">Abrir App</a>
+        <a class="button" href="../">Volver al portal</a>
+      </div>
     </header>
 
     <section class="hero">
@@ -247,18 +102,13 @@
       <p class="lead">
         Pixer.ia es un estudio de creacion multimedia para plataformas de digital signage. Su funcion es producir contenidos de audio, video y musica que puedan publicarse en redes de pantallas con rapidez, coherencia de marca y control de versiones.
       </p>
-      <span class="version">v.2026.05.02.r1</span>
+      <span class="version">v.2026.05.02.r2</span>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Proposito</p>
-          <h2>Una capa creativa para redes de pantallas.</h2>
-        </div>
-        <p>
-          El proyecto nace para resolver una necesidad concreta: las plataformas de digital signage necesitan contenido continuo, adaptado a cada pantalla y facil de renovar. Pixer.ia convierte esa necesidad en un servicio productivo recurrente.
-        </p>
+        <div><p class="eyebrow">Proposito</p><h2>Una capa creativa para redes de pantallas.</h2></div>
+        <p>El proyecto nace para resolver una necesidad concreta: las plataformas de digital signage necesitan contenido continuo, adaptado a cada pantalla y facil de renovar. Pixer.ia convierte esa necesidad en un servicio productivo recurrente.</p>
       </div>
       <div class="grid-3">
         <article class="panel"><p class="label">Clientes</p><h3>Operadores de digital signage</h3><p>Empresas que gestionan redes de pantallas y necesitan piezas nuevas para distintos clientes, espacios y campanas.</p></article>
@@ -269,13 +119,8 @@
 
     <section class="band">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Servicios</p>
-          <h2>Los tres campos principales.</h2>
-        </div>
-        <p>
-          El servicio se organiza en tres lineas: audio, video y musica. Cada linea puede funcionar por pieza, por campana o como produccion recurrente mensual.
-        </p>
+        <div><p class="eyebrow">Servicios</p><h2>Los tres campos principales.</h2></div>
+        <p>El servicio se organiza en tres lineas: audio, video y musica. Cada linea puede funcionar por pieza, por campana o como produccion recurrente mensual.</p>
       </div>
       <div class="grid-3">
         <article class="panel"><p class="label">Audio</p><h3>Locuciones y mensajes</h3><p>Mensajes informativos, avisos, cunas, voces de marca, audio para promociones y piezas sonoras de servicio.</p></article>
@@ -286,55 +131,47 @@
 
     <section class="band">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Funcionamiento</p>
-          <h2>Como debe operar el portal.</h2>
-        </div>
-        <p>
-          El portal de Pixer.ia debe servir como escaparate inicial y como documento operativo vivo. Cada release debe explicar que ha cambiado y donde se puede revisar.
-        </p>
+        <div><p class="eyebrow">Interface</p><h2>Pixer.IA App.</h2></div>
+        <p>La release r2 incorpora una interface conceptual para la aplicacion, con look operativo inspirado en Admira y una capa moderna para gestionar produccion multimedia.</p>
       </div>
       <div class="grid">
-        <article class="rule">
-          <h3>Versionado obligatorio</h3>
-          <p>Al acabar cualquier bloque relevante, la version visible debe seguir el formato:</p>
-          <p><code>v.ano.mes.dia.release</code></p>
-          <p>Ejemplo actual: <code>v.2026.05.02.r1</code></p>
-        </article>
-        <article class="rule telegram">
-          <h3>Cierre obligatorio en Telegram</h3>
-          <p>Todo cierre debe terminar con una notificacion en Telegram que incluya resumen de lo realizado y URL pulsable de la salida publicada.</p>
-          <p>Formato recomendado: <code>Resumen + Version + URL</code></p>
-        </article>
+        <article class="rule"><h3>Acceso operativo</h3><p>Incluye sidebar, selector de idioma, panel de produccion, cola de trabajos, login conceptual y biblioteca de audio, video y musica.</p><p><a class="button blue" href="../app/">Abrir Pixer.IA App</a></p></article>
+        <article class="rule"><h3>Versionado obligatorio</h3><p>Al acabar cualquier bloque relevante, la version visible debe seguir el formato:</p><p><code>v.ano.mes.dia.release</code></p><p>Ejemplo actual: <code>v.2026.05.02.r2</code></p></article>
       </div>
     </section>
 
     <section class="band">
       <div class="section-head">
-        <div>
-          <p class="eyebrow">Checklist de cierre</p>
-          <h2>Cuando se considera terminado.</h2>
-        </div>
-        <p>
-          Pixer.ia no se considera cerrado solo porque exista codigo. La entrega debe ser visible, versionada y comunicada.
-        </p>
+        <div><p class="eyebrow">Funcionamiento</p><h2>Como debe operar el portal.</h2></div>
+        <p>El portal de Pixer.ia debe servir como escaparate inicial y como documento operativo vivo. Cada release debe explicar que ha cambiado y donde se puede revisar.</p>
+      </div>
+      <div class="grid">
+        <article class="rule telegram"><h3>Cierre obligatorio en Telegram</h3><p>Todo cierre debe terminar con una notificacion en Telegram que incluya resumen de lo realizado y URL pulsable de la salida publicada.</p><p>Formato recomendado: <code>Resumen + Version + URL</code></p></article>
+        <article class="rule"><h3>URL publicas</h3><p>Portal, help e interface de aplicacion deben compartirse con cache busting de version para comprobar que se esta viendo la ultima release.</p></article>
+      </div>
+    </section>
+
+    <section class="band">
+      <div class="section-head">
+        <div><p class="eyebrow">Checklist de cierre</p><h2>Cuando se considera terminado.</h2></div>
+        <p>Pixer.ia no se considera cerrado solo porque exista codigo. La entrega debe ser visible, versionada y comunicada.</p>
       </div>
       <div class="release">
-        <h2>Release v.2026.05.02.r1</h2>
-        <p>Primera publicacion del portal Pixer.ia con portada, help, posicionamiento del estudio, servicios principales y reglas operativas.</p>
+        <h2>Release v.2026.05.02.r2</h2>
+        <p>Se ha anadido la interface Pixer.IA App y el boton de acceso desde el portal operativo.</p>
         <ol>
-          <li>Portal HTML publicado.</li>
-          <li>Pagina help publicada.</li>
+          <li>Portal actualizado con boton hacia la app.</li>
+          <li>Interface Pixer.IA App publicada.</li>
+          <li>Help actualizado a version r2.</li>
           <li>Version visible aplicada.</li>
-          <li>URL publica preparada para compartir.</li>
-          <li>Resumen de Telegram preparado con enlace pulsable.</li>
+          <li>Resumen de Telegram preparado con enlaces pulsables.</li>
         </ol>
       </div>
     </section>
 
     <footer>
       <span>Pixer.ia Help</span>
-      <span>v.2026.05.02.r1</span>
+      <span>v.2026.05.02.r2</span>
     </footer>
   </main>
 </body>
