@@ -69,11 +69,7 @@
       box-shadow: var(--shadow);
     }
 
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    nav { display: flex; flex-wrap: wrap; gap: 8px; }
 
     nav a,
     .button,
@@ -90,12 +86,8 @@
       background: rgba(255, 255, 255, 0.62);
     }
 
-    .button {
-      color: white;
-      border-color: transparent;
-      background: var(--ink);
-    }
-
+    .button { color: white; border-color: transparent; background: var(--ink); }
+    .button.blue { background: var(--blue); }
     .ghost { color: var(--ink); }
 
     .hero {
@@ -119,10 +111,7 @@
 
     .eyebrow { color: var(--blue); margin-bottom: 14px; }
 
-    h1,
-    h2,
-    h3,
-    p { margin: 0; }
+    h1, h2, h3, p { margin: 0; }
 
     h1 {
       max-width: 10ch;
@@ -147,12 +136,7 @@
       line-height: 1.75;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 28px;
-    }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 
     .hero-visual {
       min-height: 620px;
@@ -167,16 +151,8 @@
       box-shadow: var(--shadow);
     }
 
-    .visual-copy {
-      padding: 24px;
-      color: white;
-    }
-
-    .visual-copy p {
-      margin-top: 10px;
-      color: rgba(255, 255, 255, 0.82);
-      line-height: 1.65;
-    }
+    .visual-copy { padding: 24px; color: white; }
+    .visual-copy p { margin-top: 10px; color: rgba(255, 255, 255, 0.82); line-height: 1.65; }
 
     .version {
       display: inline-flex;
@@ -188,10 +164,7 @@
       background: var(--yellow);
     }
 
-    section.band {
-      padding: 52px 0;
-      border-top: 1px solid var(--line);
-    }
+    section.band { padding: 52px 0; border-top: 1px solid var(--line); }
 
     .section-head {
       display: grid;
@@ -201,18 +174,11 @@
       margin-bottom: 24px;
     }
 
-    .section-head p {
-      color: var(--muted);
-      line-height: 1.72;
-      font-size: 1.02rem;
-    }
+    .section-head p { color: var(--muted); line-height: 1.72; font-size: 1.02rem; }
 
     .grid-3,
     .grid-4,
-    .workflow {
-      display: grid;
-      gap: 16px;
-    }
+    .workflow { display: grid; gap: 16px; }
 
     .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -238,17 +204,10 @@
 
     .service p,
     .step p,
-    .proof p {
-      margin-top: 10px;
-      color: var(--muted);
-      line-height: 1.66;
-    }
+    .proof p { margin-top: 10px; color: var(--muted); line-height: 1.66; }
 
     .label { color: var(--green); margin-bottom: 10px; }
-
-    .workflow {
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-    }
+    .workflow { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 
     .step strong {
       display: inline-flex;
@@ -315,6 +274,7 @@
         <a href="#servicios">Servicios</a>
         <a href="#flujo">Flujo</a>
         <a href="#entregables">Entregables</a>
+        <a href="./app/">App</a>
         <a href="./help/">Help</a>
       </nav>
     </header>
@@ -327,10 +287,11 @@
           Creamos contenidos de audio, video y musica para redes de pantallas que necesitan comunicar cada dia con piezas claras, atractivas y listas para publicar.
         </p>
         <div class="actions">
+          <a class="button blue" href="./app/">Abrir Pixer.IA App</a>
           <a class="button" href="#servicios">Ver servicios</a>
           <a class="ghost" href="./help/">Abrir help del proyecto</a>
         </div>
-        <span class="version">v.2026.05.02.r1</span>
+        <span class="version">v.2026.05.02.r2</span>
       </div>
       <aside class="hero-visual" aria-label="Pantalla de produccion multimedia">
         <div class="visual-copy">
@@ -399,14 +360,15 @@
           <h2>Lo que debe quedar visible.</h2>
         </div>
         <p>
-          Cada release del portal debe dejar version visible, resumen publicable y URL compartible. La pagina de help documenta el proyecto y la regla de cierre con Telegram.
+          Cada release del portal debe dejar version visible, resumen publicable y URL compartible. La nueva interfaz Pixer.IA App muestra el look and feel operativo inspirado en Admira, con una capa mas moderna.
         </p>
       </div>
       <div class="strip">
         <article class="dark">
           <p class="eyebrow" style="color:#10a6b5">Version actual</p>
-          <h2>v.2026.05.02.r1</h2>
-          <p>Primera release del portal Pixer.ia con posicionamiento, servicios principales, flujo de produccion y pagina de ayuda.</p>
+          <h2>v.2026.05.02.r2</h2>
+          <p>Release con acceso a la interface Pixer.IA App, inspirada en el login operativo de Admira y adaptada a produccion multimedia.</p>
+          <div class="actions"><a class="button blue" href="./app/">Abrir Pixer.IA App</a></div>
         </article>
         <article class="dark">
           <p class="eyebrow" style="color:#f2b941">Help</p>
@@ -419,7 +381,7 @@
 
     <footer>
       <span>Pixer.ia - Estudio multimedia para digital signage</span>
-      <span>v.2026.05.02.r1</span>
+      <span>v.2026.05.02.r2</span>
     </footer>
   </main>
 </body>
