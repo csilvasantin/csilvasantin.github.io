@@ -145,9 +145,39 @@
   </div>
 </section>
 
+<section id="audiencia">
+  <div class="wrap">
+    <h2><span class="num">05</span>Audiencia capturada por el Xpace OS</h2>
+    <p class="lede">Métricas reales del simulador Xtanco — exportadas con <code>/socios export</code> desde Admira XP. Si no hay datos, se muestran los del último día disponible.</p>
+    <div id="aud-stats" class="nums">
+      <div class="n"><div class="v" id="aud-total">—</div><div class="l">Socios totales</div></div>
+      <div class="n"><div class="v" id="aud-tienda">—</div><div class="l">Alta en tienda</div></div>
+      <div class="n"><div class="v" id="aud-web">—</div><div class="l">Alta en web (QR)</div></div>
+      <div class="n"><div class="v" id="aud-ticket">—</div><div class="l">Ticket medio €</div></div>
+    </div>
+    <p class="muted" style="font-size:12px; margin-top:12px; color:var(--mut)" id="aud-meta">Cargando…</p>
+  </div>
+</section>
+<script>
+(async()=>{
+  try{
+    const res=await fetch('./data.json',{cache:'no-cache'});
+    if(!res.ok) throw new Error('no data');
+    const d=await res.json();
+    document.getElementById('aud-total').textContent=d.audiencia.totalSocios||0;
+    document.getElementById('aud-tienda').textContent=d.audiencia.altaTienda||0;
+    document.getElementById('aud-web').textContent=d.audiencia.altaWeb||0;
+    document.getElementById('aud-ticket').textContent=(d.audiencia.ticketMedioEur||0)+'€';
+    document.getElementById('aud-meta').textContent='Datos del Xpace OS · '+d.generatedFrom+' · generado '+(d.generatedAt||'').slice(0,16).replace('T',' ');
+  }catch(e){
+    document.getElementById('aud-meta').textContent='Aún no hay datos exportados. Usa /socios export en Admira XP y commitea data.json a este directorio.';
+  }
+})();
+</script>
+
 <section>
   <div class="wrap">
-    <h2><span class="num">05</span>Por qué importa</h2>
+    <h2><span class="num">06</span>Por qué importa</h2>
     <p class="lede">El estanco — y por extensión, cualquier punto de venta físico de la red AdmiraNext — deja de ser un soporte muerto. Cada metro cuadrado pasa a ser inventario monetizable, vendido en subasta a quien más lo valore en cada instante. Lo digital ya funciona así desde hace 15 años. OmniPublicity lo trae al mundo físico con el rigor de una plataforma adtech moderna.</p>
   </div>
 </section>
