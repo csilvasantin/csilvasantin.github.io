@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixer.ia | Estudio multimedia para digital signage</title>
+  <meta name="description" content="Pixer.ia es un estudio de creacion multimedia para plataformas de digital signage: audio, video y musica listos para pantallas.">
+  <style>
+    :root {
+      --ink: #151719;
+      --muted: #5e666f;
+      --paper: #f7f3ec;
+      --surface: rgba(255, 255, 255, 0.86);
+      --line: rgba(21, 23, 25, 0.12);
+      --red: #e4483d;
+      --cyan: #10a6b5;
+      --blue: #243e8f;
+      --yellow: #f2b941;
+      --green: #21795f;
+      --shadow: 0 22px 60px rgba(23, 31, 42, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        linear-gradient(90deg, rgba(228, 72, 61, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(16, 166, 181, 0.08) 1px, transparent 1px),
+        linear-gradient(135deg, #fbf7ef 0%, var(--paper) 48%, #edf6f7 100%);
+      background-size: 44px 44px, 44px 44px, auto;
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 900;
+      letter-spacing: 0.01em;
+    }
+
+    .mark {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      color: white;
+      background: conic-gradient(from 20deg, var(--red), var(--yellow), var(--cyan), var(--blue), var(--red));
+      box-shadow: var(--shadow);
+    }
+
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    nav a,
+    .button,
+    .ghost {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    .button {
+      color: white;
+      border-color: transparent;
+      background: var(--ink);
+    }
+
+    .ghost { color: var(--ink); }
+
+    .hero {
+      min-height: calc(100vh - 96px);
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: center;
+      padding: 30px 0 42px;
+    }
+
+    .eyebrow,
+    .version,
+    .label {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 0.76rem;
+      font-weight: 800;
+    }
+
+    .eyebrow { color: var(--blue); margin-bottom: 14px; }
+
+    h1,
+    h2,
+    h3,
+    p { margin: 0; }
+
+    h1 {
+      max-width: 10ch;
+      font-size: clamp(4rem, 10vw, 9rem);
+      line-height: 0.82;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: clamp(2rem, 4vw, 4.2rem);
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    h3 { font-size: 1.24rem; }
+
+    .lead {
+      max-width: 700px;
+      margin-top: 22px;
+      color: var(--muted);
+      font-size: 1.12rem;
+      line-height: 1.75;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .hero-visual {
+      min-height: 620px;
+      position: relative;
+      display: grid;
+      align-content: end;
+      overflow: hidden;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.72)),
+        url('https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1400&q=85') center/cover;
+      box-shadow: var(--shadow);
+    }
+
+    .visual-copy {
+      padding: 24px;
+      color: white;
+    }
+
+    .visual-copy p {
+      margin-top: 10px;
+      color: rgba(255, 255, 255, 0.82);
+      line-height: 1.65;
+    }
+
+    .version {
+      display: inline-flex;
+      width: fit-content;
+      margin-top: 18px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      color: var(--ink);
+      background: var(--yellow);
+    }
+
+    section.band {
+      padding: 52px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 24px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      line-height: 1.72;
+      font-size: 1.02rem;
+    }
+
+    .grid-3,
+    .grid-4,
+    .workflow {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .service,
+    .step,
+    .proof {
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+      box-shadow: 0 12px 34px rgba(23, 31, 42, 0.08);
+    }
+
+    .service img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      filter: saturate(1.08) contrast(1.02);
+    }
+
+    .service p,
+    .step p,
+    .proof p {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.66;
+    }
+
+    .label { color: var(--green); margin-bottom: 10px; }
+
+    .workflow {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .step strong {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      margin-bottom: 14px;
+      color: white;
+      background: var(--red);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .strip {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+
+    .dark {
+      padding: 30px;
+      border-radius: 8px;
+      color: white;
+      background: #111519;
+      box-shadow: var(--shadow);
+    }
+
+    .dark p { color: rgba(255, 255, 255, 0.76); line-height: 1.72; margin-top: 14px; }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      padding: 24px 0 0;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .section-head,
+      .grid-3,
+      .grid-4,
+      .workflow,
+      .strip { grid-template-columns: 1fr; }
+      .hero { min-height: auto; }
+      .hero-visual { min-height: 460px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Pixer.ia inicio">
+        <span class="mark">PX</span>
+        <span>Pixer.ia</span>
+      </a>
+      <nav aria-label="Navegacion principal">
+        <a href="#servicios">Servicios</a>
+        <a href="#flujo">Flujo</a>
+        <a href="#entregables">Entregables</a>
+        <a href="./help/">Help</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Estudio multimedia para digital signage</p>
+        <h1>Pixer.ia</h1>
+        <p class="lead">
+          Creamos contenidos de audio, video y musica para redes de pantallas que necesitan comunicar cada dia con piezas claras, atractivas y listas para publicar.
+        </p>
+        <div class="actions">
+          <a class="button" href="#servicios">Ver servicios</a>
+          <a class="ghost" href="./help/">Abrir help del proyecto</a>
+        </div>
+        <span class="version">v.2026.05.02.r1</span>
+      </div>
+      <aside class="hero-visual" aria-label="Pantalla de produccion multimedia">
+        <div class="visual-copy">
+          <p class="eyebrow" style="color:#f2b941">Contenido vivo</p>
+          <h2>Una fabrica creativa para pantallas.</h2>
+          <p>Del briefing a la emision: piezas audiovisuales adaptadas a formatos, horarios, espacios y objetivos de comunicacion.</p>
+        </div>
+      </aside>
+    </section>
+
+    <section id="servicios" class="band">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Tres campos principales</p>
+          <h2>Audio, video y musica para digital signage.</h2>
+        </div>
+        <p>
+          Pixer.ia une produccion creativa y criterio operativo: cada pieza se piensa para verse y escucharse bien en espacios reales, con duraciones utiles y formatos compatibles con plataformas de carteleria digital.
+        </p>
+      </div>
+      <div class="grid-3">
+        <article class="service">
+          <img src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=900&q=85" alt="Microfono en estudio de audio">
+          <p class="label">Audio</p>
+          <h3>Mensajes, locuciones y sonido de marca</h3>
+          <p>Produccion de locuciones, avisos, cunas, ambientes sonoros y piezas informativas para espacios comerciales, corporativos y publicos.</p>
+        </article>
+        <article class="service">
+          <img src="https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=85" alt="Equipo de video y produccion audiovisual">
+          <p class="label">Video</p>
+          <h3>Piezas visuales listas para pantalla</h3>
+          <p>Motion graphics, clips promocionales, versiones por formato, animaciones, llamadas a la accion y contenidos preparados para parrillas de emision.</p>
+        </article>
+        <article class="service">
+          <img src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=900&q=85" alt="Mesa de mezcla y produccion musical">
+          <p class="label">Musica</p>
+          <h3>Identidad musical y fondos originales</h3>
+          <p>Composicion de fondos, jingles, adaptaciones musicales y paisajes sonoros que refuerzan la experiencia sin competir con el mensaje.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="flujo" class="band">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Produccion recurrente</p>
+          <h2>Del encargo a la publicacion.</h2>
+        </div>
+        <p>
+          El portal se plantea como puerta de entrada al servicio: briefings, calendario de contenidos, versiones, aprobaciones y entrega final ordenada por campana o red de pantallas.
+        </p>
+      </div>
+      <div class="workflow">
+        <article class="step"><strong>1</strong><h3>Briefing</h3><p>Objetivo, audiencia, ubicacion, formato, duracion y tono.</p></article>
+        <article class="step"><strong>2</strong><h3>Guion</h3><p>Mensaje, estructura, copy, voz, musica y criterio visual.</p></article>
+        <article class="step"><strong>3</strong><h3>Produccion</h3><p>Generacion, grabacion, edicion, montaje y mezcla.</p></article>
+        <article class="step"><strong>4</strong><h3>Revision</h3><p>Control de marca, legibilidad, ritmo, sonido y versiones.</p></article>
+        <article class="step"><strong>5</strong><h3>Entrega</h3><p>Archivos finales, naming, versionado y URL de referencia.</p></article>
+      </div>
+    </section>
+
+    <section id="entregables" class="band">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Portal operativo</p>
+          <h2>Lo que debe quedar visible.</h2>
+        </div>
+        <p>
+          Cada release del portal debe dejar version visible, resumen publicable y URL compartible. La pagina de help documenta el proyecto y la regla de cierre con Telegram.
+        </p>
+      </div>
+      <div class="strip">
+        <article class="dark">
+          <p class="eyebrow" style="color:#10a6b5">Version actual</p>
+          <h2>v.2026.05.02.r1</h2>
+          <p>Primera release del portal Pixer.ia con posicionamiento, servicios principales, flujo de produccion y pagina de ayuda.</p>
+        </article>
+        <article class="dark">
+          <p class="eyebrow" style="color:#f2b941">Help</p>
+          <h2>Explicacion del proyecto</h2>
+          <p>La seccion help recoge vision, publico objetivo, servicios, reglas de versionado y cierre por Telegram.</p>
+          <div class="actions"><a class="button" href="./help/" style="background:white;color:#111519">Abrir help</a></div>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <span>Pixer.ia - Estudio multimedia para digital signage</span>
+      <span>v.2026.05.02.r1</span>
+    </footer>
+  </main>
+</body>
+</html>
