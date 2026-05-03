@@ -135,10 +135,24 @@ async function ackItem(id) {
   } catch {}
 }
 
+async function heartbeat(showing_id, feed_count) {
+  try {
+    await fetch(WORKER + '/signage/heartbeat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ screen: screenId, showing_id: showing_id || null, feed_count: feed_count || 0 }),
+    });
+  } catch {}
+}
+
 async function tick() {
   try {
     const r = await fetch(WORKER + '/signage/feed?limit=10');
-    if (!r.ok) { setLive('feed error ' + r.status, false); return; }
+    if (!r.ok) {
+      setLive('feed error ' + r.status, false);
+      heartbeat(lastShownId, 0);
+      return;
+    }
     const data = await r.json();
     totalCount = (data.items || []).length;
     setLive(`LIVE · ${totalCount} items en feed`, true);
@@ -149,14 +163,19 @@ async function tick() {
         stage.innerHTML = '<div class="empty">// feed vacío</div>';
         lastShownId = null;
       }
+      heartbeat(null, 0);
       return;
     }
-    if (item.id === lastShownId) return;
-    lastShownId = item.id;
-    renderItem(item);
-    await ackItem(item.id);
+    if (item.id !== lastShownId) {
+      lastShownId = item.id;
+      renderItem(item);
+      await ackItem(item.id);
+    }
+    // Heartbeat siempre, esté mostrando lo mismo o algo nuevo
+    heartbeat(lastShownId, totalCount);
   } catch (e) {
     setLive('offline: ' + String(e).slice(0,40), false);
+    heartbeat(lastShownId, 0);
   }
 }
 tick();
