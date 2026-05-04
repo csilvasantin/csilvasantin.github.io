@@ -1,4 +1,9 @@
 (function () {
+  // Solo se renderiza el feed Pixer cuando hay simulador (página admira-xp).
+  // En las páginas de instrucciones (audio/musica/imagenes/video/plataforma)
+  // no debe aparecer.
+  const page = document.body && document.body.dataset && document.body.dataset.page;
+  if (page !== 'admira-xp') return;
   const canvas = document.getElementById('matrix-rain');
   if (!canvas) return;
   const ctx = canvas.getContext('2d', { alpha: true });
