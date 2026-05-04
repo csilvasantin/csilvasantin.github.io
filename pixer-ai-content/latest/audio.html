@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="robots" content="noindex">
+<title>Pixer.ai — Última versión</title>
+<style>
+  html,body{margin:0;padding:0;background:#02080d;color:#cfeaff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,monospace;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .box{text-align:center;padding:40px;border:1px solid rgba(120,243,255,.25);border-radius:14px;background:rgba(10,22,32,.7);max-width:480px}
+  h1{font-size:18px;margin:0 0 12px;letter-spacing:.06em}
+  p{margin:6px 0;font-size:13px;color:#88aabb}
+  a{color:#78f3ff;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#78f3ff;margin-right:8px;animation:p 1s ease-in-out infinite}
+  @keyframes p{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1><span class="pulse"></span>Resolviendo última versión…</h1>
+  <p id="status">Leyendo manifest.json</p>
+  <p style="margin-top:18px;font-size:11px;opacity:.6">Si no redirige automáticamente, usa los enlaces directos:</p>
+  <p id="fallback"></p>
+</div>
+<script>
+(async () => {
+  const status = document.getElementById('status');
+  const fallback = document.getElementById('fallback');
+  // 1) Intentar leer manifest.json (mantenido por workflow)
+  let target = null;
+  try {
+    const res = await fetch('../manifest.json?ts=' + Date.now(), { cache: 'no-store' });
+    if (res.ok) {
+      const m = await res.json();
+      if (m && m.latest) target = '../' + m.latest + '/audio.html';
+    }
+  } catch (e) {}
+  // 2) Fallback duro a la r35 conocida
+  if (!target) target = '../v.2026.05.02-r35/audio.html';
+  // Mostrar fallbacks por si la redirección falla
+  fallback.innerHTML = '<a href="' + target + '">' + target + '</a>';
+  status.textContent = 'Redirigiendo…';
+  // Pequeño delay para que se vea el flash, luego redirect
+  setTimeout(() => { window.location.replace(target); }, 250);
+})();
+</script>
+</body>
+</html>
