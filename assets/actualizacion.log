@@ -1,18 +1,3 @@
-[2026-05-01 08:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-05-01 08:00] Fin de actualización
----
-[2026-05-01 09:00] Inicio de actualización
-  ✓ 00.-csilvasantin.github.io — commit + push
-[2026-05-01 09:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-05-01 09:00] Fin de actualización
----
-[2026-05-01 10:00] Inicio de actualización
-  ✓ 00.-csilvasantin.github.io — commit + push
-[2026-05-01 10:00] 1 repos actualizados:
-- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
-[2026-05-01 10:00] Fin de actualización
 ---
 [2026-05-01 11:00] Inicio de actualización
   ✓ 00.-csilvasantin.github.io — commit + push
@@ -499,3 +484,17 @@ public/council-scumm.html
 [2026-05-04 17:00] Fin de actualización
 ---
 [2026-05-04 18:00] Inicio de actualización
+  ✓ 00.-csilvasantin.github.io — commit + push
+  ✓ 01.-AdmiraXperience-Game — commit + push
+  ✓ ConsejoAdmiraNextGame — commit + push
+[2026-05-04 18:00] 3 repos actualizados:
+- 00.-csilvasantin.github.io: modificados: assets/actualizacion.log
+- 01.-AdmiraXperience-Game: modificados: game.html
+- ConsejoAdmiraNextGame: modificados: council-api.py
+council-scumm.html
+public/council-scumm.html
+tools/yarig-tasks-sync.mjs
+yar_context.json
+yar_context.json.bak
+[2026-05-04 18:00] Fin de actualización
+---
