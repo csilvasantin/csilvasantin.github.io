@@ -37,8 +37,8 @@
       if (m && m.latest) target = '../' + m.latest + '/audio.html';
     }
   } catch (e) {}
-  // 2) Fallback duro a la r41 conocida
-  if (!target) target = '../v.2026.05.02-r41/audio.html';
+  // 2) Fallback duro a la r42 conocida
+  if (!target) target = '../v.2026.05.02-r42/audio.html';
   // Mostrar fallbacks por si la redirección falla
   fallback.innerHTML = '<a href="' + target + '">' + target + '</a>';
   status.textContent = 'Redirigiendo…';
