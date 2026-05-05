@@ -3,193 +3,310 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>OmniPublicity — Compra de espacios mediante subastas | AdmiraNext</title>
-<meta name="description" content="Plataforma de publicidad programática del Xpace OS: compra de espacios físicos y digitales mediante subastas en tiempo real (RTB).">
+<title>OmniPublicity — Mapa de espacios | AdmiraNext</title>
+<meta name="description" content="Mapa global de espacios publicitarios físicos disponibles para subasta en tiempo real. Busca por nombre o dirección, aterriza en la ubicación y ve sus surfaces en bidding.">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
-  :root{--bg:#02080d;--ink:#dff8ff;--mut:#75aab9;--brand:#78f3ff;--accent:#ffd866;--card:#0a1620;--line:rgba(120,243,255,.18);--good:#88ffaa}
+  :root{--bg:#02080d;--ink:#dff8ff;--mut:#75aab9;--brand:#78f3ff;--accent:#ffd866;--good:#88ffaa;--warn:#ff8866;--card:#0a1620;--card2:#0d1c28;--line:rgba(120,243,255,.18)}
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,sans-serif;line-height:1.55}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;height:100%;overflow:hidden}
   a{color:var(--brand);text-decoration:none}
   a:hover{text-decoration:underline}
-  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
-  header{padding:18px 0;border-bottom:1px solid var(--line)}
-  header .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
-  .logo{font-family:monospace;font-size:13px;letter-spacing:.16em;color:var(--accent);font-weight:bold}
+
+  header{position:fixed;top:0;left:0;right:0;z-index:10;padding:14px 22px;background:linear-gradient(to bottom,rgba(2,8,13,.92),rgba(2,8,13,.6) 70%,transparent);backdrop-filter:blur(8px);display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .logo{font-family:monospace;font-size:13px;letter-spacing:.16em;color:var(--accent);font-weight:bold;white-space:nowrap}
   .logo .dot{color:var(--brand)}
-  nav{margin-left:auto;display:flex;gap:18px;font-size:13px}
+  .search{flex:1;min-width:280px;max-width:520px;display:flex;align-items:center;gap:8px;background:rgba(10,22,32,.85);border:1px solid var(--line);border-radius:10px;padding:8px 14px;transition:border-color .15s,box-shadow .15s}
+  .search:focus-within{border-color:var(--brand);box-shadow:0 0 18px rgba(120,243,255,.25)}
+  .search svg{width:16px;height:16px;color:var(--mut);flex-shrink:0}
+  .search input{flex:1;background:transparent;border:0;outline:0;color:var(--ink);font-size:14px;font-family:inherit}
+  .search input::placeholder{color:var(--mut)}
+  .search .hint{font-family:monospace;font-size:11px;color:var(--mut);background:rgba(120,243,255,.08);border:1px solid var(--line);padding:2px 6px;border-radius:4px;flex-shrink:0}
+  nav{display:flex;gap:14px;font-size:12px;font-family:monospace;letter-spacing:.06em;text-transform:uppercase}
   nav a{color:var(--mut)}
   nav a:hover{color:var(--ink)}
-  .hero{padding:90px 0 60px;background:radial-gradient(ellipse at 20% 0%,rgba(120,243,255,.10),transparent 55%),radial-gradient(ellipse at 100% 30%,rgba(255,216,102,.08),transparent 55%)}
-  .hero h1{font-size:56px;line-height:1.05;margin:0 0 22px;letter-spacing:-.02em;font-weight:800}
-  .hero h1 .grad{background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
-  .hero p.lede{font-size:19px;color:var(--mut);max-width:720px;margin:0 0 28px}
-  .hero .cta{display:inline-flex;gap:12px;align-items:center;background:var(--brand);color:#001620;padding:12px 22px;border-radius:8px;font-weight:700;font-size:14px;letter-spacing:.04em}
-  .hero .cta.secondary{background:transparent;color:var(--brand);border:1px solid var(--brand)}
-  .ctas{display:flex;gap:12px;flex-wrap:wrap}
-  .badge{display:inline-block;font-family:monospace;font-size:11px;color:var(--accent);letter-spacing:.18em;border:1px solid rgba(255,216,102,.45);padding:4px 10px;border-radius:999px;margin-bottom:18px}
-  section{padding:64px 0;border-top:1px solid var(--line)}
-  section h2{font-size:32px;margin:0 0 18px;letter-spacing:-.01em}
-  section h2 .num{color:var(--brand);font-family:monospace;font-size:18px;margin-right:10px;vertical-align:middle}
-  section .lede{color:var(--mut);font-size:16px;max-width:760px;margin:0 0 32px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px;transition:transform .12s,border-color .12s}
-  .card:hover{border-color:var(--brand);transform:translateY(-2px)}
-  .card h3{margin:0 0 8px;font-size:18px;color:var(--accent)}
-  .card p{margin:0;color:var(--mut);font-size:14px}
-  .card .ico{font-size:22px;margin-bottom:10px}
-  .flow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:24px 0;font-family:monospace;font-size:12px}
-  .flow .step{background:var(--card);border:1px solid var(--line);padding:14px 10px;border-radius:8px;text-align:center;color:var(--ink)}
-  .flow .step b{display:block;color:var(--brand);font-size:11px;letter-spacing:.1em;margin-bottom:4px}
-  .flow .arrow{display:flex;align-items:center;justify-content:center;color:var(--brand);font-size:18px}
-  .stack{display:grid;grid-template-columns:1fr 1fr;gap:14px;font-family:monospace;font-size:13px}
-  .stack .row{background:var(--card);border:1px solid var(--line);padding:14px 16px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
-  .stack .row b{color:var(--accent);letter-spacing:.04em}
-  .stack .row span{color:var(--mut)}
-  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-top:24px}
-  .nums .n{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
-  .nums .n .v{font-size:32px;font-weight:800;color:var(--brand);font-family:monospace}
-  .nums .n .l{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
-  footer{padding:40px 0;border-top:1px solid var(--line);font-size:13px;color:var(--mut)}
-  footer .wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
-  footer a{color:var(--mut)}
-  footer .sig{margin-left:auto;font-family:monospace;font-size:11px;letter-spacing:.1em;color:var(--accent)}
-  @media (max-width:720px){.hero h1{font-size:38px}.flow{grid-template-columns:1fr}.flow .arrow{display:none}.stack{grid-template-columns:1fr}}
+
+  #map{position:absolute;inset:0;background:#000}
+
+  /* Panel lateral con surfaces */
+  aside.panel{position:fixed;top:80px;right:0;bottom:0;width:380px;max-width:92vw;background:rgba(10,22,32,.96);border-left:1px solid var(--line);backdrop-filter:blur(12px);overflow-y:auto;transform:translateX(110%);transition:transform .35s cubic-bezier(.2,.8,.2,1);z-index:9}
+  aside.panel.open{transform:translateX(0)}
+  aside.panel .ph{padding:20px 22px;border-bottom:1px solid var(--line)}
+  aside.panel .ph .kind{font-family:monospace;font-size:10px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase}
+  aside.panel .ph h2{margin:6px 0 4px;font-size:24px;letter-spacing:-.01em}
+  aside.panel .ph .addr{color:var(--mut);font-size:13px}
+  aside.panel .ph .meta{display:flex;gap:14px;margin-top:14px;font-family:monospace;font-size:11px;color:var(--mut)}
+  aside.panel .ph .meta b{color:var(--brand);display:block;font-size:18px;letter-spacing:0}
+  aside.panel .ph .close{position:absolute;top:14px;right:16px;background:transparent;border:0;color:var(--mut);font-size:22px;cursor:pointer;line-height:1}
+  aside.panel .ph .close:hover{color:var(--ink)}
+
+  aside.panel .body{padding:18px 22px}
+  aside.panel h3{font-family:monospace;font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin:0 0 12px}
+  .surface{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:10px;cursor:pointer;transition:border-color .15s,transform .12s}
+  .surface:hover{border-color:var(--brand);transform:translateY(-1px)}
+  .surface .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+  .surface .top .name{font-weight:700;color:var(--ink);font-size:14px}
+  .surface .top .status{font-family:monospace;font-size:10px;letter-spacing:.1em;padding:2px 7px;border-radius:4px;border:1px solid;text-transform:uppercase;flex-shrink:0}
+  .surface .top .status.live{color:var(--good);border-color:rgba(136,255,170,.4);background:rgba(136,255,170,.08)}
+  .surface .top .status.sched{color:var(--accent);border-color:rgba(255,216,102,.4);background:rgba(255,216,102,.06)}
+  .surface .top .status.idle{color:var(--mut);border-color:var(--line)}
+  .surface .desc{color:var(--mut);font-size:12px;margin-bottom:10px}
+  .surface .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-family:monospace;font-size:11px;color:var(--mut)}
+  .surface .stats span{display:block;color:var(--brand);font-size:13px;font-weight:700;letter-spacing:.02em}
+
+  aside.panel .actions{display:flex;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+  aside.panel .actions a{flex:1;text-align:center;font-family:monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:10px;border:1px solid var(--brand);border-radius:6px;color:var(--brand)}
+  aside.panel .actions a:hover{background:var(--brand);color:#001620;text-decoration:none}
+  aside.panel .actions a.primary{background:var(--brand);color:#001620}
+  aside.panel .actions a.primary:hover{background:transparent;color:var(--brand)}
+
+  /* hint inicial sobre el globo */
+  .splash{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;z-index:5;transition:opacity .4s;max-width:540px;padding:0 22px}
+  .splash.hidden{opacity:0}
+  .splash h1{font-size:42px;line-height:1.1;margin:0 0 14px;letter-spacing:-.02em;font-weight:800}
+  .splash h1 .grad{background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .splash p{color:var(--mut);font-size:15px;margin:0;max-width:480px;margin-left:auto;margin-right:auto}
+  .splash .arrow{margin-top:22px;font-family:monospace;font-size:12px;color:var(--brand);letter-spacing:.15em;animation:up 1.6s ease-in-out infinite}
+  @keyframes up{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(-6px);opacity:1}}
+
+  /* status pill al estilo "buscando..." abajo */
+  .status-pill{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:rgba(10,22,32,.95);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-family:monospace;font-size:12px;color:var(--mut);letter-spacing:.06em;z-index:8;display:none}
+  .status-pill.show{display:block}
+  .status-pill b{color:var(--brand)}
+
+  /* Marker custom Xtanco */
+  .marker-pin{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd866,#7a5d00);border:2px solid var(--accent);box-shadow:0 0 18px rgba(255,216,102,.5),0 0 0 6px rgba(255,216,102,.18);display:flex;align-items:center;justify-content:center;color:#1a0e00;font-weight:800;font-family:monospace;font-size:11px;letter-spacing:.04em;cursor:pointer;animation:ping 2.4s ease-in-out infinite}
+  @keyframes ping{0%,100%{box-shadow:0 0 18px rgba(255,216,102,.5),0 0 0 6px rgba(255,216,102,.18)}50%{box-shadow:0 0 22px rgba(255,216,102,.7),0 0 0 14px rgba(255,216,102,.06)}}
+
+  @media (max-width:720px){
+    header{flex-direction:column;align-items:stretch;padding:12px}
+    nav{justify-content:center}
+    aside.panel{width:100%;top:auto;height:60vh;border-left:0;border-top:1px solid var(--line);transform:translateY(110%)}
+    aside.panel.open{transform:translateY(0)}
+    .splash h1{font-size:30px}
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap">
-    <span class="logo">OMNI<span class="dot">·</span>PUBLICITY</span>
-    <nav>
-      <a href="#concepto">Concepto</a>
-      <a href="#flujo">Flujo</a>
-      <a href="#stack">Stack</a>
-      <a href="#metricas">Métricas</a>
-      <a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Xpace OS</a>
-    </nav>
-  </div>
+  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY</span>
+  <label class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    <input id="search" type="text" placeholder='Buscar espacio · "Xtanco" o "Calle Santa Rosa 4 Madrid"' autocomplete="off">
+    <span class="hint">⏎</span>
+  </label>
+  <nav>
+    <a href="about.html">Concepto RTB</a>
+    <a href="../xpace-os/">Xpace OS</a>
+    <a href="../01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Admira XP</a>
+  </nav>
 </header>
 
-<div class="hero">
-  <div class="wrap">
-    <span class="badge">XPACE OS · ADTECH MODULE</span>
-    <h1>Compra de espacios publicitarios<br><span class="grad">mediante subastas en tiempo real.</span></h1>
-    <p class="lede">OmniPublicity es la capa programática del Xpace OS de AdmiraNext. Cada hueco publicitario — pantallas, escaparates, signage físico, vending y superficies digitales — se subasta en milisegundos a anunciantes que pujan según contexto, audiencia y momento.</p>
-    <div class="ctas">
-      <a class="cta" href="#flujo">Cómo funciona la subasta</a>
-      <a class="cta secondary" href="#stack">Ver el stack</a>
-    </div>
-  </div>
+<div id="map"></div>
+
+<div class="splash" id="splash">
+  <h1>Encuentra el espacio,<br><span class="grad">subasta la impresión.</span></h1>
+  <p>Cada hueco visible del retail es inventario subastable. Empieza buscando una ubicación — escribe <code style="color:var(--accent);font-family:monospace">Xtanco</code> o cualquier dirección y aterriza en la ficha de surfaces.</p>
+  <div class="arrow">↑ buscar arriba</div>
 </div>
 
-<section id="concepto">
-  <div class="wrap">
-    <h2><span class="num">01</span>Una subasta para cada impresión</h2>
-    <p class="lede">Donde antes había un cartel fijo y un contrato anual, OmniPublicity introduce el modelo de las grandes plataformas digitales — Real-Time Bidding — sobre activos físicos del retail. Cada vez que un cliente real entra al campo de visión de una pantalla, se dispara una subasta y gana el anuncio que mejor encaje con ese momento concreto.</p>
-    <div class="grid">
-      <div class="card"><div class="ico">🎯</div><h3>Subasta por impresión</h3><p>Real-Time Bidding (RTB) sobre cada hueco visible: pantallas LED, signage, escaparate, vending y panel del mostrador.</p></div>
-      <div class="card"><div class="ico">🛰️</div><h3>Inventario omnicanal</h3><p>El mismo motor sirve activos físicos del estanco y digitales de la PWA del Xtanco Club. Una sola plataforma para todo.</p></div>
-      <div class="card"><div class="ico">🧠</div><h3>Decisión contextual</h3><p>Hora, climatología, perfil de cliente Club, stock disponible y promociones activas alimentan el bidding context.</p></div>
-      <div class="card"><div class="ico">📊</div><h3>Trazabilidad total</h3><p>Cada impresión queda firmada con timestamp, surface, ganador, CPM y métricas de atención de la cámara.</p></div>
-    </div>
-  </div>
-</section>
+<div class="status-pill" id="status">
+  <b>Buscando…</b> <span id="status-msg"></span>
+</div>
 
-<section id="flujo">
-  <div class="wrap">
-    <h2><span class="num">02</span>El flujo de la subasta</h2>
-    <p class="lede">De la oportunidad a la impresión, pasando por la puja, en menos de 200 ms.</p>
-    <div class="flow">
-      <div class="step"><b>1 · TRIGGER</b>Cliente entra al estanco o se aproxima a la pantalla</div>
-      <div class="arrow">→</div>
-      <div class="step"><b>2 · BID REQUEST</b>Surface ID, contexto, audiencia, hueco disponible</div>
-      <div class="arrow">→</div>
-      <div class="step"><b>3 · AUCTION</b>Anunciantes pujan en paralelo; second-price</div>
-      <div class="arrow">→</div>
-      <div class="step"><b>4 · WIN</b>Anuncio servido a la pantalla en &lt; 200 ms</div>
-      <div class="arrow">→</div>
-      <div class="step"><b>5 · MEASURE</b>Atención, dwell time y conversión a TPV</div>
+<aside class="panel" id="panel">
+  <div class="ph">
+    <button class="close" id="panel-close" aria-label="Cerrar">×</button>
+    <div class="kind" id="p-kind">Estanco · Retail físico</div>
+    <h2 id="p-name">Xtanco</h2>
+    <div class="addr" id="p-addr">Calle de Santa Rosa 4 · Madrid</div>
+    <div class="meta">
+      <div><b id="p-surfaces">6</b>surfaces en bidding</div>
+      <div><b id="p-impr">~1.2K</b>impresiones / día</div>
+      <div><b id="p-cpm">€2-€8</b>CPM rango</div>
     </div>
-    <p class="lede" style="margin-top:18px">El sistema cae con elegancia: si ningún anunciante puja por encima del precio mínimo, la pantalla muestra contenido propio del estanco (lotería, vapeo, tabaco, prensa) sin dejar nunca un hueco vacío.</p>
   </div>
-</section>
+  <div class="body">
+    <h3>Surfaces disponibles</h3>
+    <div id="surfaces"></div>
+    <div class="actions">
+      <a href="about.html" class="primary">Cómo funciona la subasta</a>
+      <a href="../01.-AdmiraXperience-Game/" target="_blank" rel="noopener">Ver Gemelo Digital ↗</a>
+    </div>
+  </div>
+</aside>
 
-<section id="stack">
-  <div class="wrap">
-    <h2><span class="num">03</span>El stack tras la fachada</h2>
-    <p class="lede">OmniPublicity se apoya en componentes ya en producción del Xpace OS.</p>
-    <div class="stack">
-      <div class="row"><b>SSP — Supply Side</b><span>Inventario de surfaces del Xpace OS</span></div>
-      <div class="row"><b>DSP — Demand Side</b><span>Marketplace de anunciantes (Cloudflare Worker)</span></div>
-      <div class="row"><b>Bid Router</b><span>Orquestador de subasta · second-price · &lt;200 ms</span></div>
-      <div class="row"><b>Targeting Engine</b><span>Hora · clima · perfil Club · stock · clima</span></div>
-      <div class="row"><b>Creative Cache</b><span>Plantillas dinámicas + AdmiraTube + AdmiraLive</span></div>
-      <div class="row"><b>Measurement</b><span>Cámara + dwell time + conversión TPV</span></div>
-      <div class="row"><b>Storage</b><span>Cloudflare D1 · auditable por anunciante</span></div>
-      <div class="row"><b>Compliance</b><span>Sin cookies · datos anonimizados · RGPD-ready</span></div>
-    </div>
-  </div>
-</section>
-
-<section id="metricas">
-  <div class="wrap">
-    <h2><span class="num">04</span>Lo que ya está corriendo</h2>
-    <p class="lede">Mediciones del piloto en el simulador Xtanco del Xpace OS.</p>
-    <div class="nums">
-      <div class="n"><div class="v">&lt;200ms</div><div class="l">Tiempo de subasta</div></div>
-      <div class="n"><div class="v">6</div><div class="l">Surfaces activas</div></div>
-      <div class="n"><div class="v">3</div><div class="l">Verticales (lotería, vapes, prensa)</div></div>
-      <div class="n"><div class="v">100%</div><div class="l">Fill rate (con fallback)</div></div>
-    </div>
-  </div>
-</section>
-
-<section id="audiencia">
-  <div class="wrap">
-    <h2><span class="num">05</span>Audiencia capturada por el Xpace OS</h2>
-    <p class="lede">Métricas reales del simulador Xtanco — exportadas con <code>/socios export</code> desde Admira XP. Si no hay datos, se muestran los del último día disponible.</p>
-    <div id="aud-stats" class="nums">
-      <div class="n"><div class="v" id="aud-total">—</div><div class="l">Socios totales</div></div>
-      <div class="n"><div class="v" id="aud-tienda">—</div><div class="l">Alta en tienda</div></div>
-      <div class="n"><div class="v" id="aud-web">—</div><div class="l">Alta en web (QR)</div></div>
-      <div class="n"><div class="v" id="aud-ticket">—</div><div class="l">Ticket medio €</div></div>
-    </div>
-    <p class="muted" style="font-size:12px; margin-top:12px; color:var(--mut)" id="aud-meta">Cargando…</p>
-  </div>
-</section>
 <script>
-(async()=>{
-  try{
-    const res=await fetch('./data.json',{cache:'no-cache'});
-    if(!res.ok) throw new Error('no data');
-    const d=await res.json();
-    document.getElementById('aud-total').textContent=d.audiencia.totalSocios||0;
-    document.getElementById('aud-tienda').textContent=d.audiencia.altaTienda||0;
-    document.getElementById('aud-web').textContent=d.audiencia.altaWeb||0;
-    document.getElementById('aud-ticket').textContent=(d.audiencia.ticketMedioEur||0)+'€';
-    document.getElementById('aud-meta').textContent='Datos del Xpace OS · '+d.generatedFrom+' · generado '+(d.generatedAt||'').slice(0,16).replace('T',' ');
-  }catch(e){
-    document.getElementById('aud-meta').textContent='Aún no hay datos exportados. Usa /socios export en Admira XP y commitea data.json a este directorio.';
+// ─── Xtanco demo data ──────────────────────────────────────────────
+const XTANCO = {
+  name: 'Xtanco',
+  kind: 'Estanco · Retail físico',
+  addr: 'Calle de Santa Rosa 4 · Madrid',
+  // Aproximadamente Calle de Santa Rosa, Madrid Centro (Latina/Lavapies area)
+  coords: [-3.7283, 40.4036],
+  surfaces: [
+    { name:'LED Frontal', desc:'Pantalla principal sobre el mostrador · 1920×1080 · 24h', status:'live',  impr:540, cpm:'€8',  surface:'pantalla' },
+    { name:'LED Vertical', desc:'Pantalla del display lateral · 1080×1920 · 24h',           status:'live',  impr:380, cpm:'€6',  surface:'pantalla' },
+    { name:'Escaparate exterior', desc:'LED en la fachada visible desde la calle · noche',  status:'sched', impr:210, cpm:'€5',  surface:'escaparate' },
+    { name:'Mostrador panel',     desc:'Panel táctil del mostrador · interacción cliente',  status:'live',  impr:90,  cpm:'€4',  surface:'mostrador' },
+    { name:'Vending / cigarreras', desc:'Display digital del vending · loop comercial',     status:'idle',  impr:60,  cpm:'€3',  surface:'vending' },
+    { name:'PWA Xtanco Club',     desc:'Notificaciones push y cards en la app del Club',    status:'live',  impr:140, cpm:'€2',  surface:'pwa' },
+  ],
+};
+
+// ─── Map ────────────────────────────────────────────────────────────
+const map = new maplibregl.Map({
+  container: 'map',
+  style: 'https://tiles.openfreemap.org/styles/liberty',
+  center: [10, 30],
+  zoom: 1.4,
+  projection: 'globe',
+  attributionControl: false,
+  // El cielo se renderiza desde el style; añadimos atmosphere via setSky despues del load.
+});
+map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'bottom-right');
+map.addControl(new maplibregl.AttributionControl({compact:true}), 'bottom-left');
+
+map.on('load', () => {
+  // Dim base maps via paint adjustment para lookmatrix-friendly.
+  // No reescribimos el style entero; solo quitamos algunos labels brillantes.
+  try {
+    map.setSky({
+      'sky-color': '#050a14',
+      'sky-horizon-blend': 0.6,
+      'horizon-color': '#0a1620',
+      'horizon-fog-blend': 0.5,
+      'fog-color': '#02080d',
+      'fog-ground-blend': 0.4,
+    });
+  } catch (e) { /* sky API solo en MapLibre 4+ */ }
+});
+
+// ─── UI helpers ────────────────────────────────────────────────────
+const splash  = document.getElementById('splash');
+const panel   = document.getElementById('panel');
+const panelClose = document.getElementById('panel-close');
+const statusEl = document.getElementById('status');
+const statusMsg = document.getElementById('status-msg');
+function setStatus(msg) {
+  statusMsg.textContent = msg;
+  statusEl.classList.add('show');
+  clearTimeout(setStatus._t);
+  setStatus._t = setTimeout(() => statusEl.classList.remove('show'), 3000);
+}
+panelClose.addEventListener('click', () => panel.classList.remove('open'));
+
+// ─── Surfaces panel ────────────────────────────────────────────────
+function renderSurfaces() {
+  const list = document.getElementById('surfaces');
+  list.innerHTML = XTANCO.surfaces.map(s => `
+    <div class="surface" data-surface="${s.surface}">
+      <div class="top">
+        <div class="name">${s.name}</div>
+        <div class="status ${s.status}">${s.status === 'live' ? '● LIVE' : s.status === 'sched' ? 'PROG' : 'IDLE'}</div>
+      </div>
+      <div class="desc">${s.desc}</div>
+      <div class="stats">
+        <div>impr/día<span>${s.impr}</span></div>
+        <div>CPM<span>${s.cpm}</span></div>
+        <div>tipo<span>${s.surface}</span></div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('p-name').textContent = XTANCO.name;
+  document.getElementById('p-addr').textContent = XTANCO.addr;
+  document.getElementById('p-kind').textContent = XTANCO.kind;
+  document.getElementById('p-surfaces').textContent = XTANCO.surfaces.length;
+  const totalImpr = XTANCO.surfaces.reduce((a, s) => a + s.impr, 0);
+  document.getElementById('p-impr').textContent = '~' + (totalImpr / 1000).toFixed(1) + 'K';
+}
+
+// ─── Marker Xtanco ─────────────────────────────────────────────────
+let xtancoMarker = null;
+function dropXtancoMarker() {
+  if (xtancoMarker) return;
+  const el = document.createElement('div');
+  el.className = 'marker-pin';
+  el.textContent = 'X';
+  el.title = `${XTANCO.name} · ${XTANCO.addr}`;
+  el.addEventListener('click', () => panel.classList.add('open'));
+  xtancoMarker = new maplibregl.Marker({element: el}).setLngLat(XTANCO.coords).addTo(map);
+}
+
+// ─── Búsqueda ──────────────────────────────────────────────────────
+async function geocodeNominatim(q) {
+  // Política Nominatim: identifícate. El navegador envía Referer automáticamente.
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+  const r = await fetch(url, {headers: {'Accept': 'application/json'}});
+  if (!r.ok) throw new Error('geocoder ' + r.status);
+  const d = await r.json();
+  if (!d.length) throw new Error('sin resultados');
+  return {lon: parseFloat(d[0].lon), lat: parseFloat(d[0].lat), name: d[0].display_name};
+}
+
+function flyToXtanco() {
+  splash.classList.add('hidden');
+  setStatus('Aterrizando en ' + XTANCO.addr);
+  map.flyTo({
+    center: XTANCO.coords,
+    zoom: 17.5,
+    pitch: 60,
+    bearing: -20,
+    duration: 4500,
+    essential: true,
+  });
+  setTimeout(() => {
+    dropXtancoMarker();
+    renderSurfaces();
+    panel.classList.add('open');
+  }, 4600);
+}
+
+document.getElementById('search').addEventListener('keydown', async (e) => {
+  if (e.key !== 'Enter') return;
+  const q = e.target.value.trim();
+  if (!q) return;
+
+  // Caso especial Xtanco
+  const norm = q.toLowerCase();
+  if (norm.includes('xtanco') || norm.includes('santa rosa 4')) {
+    flyToXtanco();
+    return;
   }
-})();
+
+  splash.classList.add('hidden');
+  setStatus('Buscando "' + q.slice(0, 40) + '"…');
+  try {
+    const res = await geocodeNominatim(q);
+    setStatus('Aterrizando en ' + res.name.split(',').slice(0, 2).join(','));
+    map.flyTo({center:[res.lon, res.lat], zoom:16, pitch:55, duration:4500, essential:true});
+    panel.classList.remove('open'); // sin surfaces para ubicaciones genéricas
+  } catch (err) {
+    setStatus('Sin resultados · prueba "Xtanco" o una dirección completa');
+  }
+});
+
+// ─── Auto-rotación lenta del globo mientras esperamos input ────────
+let rotating = true;
+let lastTs = 0;
+function tickRotate(ts) {
+  if (!rotating) { lastTs = ts; requestAnimationFrame(tickRotate); return; }
+  if (lastTs && map && map.getZoom() < 2.5) {
+    const dt = ts - lastTs;
+    const c = map.getCenter();
+    map.easeTo({center:[c.lng + (dt * 0.005), c.lat], duration:0});
+  }
+  lastTs = ts;
+  requestAnimationFrame(tickRotate);
+}
+requestAnimationFrame(tickRotate);
+// Detener rotación cuando el usuario interactúa o busca
+['mousedown','wheel','touchstart','keydown'].forEach(ev => {
+  document.addEventListener(ev, () => { rotating = false; }, {once:true});
+});
 </script>
-
-<section>
-  <div class="wrap">
-    <h2><span class="num">06</span>Por qué importa</h2>
-    <p class="lede">El estanco — y por extensión, cualquier punto de venta físico de la red AdmiraNext — deja de ser un soporte muerto. Cada metro cuadrado pasa a ser inventario monetizable, vendido en subasta a quien más lo valore en cada instante. Lo digital ya funciona así desde hace 15 años. OmniPublicity lo trae al mundo físico con el rigor de una plataforma adtech moderna.</p>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap">
-    <span>© 2026 AdmiraNext · OmniPublicity</span>
-    <a href="https://github.com/AdmiraNext/01.--OmniPublicity" target="_blank" rel="noopener">↗ GitHub</a>
-    <a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Xpace OS · Admira XP</a>
-    <span class="sig">_Admirito by Claude_</span>
-  </div>
-</footer>
 
 </body>
 </html>
