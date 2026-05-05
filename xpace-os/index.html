@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Xpace OS — Las 3 capas de AdmiraNext: Pixer.ai · Admira XP · OmniPublicity</title>
+<meta name="description" content="Xpace OS de AdmiraNext convierte tu retail en un medio publicitario inteligente con tres capas integradas: creación de contenido con IA (Pixer.ai), distribución con Gemelo Digital (Admira XP) y marketplace de subastas en tiempo real (OmniPublicity).">
+<meta property="og:title" content="Xpace OS — Las 3 capas de AdmiraNext">
+<meta property="og:description" content="Plataforma integrada: creación IA + distribución signage + marketplace publicitario RTB sobre tus pantallas físicas.">
+<style>
+  :root{--bg:#02080d;--ink:#dff8ff;--mut:#75aab9;--brand:#78f3ff;--accent:#ffd866;--good:#88ffaa;--warn:#ff8866;--card:#0a1620;--card2:#0d1c28;--line:rgba(120,243,255,.18)}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,sans-serif;line-height:1.55}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 22px}
+  header{padding:18px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(2,8,13,.92);backdrop-filter:blur(8px);z-index:10}
+  header .wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .logo{font-family:monospace;font-size:13px;letter-spacing:.16em;color:var(--accent);font-weight:bold}
+  .logo .dot{color:var(--brand)}
+  nav{margin-left:auto;display:flex;gap:18px;font-size:13px;flex-wrap:wrap}
+  nav a{color:var(--mut)}
+  nav a:hover{color:var(--ink)}
+  .hero{padding:90px 0 70px;background:radial-gradient(ellipse at 20% 0%,rgba(120,243,255,.10),transparent 55%),radial-gradient(ellipse at 100% 30%,rgba(255,216,102,.08),transparent 55%)}
+  .hero h1{font-size:60px;line-height:1.05;margin:0 0 22px;letter-spacing:-.02em;font-weight:800}
+  .hero h1 .grad{background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.lede{font-size:19px;color:var(--mut);max-width:760px;margin:0 0 28px}
+  .badge{display:inline-block;font-family:monospace;font-size:11px;color:var(--accent);letter-spacing:.18em;border:1px solid rgba(255,216,102,.45);padding:4px 10px;border-radius:999px;margin-bottom:18px}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .cta{display:inline-flex;gap:10px;align-items:center;background:var(--brand);color:#001620;padding:12px 22px;border-radius:8px;font-weight:700;font-size:14px;letter-spacing:.04em}
+  .cta.secondary{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  section h2{font-size:32px;margin:0 0 18px;letter-spacing:-.01em}
+  section h2 .num{color:var(--brand);font-family:monospace;font-size:18px;margin-right:10px;vertical-align:middle}
+  section .lede{color:var(--mut);font-size:16px;max-width:780px;margin:0 0 32px}
+  .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .layer{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;transition:transform .12s,border-color .12s;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+  .layer:hover{border-color:var(--brand);transform:translateY(-3px)}
+  .layer .lnum{position:absolute;top:14px;right:18px;font-family:monospace;font-size:48px;font-weight:800;color:rgba(120,243,255,.10)}
+  .layer .lkind{font-family:monospace;font-size:11px;letter-spacing:.18em;color:var(--accent);text-transform:uppercase}
+  .layer h3{margin:0;font-size:24px;color:var(--ink)}
+  .layer .who{font-size:13px;color:var(--mut);font-style:italic}
+  .layer p{margin:0;color:var(--mut);font-size:14px}
+  .layer ul{margin:0;padding:0 0 0 18px;color:var(--mut);font-size:13px}
+  .layer ul li{margin-bottom:4px}
+  .layer .more{margin-top:auto;font-size:13px;color:var(--brand);font-family:monospace;letter-spacing:.04em}
+  .deep{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:30px;margin-bottom:18px}
+  .deep h3{margin:0 0 6px;font-size:22px;color:var(--accent)}
+  .deep .who{font-size:13px;color:var(--mut);font-style:italic;margin-bottom:14px}
+  .deep p{color:var(--ink);font-size:15px}
+  .deep .feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin:18px 0;font-family:monospace;font-size:12px}
+  .deep .feats div{background:rgba(0,0,0,.3);border:1px solid var(--line);padding:10px 12px;border-radius:6px;color:var(--mut)}
+  .deep .feats div b{color:var(--brand);display:block;letter-spacing:.05em;margin-bottom:2px}
+  .deep .links{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .deep .links a{font-family:monospace;font-size:12px;border:1px solid var(--line);padding:6px 12px;border-radius:6px;color:var(--brand)}
+  .deep .links a:hover{border-color:var(--brand);text-decoration:none}
+  .vs{overflow-x:auto}
+  table.vs-table{width:100%;border-collapse:collapse;font-size:14px}
+  table.vs-table th,table.vs-table td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+  table.vs-table th{font-family:monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);background:rgba(255,216,102,.04)}
+  table.vs-table td b{color:var(--ink)}
+  table.vs-table .ok{color:var(--good)}
+  table.vs-table .partial{color:var(--accent)}
+  table.vs-table .no{color:var(--warn)}
+  table.vs-table tr:hover td{background:rgba(120,243,255,.03)}
+  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:18px}
+  .nums .n{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .nums .n .v{font-size:32px;font-weight:800;color:var(--brand);font-family:monospace}
+  .nums .n .l{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;margin-top:4px}
+  .nums .n .v.live::before{content:"●";color:var(--good);font-size:14px;margin-right:6px;vertical-align:middle;animation:pulse 1.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .stack-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;font-family:monospace;font-size:13px}
+  .stack-row .row{background:var(--card);border:1px solid var(--line);padding:12px 14px;border-radius:8px}
+  .stack-row .row b{color:var(--accent);letter-spacing:.04em;display:block;margin-bottom:2px}
+  .stack-row .row span{color:var(--mut);font-size:12px}
+  footer{padding:40px 0;border-top:1px solid var(--line);font-size:13px;color:var(--mut)}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  footer a{color:var(--mut)}
+  footer .sig{margin-left:auto;font-family:monospace;font-size:11px;letter-spacing:.1em;color:var(--accent)}
+  @media (max-width:820px){.hero h1{font-size:38px}.layers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <span class="logo">XPACE<span class="dot">·</span>OS</span>
+    <nav>
+      <a href="#capas">3 capas</a>
+      <a href="#pixer">Pixer.ai</a>
+      <a href="#xp">Admira XP</a>
+      <a href="#omni">OmniPublicity</a>
+      <a href="#advertima">vs Advertima</a>
+      <a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Demo live</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <span class="badge">ADMIRANEXT · XPACE OS</span>
+    <h1>Tu retail físico,<br><span class="grad">un medio publicitario inteligente.</span></h1>
+    <p class="lede">Xpace OS es la plataforma de AdmiraNext que convierte cada pantalla, escaparate y superficie de una tienda en inventario monetizable. Tres capas integradas — generación de contenido con IA, distribución con Gemelo Digital y marketplace de subastas en tiempo real — sustituyen el cartel fijo y el contrato anual por un sistema que respira con la audiencia.</p>
+    <div class="ctas">
+      <a class="cta" href="#capas">Conoce las 3 capas</a>
+      <a class="cta secondary" href="#advertima">¿En qué se diferencia de Advertima?</a>
+    </div>
+  </div>
+</div>
+
+<section id="capas">
+  <div class="wrap">
+    <h2><span class="num">01</span>Las tres capas</h2>
+    <p class="lede">Cada capa resuelve una pieza del puzzle, y juntas forman la cadena completa que va del prompt creativo a la impresión publicitaria con métrica auditada. Otros venden trozos. Xpace OS es el sistema operativo entero.</p>
+    <div class="layers">
+      <div class="layer">
+        <div class="lnum">01</div>
+        <div class="lkind">Creación</div>
+        <h3>Pixer.ai</h3>
+        <div class="who">Para creativos, equipos de marca y operadores de tienda</div>
+        <p>Briefs estructurados generan en minutos audio, música con letra, imágenes y video. Motores conectados: Suno, Lyria 3, ElevenLabs, FLUX, Imagen 4, Veo 3, Grok Imagine. Importación desde URL pública (YouTube, Vimeo, TikTok…) vía yt-dlp.</p>
+        <a class="more" href="#pixer">→ ver detalle</a>
+      </div>
+      <div class="layer">
+        <div class="lnum">02</div>
+        <div class="lkind">Distribución</div>
+        <h3>Admira XP</h3>
+        <div class="who">Para retailers que quieren probar antes de invertir</div>
+        <p>Digital signage con Gemelo Digital — una réplica isométrica de tu tienda real corriendo en el navegador. Programa playlists, mide impresiones, simula tráfico y auditea audiencia antes de tocar un solo cable en la tienda física.</p>
+        <a class="more" href="#xp">→ ver detalle</a>
+      </div>
+      <div class="layer">
+        <div class="lnum">03</div>
+        <div class="lkind">Marketplace</div>
+        <h3>OmniPublicity</h3>
+        <div class="who">Para anunciantes y agencias programáticas</div>
+        <p>Real-Time Bidding sobre activos físicos: cada hueco visible se subasta en menos de 200 ms al anunciante con la mejor oferta para esa audiencia, ese momento y ese contexto. Inventario omnicanal: pantalla, escaparate, mostrador, vending, PWA.</p>
+        <a class="more" href="#omni">→ ver detalle</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pixer">
+  <div class="wrap">
+    <h2><span class="num">02</span>Pixer.ai · Capa de creación</h2>
+    <div class="deep">
+      <h3>Brief estructurado → asset listo para signage en minutos</h3>
+      <div class="who">Si Advertima asume que el retailer ya tiene contenido, Pixer.ai lo genera.</div>
+      <p>Cuatro tipos de contenido — Audio, Música, Imágenes, Video — con un brief operativo por cada uno. La plataforma orquesta los motores adecuados según el caso: TTS multilingüe para voz, Suno con letra custom para identidad sonora de marca, Imagen 4 / FLUX para visuales en serie, Veo 3 para video con audio nativo.</p>
+      <div class="feats">
+        <div><b>SUNO</b>chirp-v4 / v4.5 · letra propia · 2 clips por canción</div>
+        <div><b>LYRIA 3</b>Google · 30s o 2min con voz cantando</div>
+        <div><b>ELEVENLABS</b>voces ultrarrealistas multilingüe</div>
+        <div><b>IMAGEN 4 · FLUX · GROK</b>imagen estática 1024-2K</div>
+        <div><b>VEO 3</b>video 720p con audio nativo</div>
+        <div><b>YT-DLP IMPORT</b>YouTube/Vimeo/X/TikTok/Instagram → mp3 o mp4</div>
+      </div>
+      <p>Cada asset sale con título descriptivo y carátula auto-generada, listo para empujar al feed del Gemelo Digital con un click.</p>
+      <div class="links">
+        <a href="https://csilvasantin.github.io/pixer-ai-content/latest/audio.html" target="_blank" rel="noopener">↗ Pixer.ai live</a>
+        <a href="#xp">↓ siguiente: Admira XP</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="xp">
+  <div class="wrap">
+    <h2><span class="num">03</span>Admira XP · Capa de distribución</h2>
+    <div class="deep">
+      <h3>Digital signage encima de un Gemelo Digital de tu tienda</h3>
+      <div class="who">El simulador es la primera demo, no el último paso.</div>
+      <p>Admira XP renderiza tu tienda en perspectiva isométrica con clientes reales, pantallas, escaparate, mostrador y aparato de olores. Cada pantalla del gemelo digital es un surface real configurable: asignas playlists, programas tomas de audio, defines reglas por hora/clima/perfil de cliente y ves el resultado antes de instalar nada en la tienda física.</p>
+      <div class="feats">
+        <div><b>GEMELO DIGITAL</b>réplica isométrica con tráfico simulado de clientes</div>
+        <div><b>SIGNAGE PLAYLIST</b>imagen, video, IFRAME YouTube, Pixer Feed live</div>
+        <div><b>AUDIENCE CAPTURE</b>perfil de cliente Club, género, edad estimada</div>
+        <div><b>METRICAS</b>impresiones, atención, conversión a Club</div>
+        <div><b>CONTROL DE TIENDA</b>aroma, música, iluminación Hue, ESL</div>
+        <div><b>API XTAPI</b>status, telegram, comando externo</div>
+      </div>
+      <p>Cuando estás listo, el mismo motor empuja el playlist al hardware real (Elgato Stream Deck, ESL, Philips Hue) sin reescribir nada. La validación que hiciste sobre el simulador es la misma configuración que sale a producción.</p>
+      <div class="links">
+        <a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Admira XP live</a>
+        <a href="#omni">↓ siguiente: OmniPublicity</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="omni">
+  <div class="wrap">
+    <h2><span class="num">04</span>OmniPublicity · Capa de marketplace</h2>
+    <div class="deep">
+      <h3>Real-Time Bidding sobre cada hueco físico visible</h3>
+      <div class="who">El mismo modelo que Google Ads y The Trade Desk, sobre tus pantallas reales.</div>
+      <p>Cada vez que un cliente real entra al campo de visión de una pantalla, OmniPublicity dispara una subasta en milisegundos. Los anunciantes pujan según contexto (hora, clima, stock disponible), audiencia (perfil Club, género, edad) y momento. Gana el mejor encaje, no el mayor presupuesto.</p>
+      <div class="feats">
+        <div><b>RTB &lt; 200ms</b>subasta por impresión, no por contrato anual</div>
+        <div><b>INVENTARIO OMNICANAL</b>pantallas, escaparates, vending, mostrador, PWA</div>
+        <div><b>BIDDING CONTEXT</b>hora, climatología, perfil cliente, stock, promo activa</div>
+        <div><b>FALLBACK ELEGANTE</b>si nadie puja, contenido propio del retailer</div>
+        <div><b>TRAZABILIDAD</b>cada impresión firmada con surface, ganador, CPM, atención</div>
+        <div><b>BACKEND COMPARTIDO</b>mismo Xpace OS — sin integración separada</div>
+      </div>
+      <div class="links">
+        <a href="https://csilvasantin.github.io/omnipublicity/" target="_blank" rel="noopener">↗ OmniPublicity live</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="advertima">
+  <div class="wrap">
+    <h2><span class="num">05</span>Xpace OS vs Advertima</h2>
+    <p class="lede">Advertima es una buena referencia y la han hecho bien — bridging digital y físico con audiencia AI sobre signage. La diferencia sustancial es el alcance: ellos resuelven la capa de audiencia y monetización; nosotros traemos también la creación y la distribución, todo con un Gemelo Digital donde validar antes de invertir un euro en hardware.</p>
+    <div class="vs">
+    <table class="vs-table">
+      <thead>
+        <tr>
+          <th>Capacidad</th>
+          <th>Advertima</th>
+          <th>AdmiraNext · Xpace OS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>Generación de contenido con IA</b><br><span style="color:var(--mut);font-size:12px">música, voz, imagen, video</span></td>
+          <td class="no">— depende del retailer / agencia externa</td>
+          <td class="ok">✓ Pixer.ai con 7+ motores integrados</td>
+        </tr>
+        <tr>
+          <td><b>Distribución signage propia</b></td>
+          <td class="partial">△ requiere integración con cartelería existente</td>
+          <td class="ok">✓ Admira XP nativo, drag-and-drop al surface</td>
+        </tr>
+        <tr>
+          <td><b>Gemelo Digital del retail</b><br><span style="color:var(--mut);font-size:12px">probar sin instalar hardware</span></td>
+          <td class="no">— se valida sobre la tienda real</td>
+          <td class="ok">✓ Simulador isométrico con tráfico, audiencia y reglas</td>
+        </tr>
+        <tr>
+          <td><b>Audience capture (cámara IA)</b></td>
+          <td class="ok">✓ Audience AI</td>
+          <td class="ok">✓ LiveCam + Mocap + perfil Club</td>
+        </tr>
+        <tr>
+          <td><b>Marketplace RTB / programmatic</b></td>
+          <td class="ok">✓ booking automatizado</td>
+          <td class="ok">✓ OmniPublicity con subasta &lt;200ms</td>
+        </tr>
+        <tr>
+          <td><b>Mercado primario</b></td>
+          <td class="partial">grocery US/EU</td>
+          <td class="ok">retail, estancos, ciudad — agnóstico</td>
+        </tr>
+        <tr>
+          <td><b>Onboarding hasta primera demo</b></td>
+          <td class="partial">semanas — instalación de cámaras y signage</td>
+          <td class="ok">día 1 — el Gemelo Digital ya está corriendo</td>
+        </tr>
+        <tr>
+          <td><b>Stack abierto / inspeccionable</b></td>
+          <td class="no">SaaS cerrado</td>
+          <td class="ok">GitHub Pages + workers Cloudflare, todo trazable</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2><span class="num">06</span>Cómo está montado por dentro</h2>
+    <p class="lede">Stack pequeño, decisiones explícitas, todo open en GitHub Pages + Cloudflare. Sin SaaS opaco.</p>
+    <div class="stack-row">
+      <div class="row"><b>Pixer.ai</b><span>SPA estática · Gemini · Suno proxy · Pollinations · ElevenLabs worker</span></div>
+      <div class="row"><b>Admira XP</b><span>Canvas isométrico · Service Worker · KV signage feed · IFRAME YouTube</span></div>
+      <div class="row"><b>OmniPublicity</b><span>RTB engine sobre Cloudflare Workers · KV bid log · audit trail</span></div>
+      <div class="row"><b>Suno-local</b><span>Node nativo · cookie Clerk auth · Tailscale Funnel /suno</span></div>
+      <div class="row"><b>Admira-tube</b><span>Node nativo · yt-dlp + ffmpeg · Funnel /admira/tube</span></div>
+      <div class="row"><b>Pixer-eleven</b><span>Cloudflare Worker · signage push/feed/ack/heartbeat · KV</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="metricas">
+  <div class="wrap">
+    <h2><span class="num">07</span>Estado del piloto</h2>
+    <p class="lede">Métricas en vivo del simulador Xtanco corriendo en producción. Si los workers están dormidos, los números muestran "—".</p>
+    <div class="nums">
+      <div class="n"><div class="v live" id="m-screens">—</div><div class="l">pantallas signage activas</div></div>
+      <div class="n"><div class="v" id="m-feed">—</div><div class="l">items recientes en Pixer Feed</div></div>
+      <div class="n"><div class="v" id="m-credits">—</div><div class="l">créditos Suno disponibles</div></div>
+      <div class="n"><div class="v">3</div><div class="l">capas integradas en producción</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 AdmiraNext · Xpace OS</span>
+    <a href="https://csilvasantin.github.io/pixer-ai-content/latest/audio.html" target="_blank" rel="noopener">Pixer.ai</a>
+    <a href="https://csilvasantin.github.io/01.-AdmiraXperience-Game/" target="_blank" rel="noopener">Admira XP</a>
+    <a href="https://csilvasantin.github.io/omnipublicity/" target="_blank" rel="noopener">OmniPublicity</a>
+    <span class="sig">XPACE OS · v.2026.05.05</span>
+  </div>
+</footer>
+
+<script>
+// Métricas live — silently fail si los workers están dormidos.
+(async () => {
+  const PIXER = 'https://pixer-eleven.csilvasantin.workers.dev';
+  const SUNO  = 'https://macmini.tail48b61c.ts.net/suno';
+
+  // Pantallas + feed
+  try {
+    const sc = await fetch(PIXER + '/signage/screens').then(r => r.json());
+    if (sc && Array.isArray(sc.screens)) {
+      const online = sc.screens.filter(s => s.status === 'online' || (Date.now() - (s.last_heartbeat || 0) < 60000)).length;
+      document.getElementById('m-screens').textContent = online || sc.screens.length;
+    }
+  } catch {}
+  try {
+    const f = await fetch(PIXER + '/signage/feed?limit=50').then(r => r.json());
+    if (f && Array.isArray(f.items)) {
+      document.getElementById('m-feed').textContent = f.items.length;
+    }
+  } catch {}
+
+  // Créditos Suno
+  try {
+    const h = await fetch(SUNO + '/healthz').then(r => r.json());
+    if (h && h.ok && typeof h.total_credits_left === 'number') {
+      document.getElementById('m-credits').textContent = h.total_credits_left.toLocaleString('es');
+    }
+  } catch {}
+})();
+</script>
+
+</body>
+</html>
