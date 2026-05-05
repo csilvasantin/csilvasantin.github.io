@@ -75,6 +75,35 @@
   .status-pill.show{display:block}
   .status-pill b{color:var(--brand)}
 
+  /* Controles derecha estilo Google Maps */
+  .map-ctrls{position:fixed;right:18px;bottom:120px;display:flex;flex-direction:column;gap:8px;z-index:9}
+  .ctrl-btn{width:46px;height:46px;border-radius:12px;background:rgba(10,22,32,.92);border:1px solid var(--line);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:13px;font-weight:700;letter-spacing:.04em;transition:border-color .15s,background .15s,transform .12s;backdrop-filter:blur(8px)}
+  .ctrl-btn:hover{border-color:var(--brand);color:var(--brand)}
+  .ctrl-btn:active{transform:scale(.96)}
+  .ctrl-btn.active{background:var(--brand);color:#001620;border-color:var(--brand)}
+  .ctrl-btn svg{width:20px;height:20px}
+  .ctrl-btn.compass svg{width:24px;height:24px}
+  .zoom-grp{display:flex;flex-direction:column;background:rgba(10,22,32,.92);border:1px solid var(--line);border-radius:12px;overflow:hidden;backdrop-filter:blur(8px)}
+  .zoom-grp .ctrl-btn{border:0;border-radius:0;background:transparent;width:46px;height:46px}
+  .zoom-grp .ctrl-btn.ztop{border-bottom:1px solid var(--line)}
+
+  /* Selector capas abajo izquierda */
+  .layer-chooser{position:fixed;left:22px;bottom:24px;display:flex;gap:6px;background:rgba(10,22,32,.92);border:1px solid var(--line);border-radius:14px;padding:6px;z-index:9;backdrop-filter:blur(8px)}
+  .layer-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 8px 4px;border-radius:10px;border:1px solid transparent;background:transparent;color:var(--mut);cursor:pointer;transition:border-color .15s,background .15s}
+  .layer-btn:hover{border-color:var(--line);background:rgba(120,243,255,.05);color:var(--ink)}
+  .layer-btn.active{border-color:var(--brand);background:rgba(120,243,255,.1);color:var(--brand)}
+  .layer-btn .thumb{width:54px;height:38px;border-radius:6px;border:1px solid var(--line);background-size:cover;background-position:center}
+  .layer-btn .lbl{font-family:monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+  .layer-btn .t-mapa{background:linear-gradient(135deg,#2a4d6e 0%,#5d8fb5 50%,#a9c5dc 100%);position:relative}
+  .layer-btn .t-mapa::after{content:"";position:absolute;inset:6px 4px;background:linear-gradient(90deg,transparent 47%,rgba(255,255,255,.5) 47% 53%,transparent 53%),linear-gradient(0deg,transparent 60%,rgba(255,255,255,.4) 60% 64%,transparent 64%);border-radius:3px}
+  .layer-btn .t-relieve{background:linear-gradient(135deg,#3d4a2a 0%,#7a8b4d 35%,#c4a566 65%,#e8d8a8 100%)}
+  .layer-btn .t-trafico{background:linear-gradient(135deg,#1a2438 0%,#3a4868 100%);position:relative}
+  .layer-btn .t-trafico::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,#88ffaa 12%,transparent 13% 35%,#ffd866 35% 38%,transparent 38% 60%,#ff5e3a 60% 64%,transparent 64%);opacity:.85;border-radius:5px}
+
+  .demo-pill{position:fixed;bottom:88px;left:22px;background:rgba(255,94,58,.12);border:1px solid rgba(255,94,58,.5);color:#ffb39e;font-family:monospace;font-size:11px;letter-spacing:.05em;padding:7px 14px;border-radius:8px;z-index:8;display:none;backdrop-filter:blur(6px)}
+  .demo-pill.show{display:block}
+  .demo-pill b{color:var(--warn);letter-spacing:.16em;margin-right:6px}
+
   /* Marker custom Xtanco */
   .marker-pin{width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd866,#7a5d00);border:2px solid var(--accent);box-shadow:0 0 18px rgba(255,216,102,.5),0 0 0 6px rgba(255,216,102,.18);display:flex;align-items:center;justify-content:center;color:#1a0e00;font-weight:800;font-family:monospace;font-size:11px;letter-spacing:.04em;cursor:pointer;animation:ping 2.4s ease-in-out infinite}
   @keyframes ping{0%,100%{box-shadow:0 0 18px rgba(255,216,102,.5),0 0 0 6px rgba(255,216,102,.18)}50%{box-shadow:0 0 22px rgba(255,216,102,.7),0 0 0 14px rgba(255,216,102,.06)}}
@@ -111,6 +140,40 @@
   <p>Cada hueco visible del retail es inventario subastable. Empieza buscando una ubicación — escribe <code style="color:var(--accent);font-family:monospace">Xtanco</code> o cualquier dirección y aterriza en la ficha de surfaces.</p>
   <div class="arrow">↑ buscar arriba</div>
 </div>
+
+<!-- Controles a la derecha estilo Google Maps: 3D toggle + locate + zoom +/- -->
+<div class="map-ctrls" id="ctrls">
+  <button class="ctrl-btn compass" id="btn-compass" title="Reset bearing/pitch" aria-label="Reset bearing">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18M5 8a7 7 0 0 1 14 0M19 16a7 7 0 0 1-14 0"/><polygon points="12,3 9,10 12,8 15,10" fill="#ff5e3a" stroke="none"/></svg>
+  </button>
+  <button class="ctrl-btn" id="btn-3d" title="Alternar 2D / 3D">3D</button>
+  <button class="ctrl-btn" id="btn-loc" title="Mi ubicación" aria-label="Localizar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+  </button>
+  <div class="zoom-grp">
+    <button class="ctrl-btn ztop" id="btn-zin" title="Zoom +" aria-label="Acercar">+</button>
+    <button class="ctrl-btn zbot" id="btn-zout" title="Zoom −" aria-label="Alejar">−</button>
+  </div>
+</div>
+
+<!-- Selector de capa estilo Google Maps abajo izquierda -->
+<div class="layer-chooser" id="layers">
+  <button class="layer-btn active" data-layer="mapa" title="Vista de mapa estándar">
+    <span class="thumb t-mapa"></span>
+    <span class="lbl">Mapa</span>
+  </button>
+  <button class="layer-btn" data-layer="relieve" title="Vista de relieve / topográfica">
+    <span class="thumb t-relieve"></span>
+    <span class="lbl">Relieve</span>
+  </button>
+  <button class="layer-btn" data-layer="trafico" title="Tráfico (datos demo — sin API real)">
+    <span class="thumb t-trafico"></span>
+    <span class="lbl">Tráfico</span>
+  </button>
+</div>
+
+<!-- Pill que aparece cuando la capa Tráfico está activa -->
+<div class="demo-pill" id="demo-pill"><b>DEMO</b> · Tráfico simulado · sin proveedor real conectado todavía</div>
 
 <div class="status-pill" id="status">
   <b>Buscando…</b> <span id="status-msg"></span>
@@ -156,22 +219,51 @@ const XTANCO = {
   ],
 };
 
+// ─── Estilos disponibles ────────────────────────────────────────────
+// Mapa: OpenFreeMap liberty (streets, vector). Relieve: OpenTopoMap raster.
+// Tráfico: liberty con un overlay decorativo de "congestion" (demo — el dato
+// real de trafico requiere API de pago HERE/TomTom/Google).
+const STYLE_MAPA = 'https://tiles.openfreemap.org/styles/liberty';
+const STYLE_RELIEVE = {
+  version: 8,
+  sources: {
+    otm: {
+      type: 'raster',
+      tiles: [
+        'https://a.tile.opentopomap.org/{z}/{x}/{y}.png',
+        'https://b.tile.opentopomap.org/{z}/{x}/{y}.png',
+        'https://c.tile.opentopomap.org/{z}/{x}/{y}.png',
+      ],
+      tileSize: 256,
+      maxzoom: 17,
+      attribution: '© OpenTopoMap (CC-BY-SA), © OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    {id: 'bg', type: 'background', paint: {'background-color': '#0a1620'}},
+    {id: 'otm', type: 'raster', source: 'otm'},
+  ],
+  glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
+};
+
 // ─── Map ────────────────────────────────────────────────────────────
 const map = new maplibregl.Map({
   container: 'map',
-  style: 'https://tiles.openfreemap.org/styles/liberty',
-  center: [10, 30],
-  zoom: 1.4,
+  style: STYLE_MAPA,
+  center: [10, 25],
+  zoom: 0,                    // entero visible
+  pitch: 0,
   projection: 'globe',
   attributionControl: false,
-  // El cielo se renderiza desde el style; añadimos atmosphere via setSky despues del load.
+  renderWorldCopies: false,
 });
-map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'bottom-right');
 map.addControl(new maplibregl.AttributionControl({compact:true}), 'bottom-left');
 
-map.on('load', () => {
-  // Dim base maps via paint adjustment para lookmatrix-friendly.
-  // No reescribimos el style entero; solo quitamos algunos labels brillantes.
+let currentLayer = 'mapa';
+let currentView = '3d'; // '3d' = globe; '2d' = mercator plano
+let trafficOverlayAdded = false;
+
+function applySky() {
   try {
     map.setSky({
       'sky-color': '#050a14',
@@ -181,8 +273,84 @@ map.on('load', () => {
       'fog-color': '#02080d',
       'fog-ground-blend': 0.4,
     });
-  } catch (e) { /* sky API solo en MapLibre 4+ */ }
+  } catch (e) {}
+}
+map.on('style.load', () => {
+  applySky();
+  if (currentLayer === 'trafico') ensureTrafficOverlay();
 });
+map.on('load', applySky);
+
+// ─── Tráfico (demo overlay) ────────────────────────────────────────
+// Dibuja segmentos coloreados (verde/amarillo/rojo) sobre calles del Xtanco.
+// Honesto: es decorativo. Cuando enchufemos TomTom/HERE/Google Traffic
+// reemplazaremos esta GeoJSON por la respuesta real del API.
+const TRAFFIC_DEMO = {
+  type: 'FeatureCollection',
+  features: [
+    // Tramo Calle Santa Rosa (alrededor del Xtanco)
+    {type:'Feature',properties:{c:'#ff5e3a',label:'denso'},geometry:{type:'LineString',coordinates:[[-3.7305,40.4042],[-3.7283,40.4036],[-3.7261,40.4030]]}},
+    {type:'Feature',properties:{c:'#ffd866',label:'medio'},geometry:{type:'LineString',coordinates:[[-3.7283,40.4036],[-3.7280,40.4055],[-3.7268,40.4068]]}},
+    {type:'Feature',properties:{c:'#88ffaa',label:'fluido'},geometry:{type:'LineString',coordinates:[[-3.7283,40.4036],[-3.7295,40.4022],[-3.7310,40.4010]]}},
+    // Calles aledañas
+    {type:'Feature',properties:{c:'#ff5e3a',label:'denso'},geometry:{type:'LineString',coordinates:[[-3.7330,40.4055],[-3.7295,40.4055],[-3.7275,40.4060]]}},
+    {type:'Feature',properties:{c:'#ffd866',label:'medio'},geometry:{type:'LineString',coordinates:[[-3.7275,40.4060],[-3.7250,40.4045]]}},
+    {type:'Feature',properties:{c:'#88ffaa',label:'fluido'},geometry:{type:'LineString',coordinates:[[-3.7250,40.4045],[-3.7230,40.4030]]}},
+  ],
+};
+function ensureTrafficOverlay() {
+  if (!map.isStyleLoaded()) { map.once('style.load', ensureTrafficOverlay); return; }
+  if (map.getSource('traffic-demo')) return;
+  map.addSource('traffic-demo', {type:'geojson', data: TRAFFIC_DEMO});
+  map.addLayer({
+    id:'traffic-demo-line',
+    type:'line',
+    source:'traffic-demo',
+    paint:{
+      'line-color': ['get','c'],
+      'line-width': ['interpolate',['linear'],['zoom'], 10, 1, 14, 4, 18, 9],
+      'line-opacity': 0.85,
+      'line-blur': 0.4,
+    },
+  });
+}
+function removeTrafficOverlay() {
+  if (map.getLayer('traffic-demo-line')) map.removeLayer('traffic-demo-line');
+  if (map.getSource('traffic-demo')) map.removeSource('traffic-demo');
+}
+
+// ─── Cambios de capa y vista ───────────────────────────────────────
+function setLayer(name) {
+  if (name === currentLayer) return;
+  currentLayer = name;
+  document.querySelectorAll('.layer-btn').forEach(b => b.classList.toggle('active', b.dataset.layer === name));
+  if (name === 'mapa') {
+    map.setStyle(STYLE_MAPA);
+  } else if (name === 'relieve') {
+    map.setStyle(STYLE_RELIEVE);
+  } else if (name === 'trafico') {
+    map.setStyle(STYLE_MAPA);
+    // overlay se añadirá en style.load
+  }
+  document.getElementById('demo-pill').classList.toggle('show', name === 'trafico');
+}
+
+function setView(mode) {
+  if (mode === currentView) return;
+  currentView = mode;
+  const btn = document.getElementById('btn-3d');
+  if (mode === '3d') {
+    map.setProjection({type:'globe'});
+    btn.textContent = '3D';
+    btn.classList.add('active');
+    if (map.getZoom() > 12) map.easeTo({pitch: 60, duration: 600});
+  } else {
+    map.setProjection({type:'mercator'});
+    btn.textContent = '2D';
+    btn.classList.remove('active');
+    map.easeTo({pitch: 0, bearing: 0, duration: 600});
+  }
+}
 
 // ─── UI helpers ────────────────────────────────────────────────────
 const splash  = document.getElementById('splash');
@@ -197,6 +365,24 @@ function setStatus(msg) {
   setStatus._t = setTimeout(() => statusEl.classList.remove('show'), 3000);
 }
 panelClose.addEventListener('click', () => panel.classList.remove('open'));
+
+// ─── Handlers controles derecha + capas ────────────────────────────
+document.getElementById('btn-3d').addEventListener('click', () => setView(currentView === '3d' ? '2d' : '3d'));
+document.getElementById('btn-zin').addEventListener('click', () => map.zoomIn({duration: 250}));
+document.getElementById('btn-zout').addEventListener('click', () => map.zoomOut({duration: 250}));
+document.getElementById('btn-compass').addEventListener('click', () => map.easeTo({bearing: 0, pitch: currentView === '3d' && map.getZoom() > 12 ? 60 : 0, duration: 600}));
+document.getElementById('btn-loc').addEventListener('click', () => {
+  if (!navigator.geolocation) { setStatus('Geolocalización no disponible'); return; }
+  setStatus('Localizando…');
+  navigator.geolocation.getCurrentPosition(
+    pos => map.flyTo({center: [pos.coords.longitude, pos.coords.latitude], zoom: 15, pitch: currentView === '3d' ? 55 : 0, duration: 3000, essential: true}),
+    err => setStatus('No se pudo localizar (' + err.code + ')'),
+    {enableHighAccuracy: true, timeout: 10000}
+  );
+});
+document.querySelectorAll('.layer-btn').forEach(btn => {
+  btn.addEventListener('click', () => setLayer(btn.dataset.layer));
+});
 
 // ─── Surfaces panel ────────────────────────────────────────────────
 function renderSurfaces() {
