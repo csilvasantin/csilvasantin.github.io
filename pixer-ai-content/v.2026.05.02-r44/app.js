@@ -129,12 +129,9 @@
       { id: 'suno-local-v45',       nombre: 'Suno v4.5 (local)',      tipo: 'pro',  coste: '~10 créditos / canción · cuenta loguead.', desc: 'chirp-v4-5 · calidad superior · vía proxy suno-local' },
     ],
     imagenes: [
-      { id: 'flux-schnell',                nombre: 'FLUX.1 [schnell]',         tipo: 'free', coste: 'gratis · Pollinations', desc: 'open weights, rápido' },
-      { id: 'imagen-4.0-generate-001',     nombre: 'Imagen 4 (Google)',        tipo: 'pro',  coste: '$0.04 / imagen',        desc: 'calidad pro · 1024px' },
-      { id: 'imagen-4.0-ultra-generate-001', nombre: 'Imagen 4 Ultra (Google)', tipo: 'pro', coste: '$0.06 / imagen 2K',     desc: 'máxima calidad · hasta 2K' },
-      { id: 'grok-imagine-image',          nombre: 'Grok Imagine (xAI)',       tipo: 'pro',  coste: '$0.02 / imagen',        desc: 'vía worker · sin key cliente' },
-      { id: 'grok-imagine-image-pro',      nombre: 'Grok Imagine Pro (xAI)',   tipo: 'pro',  coste: '$0.07 / imagen',        desc: 'mayor calidad · vía worker' },
-      { id: 'all-images',                  nombre: '⚡ TODAS (comparar)',       tipo: 'pro',  coste: '~$0.19 total',          desc: '5 motores en paralelo, side-by-side' },
+      { id: 'flux-schnell',                  nombre: 'FLUX.1 [schnell]',        tipo: 'free', coste: 'gratis · Pollinations', desc: 'open weights, rápido' },
+      { id: 'imagen-4.0-ultra-generate-001', nombre: 'Imagen 4 Ultra (Google)', tipo: 'pro',  coste: '$0.06 / imagen 2K',     desc: 'máxima calidad · hasta 2K' },
+      { id: 'grok-imagine-image-pro',        nombre: 'Grok Imagine Pro (xAI)',  tipo: 'pro',  coste: '$0.07 / imagen',        desc: 'mayor calidad · vía worker' },
     ],
     video: [
       { id: 'pixer-storyboard',        nombre: 'Pixer Storyboard',     tipo: 'free', coste: 'gratis · navegador',     desc: '3 escenas + crossfade + voz' },
@@ -212,21 +209,40 @@
       const opciones = MOTORES[seccion];
       if (!opciones) return;
       const store = loadStore();
-      const selectedId = (store[seccion] && store[seccion].motor) || opciones[0].id;
+      // imagenes admite multi-select: click cada motor para añadir/quitar.
+      // Para comparar 2-3 motores en paralelo basta con marcar varias.
+      const isMulti = (seccion === 'imagenes');
+      const inputType = isMulti ? 'checkbox' : 'radio';
+      let selected;
+      if (isMulti) {
+        const m = store[seccion] && store[seccion].motors;
+        if (Array.isArray(m) && m.length) {
+          selected = m.filter(id => opciones.some(o => o.id === id));
+        }
+        if (!selected || !selected.length) {
+          const single = (store[seccion] && store[seccion].motor) || opciones[0].id;
+          selected = [opciones.some(o => o.id === single) ? single : opciones[0].id];
+        }
+      } else {
+        selected = [(store[seccion] && store[seccion].motor) || opciones[0].id];
+      }
       const groupName = `motor-${seccion}-${Math.random().toString(36).slice(2, 8)}`;
       const opts = opciones.map(o => `
         <div class="motor-opt">
-          <input type="radio" id="${groupName}-${o.id}" name="${groupName}" value="${o.id}" ${o.id === selectedId ? 'checked' : ''}>
+          <input type="${inputType}" id="${groupName}-${o.id}" name="${groupName}" value="${o.id}" ${selected.includes(o.id) ? 'checked' : ''}>
           <label for="${groupName}-${o.id}">
             <span class="motor-name">${o.nombre}<span class="motor-tag ${o.tipo}">${o.tipo}</span></span>
             <span class="motor-cost">${o.coste}</span>
             <span class="motor-desc">${o.desc}</span>
           </label>
         </div>`).join('');
+      const titleHint = isMulti
+        ? '<span style="color:#75aab9;font-weight:normal;font-size:11px;margin-left:8px">· multi-click para comparar</span>'
+        : '';
       host.innerHTML = `
         <div class="motor-section" data-section="${seccion}">
           <div class="motor-head">
-            <span class="motor-title">Motor IA · ${seccion}</span>
+            <span class="motor-title">Motor IA · ${seccion}${titleHint}</span>
             <span class="motor-disclaimer">Costes orientativos a ${COSTES_FECHA}</span>
           </div>
           <div class="motor-grid">${opts}</div>
@@ -257,11 +273,21 @@
           document.getElementById('openSettings')?.click();
         });
       }
-      host.querySelectorAll('input[type=radio]').forEach(r => {
+      host.querySelectorAll('input').forEach(r => {
         r.addEventListener('change', () => {
-          if (!r.checked) return;
           const s = loadStore();
-          setNested(s, `${seccion}.motor`, r.value);
+          if (isMulti) {
+            const all = Array.from(host.querySelectorAll('input:checked')).map(x => x.value);
+            // Garantiza al menos 1 seleccionado: si el usuario desmarcó el último, lo re-marcamos.
+            if (all.length === 0) { r.checked = true; return; }
+            setNested(s, `${seccion}.motors`, all);
+            // Mantener s.motor como el primero seleccionado para back-compat con paths
+            // antiguos del store (briefs persistidos antes de la multi-select).
+            setNested(s, `${seccion}.motor`, all[0]);
+          } else {
+            if (!r.checked) return;
+            setNested(s, `${seccion}.motor`, r.value);
+          }
           saveStore(s);
           renderWarning();
         });
@@ -996,6 +1022,56 @@
     } catch (e) { return { ok: false, error: String(e) }; }
   }
 
+  // Compara N motores en paralelo, side-by-side. Recibe la lista de IDs
+  // (de MOTORES.imagenes) seleccionados por el usuario via checkbox multi-select.
+  async function compareSelectedImages(motorIds, s, fullPrompt, w, h) {
+    const aspectRatio = ASPECT_IMAGEN[s.encuadre] || '1:1';
+    // Tabla de fabricacion por motor → {label, cost, promise}
+    const factory = {
+      'flux-schnell':                  () => ({ label: 'FLUX schnell',     cost: 'gratis',  promise: Promise.resolve({ ok: true, url: genFluxUrl(fullPrompt, w, h) }) }),
+      'imagen-4.0-ultra-generate-001': () => ({ label: 'Imagen 4 Ultra',   cost: '$0.06',   promise: genImagenRaw(fullPrompt, aspectRatio, 'imagen-4.0-ultra-generate-001') }),
+      'grok-imagine-image-pro':        () => ({ label: 'Grok Imagine Pro', cost: '$0.07',   promise: genGrokRaw(fullPrompt, 'grok-imagine-image-pro') }),
+      // Fallbacks legacy por si el store conserva IDs antiguos:
+      'imagen-4.0-generate-001':       () => ({ label: 'Imagen 4',         cost: '$0.04',   promise: genImagenRaw(fullPrompt, aspectRatio, 'imagen-4.0-generate-001') }),
+      'grok-imagine-image':            () => ({ label: 'Grok Imagine',     cost: '$0.02',   promise: genGrokRaw(fullPrompt, 'grok-imagine-image') }),
+    };
+    const motors = motorIds
+      .map(id => factory[id] ? Object.assign({ id }, factory[id]()) : null)
+      .filter(Boolean);
+    if (!motors.length) return;
+    if (motors.some(m => /imagen|grok/i.test(m.label))) {
+      const total = motors.reduce((a,m)=>a + (parseFloat((m.cost||'').replace('$','').replace(',','.'))||0), 0);
+      if (!confirmPro('COMPARAR motores', motors.map(m=>m.label).join(' + ') + (total>0?(' (~$'+total.toFixed(2)+' total)'):''))) return;
+    }
+    showPlayer(`
+      <div class="player-card">
+        <div class="player-head">▶ COMPARAR · ${motors.length} motor${motors.length>1?'es':''} · ${aspectRatio}</div>
+        <div class="compare-grid">
+          ${motors.map(m => `
+            <div class="compare-cell" data-cell="${m.id}">
+              <div class="compare-cell-head"><strong>${m.label}</strong> <span style="opacity:.7">${m.cost}</span></div>
+              <div class="compare-cell-img"><span class="compare-loading">// generando...</span></div>
+            </div>`).join('')}
+        </div>
+        <pre class="player-body">${fullPrompt.replace(/</g,'&lt;')}</pre>
+        <small class="player-foot">// ${motors.length} motor${motors.length>1?'es':''} en paralelo · resultados conforme lleguen</small>
+      </div>`);
+    motors.forEach(async m => {
+      const t0 = Date.now();
+      const res = await m.promise;
+      const ms = Date.now() - t0;
+      const cell = document.querySelector(`[data-cell="${m.id}"] .compare-cell-img`);
+      if (!cell) return;
+      if (res && res.ok && res.url) {
+        const cTitle = (typeof deriveAssetTitle==='function') ? deriveAssetTitle('imagenes', loadStore()) : (m.label);
+        const safeTitle = (typeof escAttr==='function') ? escAttr(cTitle) : String(cTitle).replace(/"/g,'&quot;');
+        cell.innerHTML = `<img src="${res.url}" alt="${m.label}" data-pixer-title="${safeTitle}" onload="this.parentElement.querySelector('.compare-time')?.remove()"><span class="compare-time">${(ms/1000).toFixed(1)}s</span>`;
+      } else {
+        cell.innerHTML = `<div class="compare-error">⚠ ${(res && res.error || 'error').slice(0,100).replace(/</g,'&lt;')}</div>`;
+      }
+    });
+  }
+
   async function compareAllImages(s, fullPrompt, w, h) {
     if (!confirmPro('TODAS las imágenes', '~$0.19 total · 5 motores en paralelo (Pollinations gratis + Imagen 4 + Imagen 4 Ultra + Grok + Grok Pro)')) return;
     const aspectRatio = ASPECT_IMAGEN[s.encuadre] || '1:1';
@@ -1035,7 +1111,9 @@
 
   async function playImagenes() {
     const s = loadStore().imagenes || {};
-    const motor = s.motor || 'flux-schnell';
+    // Multi-select: leer s.motors (array) y caer a [s.motor] solo si no existe.
+    const motorsList = Array.isArray(s.motors) && s.motors.length ? s.motors : [s.motor || 'flux-schnell'];
+    const motor = motorsList[0]; // primario para single-render path
     const prompt = (s.prompt || 'Matrix terminal screen with green falling code').trim();
     const sizeMap = {
       'Vertical 9:16': [576, 1024],
@@ -1049,8 +1127,15 @@
     const fullPrompt = styleHints ? `${prompt}, ${styleHints}` : prompt;
     const keys = loadKeys();
 
+    // 2+ motores seleccionados → grid comparativa.
+    if (motorsList.length > 1) {
+      return compareSelectedImages(motorsList, s, fullPrompt, w, h);
+    }
+
+    // Compat con casos legacy donde el store tenia motor='all-images' antes
+    // de eliminar el boton dedicado en r44.
     if (motor === 'all-images') {
-      return compareAllImages(s, fullPrompt, w, h);
+      return compareSelectedImages(['flux-schnell','imagen-4.0-ultra-generate-001','grok-imagine-image-pro'], s, fullPrompt, w, h);
     }
 
     if (motor === 'imagen-4.0-generate-001' || motor === 'imagen-4.0-ultra-generate-001') {
