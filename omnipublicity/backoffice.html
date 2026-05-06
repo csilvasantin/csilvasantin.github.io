@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OmniPublicity — Backoffice</title>
+<meta name="description" content="Backoffice para dar de alta gemelos digitales (tiendas + surfaces) en el mapa de OmniPublicity.">
+<link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="locations.js"></script>
+<style>
+  :root{--bg:#02080d;--ink:#dff8ff;--mut:#75aab9;--brand:#78f3ff;--accent:#ffd866;--good:#88ffaa;--warn:#ff8866;--danger:#ff4f5e;--card:#0a1620;--card2:#0d1c28;--line:rgba(120,243,255,.18)}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;height:100%}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+  button{font-family:inherit}
+
+  header{padding:14px 22px;background:linear-gradient(to bottom,rgba(2,8,13,.92),rgba(2,8,13,.6));border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;flex-wrap:wrap;position:sticky;top:0;z-index:10;backdrop-filter:blur(8px)}
+  .logo{font-family:monospace;font-size:13px;letter-spacing:.16em;color:var(--accent);font-weight:bold;white-space:nowrap}
+  .logo .dot{color:var(--brand)}
+  .logo .sub{color:var(--mut);margin-left:10px;font-weight:normal;letter-spacing:.1em}
+  nav{margin-left:auto;display:flex;gap:14px;font-size:12px;font-family:monospace;letter-spacing:.06em;text-transform:uppercase}
+  nav a{color:var(--mut)}
+  nav a:hover{color:var(--ink)}
+  nav .badge{font-size:10px;color:var(--accent);border:1px solid rgba(255,216,102,.4);padding:1px 6px;border-radius:3px;letter-spacing:.1em}
+
+  .shell{display:grid;grid-template-columns:280px 1fr 380px;gap:0;height:calc(100vh - 65px);min-height:0}
+  @media(max-width:1100px){.shell{grid-template-columns:240px 1fr 320px}}
+  @media(max-width:880px){.shell{grid-template-columns:1fr;height:auto}}
+
+  /* ── Lista lateral izquierda ── */
+  .bo-list{border-right:1px solid var(--line);background:rgba(10,22,32,.55);overflow-y:auto;display:flex;flex-direction:column}
+  .bo-list .lh{padding:18px 18px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .bo-list .lh h3{font-family:monospace;font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin:0}
+  .bo-list .lh .count{font-family:monospace;font-size:11px;color:var(--mut)}
+  .bo-list .new{margin:12px 18px;padding:10px;border:1px dashed var(--brand);border-radius:8px;background:transparent;color:var(--brand);font-family:monospace;font-size:12px;letter-spacing:.06em;cursor:pointer;transition:background .12s}
+  .bo-list .new:hover{background:rgba(120,243,255,.08)}
+  .bo-list ul{list-style:none;margin:0;padding:0 0 12px;flex:1;overflow-y:auto}
+  .bo-list li{padding:11px 18px;border-bottom:1px solid rgba(120,243,255,.06);cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:background .12s,border-left-color .12s;border-left:3px solid transparent}
+  .bo-list li:hover{background:rgba(120,243,255,.05)}
+  .bo-list li.active{background:rgba(120,243,255,.10);border-left-color:var(--brand)}
+  .bo-list li .nm{font-weight:700;font-size:13px;color:var(--ink)}
+  .bo-list li .ad{font-size:11px;color:var(--mut)}
+  .bo-list li .sf{font-family:monospace;font-size:10px;color:var(--accent);letter-spacing:.05em;margin-top:2px}
+  .bo-list .tools{padding:14px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px;background:rgba(10,22,32,.4)}
+  .bo-list .tools button{padding:8px 10px;background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--mut);font-family:monospace;font-size:11px;letter-spacing:.06em;cursor:pointer;text-align:left;transition:border-color .12s,color .12s}
+  .bo-list .tools button:hover{border-color:var(--brand);color:var(--brand)}
+  .bo-list .tools button.danger:hover{border-color:var(--danger);color:var(--danger)}
+
+  /* ── Formulario centro ── */
+  .bo-form{padding:24px;overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+  .bo-form .empty{margin:auto;text-align:center;color:var(--mut);font-family:monospace;font-size:13px;line-height:1.7;max-width:420px}
+  .bo-form .empty .big{display:block;font-size:48px;margin-bottom:14px}
+  .bo-form .formhead{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:14px;flex-wrap:wrap}
+  .bo-form .formhead h2{margin:0;font-size:22px;letter-spacing:-.01em}
+  .bo-form .formhead h2 .sub{font-family:monospace;font-size:12px;color:var(--mut);font-weight:normal;letter-spacing:.06em;margin-left:8px;text-transform:uppercase}
+  .bo-form .formhead .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .bo-form .formhead button{padding:8px 14px;font-family:monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;cursor:pointer;border:1px solid;background:transparent;transition:background .12s,color .12s}
+  .bo-form .formhead .save{border-color:var(--good);color:var(--good)}
+  .bo-form .formhead .save:hover{background:var(--good);color:#001620}
+  .bo-form .formhead .cancel{border-color:var(--line);color:var(--mut)}
+  .bo-form .formhead .cancel:hover{border-color:var(--ink);color:var(--ink)}
+  .bo-form .formhead .delete{border-color:var(--danger);color:var(--danger)}
+  .bo-form .formhead .delete:hover{background:var(--danger);color:#fff}
+
+  .bo-form fieldset{border:1px solid var(--line);border-radius:8px;padding:18px;margin:0;background:rgba(10,22,32,.4)}
+  .bo-form legend{padding:0 8px;font-family:monospace;font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+
+  .bo-form .row{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;margin-bottom:10px}
+  .bo-form .row:last-child{margin-bottom:0}
+  .bo-form .row label{font-family:monospace;font-size:11px;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+  .bo-form .row input, .bo-form .row select, .bo-form .row textarea{width:100%;background:rgba(2,8,13,.7);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);font-family:inherit;font-size:13px;outline:0;transition:border-color .12s}
+  .bo-form .row input:focus, .bo-form .row select:focus, .bo-form .row textarea:focus{border-color:var(--brand)}
+  .bo-form .row textarea{min-height:54px;resize:vertical;font-family:inherit}
+  .bo-form .coords-row{display:grid;grid-template-columns:120px 1fr 1fr auto auto;gap:8px;align-items:center;margin-bottom:10px}
+  .bo-form .coords-row label{font-family:monospace;font-size:11px;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+  .bo-form .coords-row input{width:100%;background:rgba(2,8,13,.7);border:1px solid var(--line);border-radius:6px;padding:8px 10px;color:var(--ink);font-size:13px;outline:0;font-family:monospace}
+  .bo-form .coords-row button{padding:8px 12px;background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--mut);font-family:monospace;font-size:11px;cursor:pointer;letter-spacing:.05em;white-space:nowrap}
+  .bo-form .coords-row button:hover{border-color:var(--brand);color:var(--brand)}
+
+  /* Surfaces editor */
+  .surf-list{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .surf-row{display:grid;grid-template-columns:1.4fr 2fr 88px 70px 70px 100px 30px;gap:8px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:6px;padding:8px}
+  .surf-row input, .surf-row select{width:100%;background:rgba(2,8,13,.7);border:1px solid transparent;border-radius:4px;padding:6px 8px;color:var(--ink);font-size:12px;outline:0;font-family:inherit}
+  .surf-row input:focus, .surf-row select:focus{border-color:var(--brand)}
+  .surf-row .del{background:transparent;border:0;color:var(--mut);cursor:pointer;font-size:18px;padding:0;line-height:1}
+  .surf-row .del:hover{color:var(--danger)}
+  .surf-add{padding:10px;border:1px dashed var(--line);border-radius:6px;background:transparent;color:var(--mut);font-family:monospace;font-size:11px;letter-spacing:.06em;cursor:pointer;width:100%;margin-top:10px;text-transform:uppercase}
+  .surf-add:hover{border-color:var(--brand);color:var(--brand)}
+  .surf-headrow{display:grid;grid-template-columns:1.4fr 2fr 88px 70px 70px 100px 30px;gap:8px;padding:0 8px;font-family:monospace;font-size:9px;letter-spacing:.1em;color:var(--mut);text-transform:uppercase;margin-bottom:-4px}
+
+  /* ── Mini-mapa derecho ── */
+  .bo-map-pane{border-left:1px solid var(--line);background:rgba(10,22,32,.55);display:flex;flex-direction:column;min-height:0}
+  .bo-map-pane .mh{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+  .bo-map-pane .mh h3{font-family:monospace;font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin:0}
+  .bo-map-pane .mh .hint{font-size:11px;color:var(--mut);line-height:1.4}
+  .bo-map-pane #bo-map{flex:1;min-height:300px}
+  .bo-map-pane .mfoot{padding:10px 18px;border-top:1px solid var(--line);font-family:monospace;font-size:11px;color:var(--mut);display:flex;justify-content:space-between;gap:8px}
+  .bo-map-pane .mfoot b{color:var(--brand)}
+
+  /* Toast */
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(10,22,32,.96);border:1px solid var(--brand);border-radius:8px;padding:12px 20px;font-family:monospace;font-size:12px;color:var(--ink);letter-spacing:.04em;z-index:30;display:none;backdrop-filter:blur(8px);box-shadow:0 4px 24px rgba(0,0,0,.5)}
+  .toast.show{display:block;animation:fadein .3s ease}
+  .toast.err{border-color:var(--danger);color:var(--warn)}
+  @keyframes fadein{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+  /* Modals */
+  .modal{position:fixed;inset:0;background:rgba(2,8,13,.85);z-index:40;display:none;align-items:center;justify-content:center;padding:22px;backdrop-filter:blur(4px)}
+  .modal.show{display:flex}
+  .modal .box{background:var(--card);border:1px solid var(--brand);border-radius:10px;padding:22px;max-width:560px;width:100%;max-height:80vh;display:flex;flex-direction:column;gap:14px}
+  .modal h3{margin:0;font-family:monospace;font-size:12px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+  .modal textarea{width:100%;flex:1;min-height:280px;background:rgba(2,8,13,.7);border:1px solid var(--line);border-radius:6px;padding:12px;color:var(--ink);font-family:monospace;font-size:11px;outline:0;line-height:1.4;resize:vertical}
+  .modal .mactions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .modal button{padding:8px 14px;font-family:monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;cursor:pointer;border:1px solid;background:transparent;color:var(--mut)}
+  .modal button:hover{border-color:var(--ink);color:var(--ink)}
+  .modal button.primary{border-color:var(--good);color:var(--good)}
+  .modal button.primary:hover{background:var(--good);color:#001620}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="sub">/ backoffice</span></span>
+  <nav>
+    <a href="index.html">↗ Mapa público</a>
+    <a href="about.html">Concepto RTB</a>
+    <span class="badge">LOCAL · localStorage</span>
+  </nav>
+</header>
+
+<div class="shell">
+
+  <!-- ── Lista de tiendas ── -->
+  <aside class="bo-list">
+    <div class="lh">
+      <h3>Tiendas</h3>
+      <span class="count" id="lh-count">0</span>
+    </div>
+    <button class="new" id="btn-new">+ Nueva tienda</button>
+    <ul id="bo-list-ul"></ul>
+    <div class="tools">
+      <button id="btn-import">📥 Importar JSON</button>
+      <button id="btn-export">📤 Exportar JSON</button>
+      <button id="btn-reset" class="danger">↺ Reset al catálogo por defecto</button>
+    </div>
+  </aside>
+
+  <!-- ── Formulario ── -->
+  <section class="bo-form" id="bo-form">
+    <div class="empty" id="bo-empty">
+      <span class="big">🏪</span>
+      Selecciona una tienda de la lista o pulsa <b style="color:var(--brand)">+ Nueva tienda</b> para empezar.<br><br>
+      Los cambios se guardan en <b>localStorage</b> de este navegador.<br>
+      Para deployarlos al sitio público, exporta el JSON y commitéalo a <code style="color:var(--accent)">locations.js</code>.
+    </div>
+    <div id="bo-editor" hidden>
+      <div class="formhead">
+        <h2><span id="f-title">Nueva tienda</span><span class="sub" id="f-sub"></span></h2>
+        <div class="actions">
+          <button class="save" id="btn-save">💾 Guardar</button>
+          <button class="cancel" id="btn-cancel">Cancelar</button>
+          <button class="delete" id="btn-delete" hidden>🗑 Eliminar</button>
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>Identidad</legend>
+        <div class="row"><label for="f-id">ID</label><input id="f-id" type="text" placeholder="ej: admira-malaga" autocomplete="off"></div>
+        <div class="row"><label for="f-name">Nombre</label><input id="f-name" type="text" placeholder="Admira Málaga"></div>
+        <div class="row"><label for="f-kind">Tipo</label><input id="f-kind" type="text" placeholder="Estanco · Retail físico"></div>
+        <div class="row"><label for="f-addr">Dirección</label><input id="f-addr" type="text" placeholder="Calle Larios 8 · Málaga"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Coordenadas</legend>
+        <div class="coords-row">
+          <label>lat / lng</label>
+          <input id="f-lat" type="number" step="any" placeholder="40.4036" inputmode="decimal">
+          <input id="f-lng" type="number" step="any" placeholder="-3.7283" inputmode="decimal">
+          <button type="button" id="btn-geocode">🔍 Geocodificar dirección</button>
+          <button type="button" id="btn-pin">📍 Pin desde mapa →</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Surfaces</legend>
+        <div class="surf-headrow">
+          <span>Nombre</span><span>Descripción</span><span>Estado</span><span>Impr/día</span><span>CPM</span><span>Tipo</span><span></span>
+        </div>
+        <div class="surf-list" id="surf-list"></div>
+        <button type="button" class="surf-add" id="btn-surf-add">+ Añadir surface</button>
+      </fieldset>
+    </div>
+  </section>
+
+  <!-- ── Mini-mapa ── -->
+  <aside class="bo-map-pane">
+    <div class="mh">
+      <h3>Pin en mapa</h3>
+      <span class="hint">Haz click en cualquier punto del mapa para fijar las coordenadas del formulario.</span>
+    </div>
+    <div id="bo-map"></div>
+    <div class="mfoot">
+      <span>Centro: <b id="m-center">—</b></span>
+      <span>zoom <b id="m-zoom">—</b></span>
+    </div>
+  </aside>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Modal genérico para importar / exportar JSON -->
+<div class="modal" id="modal">
+  <div class="box">
+    <h3 id="mo-title">JSON</h3>
+    <textarea id="mo-text" spellcheck="false"></textarea>
+    <div class="mactions">
+      <button id="mo-cancel">Cerrar</button>
+      <button id="mo-confirm" class="primary" hidden>Confirmar</button>
+      <button id="mo-copy" hidden>📋 Copiar al portapapeles</button>
+      <button id="mo-download" hidden>⬇ Descargar locations.js</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ─────────────────────────────────────────────────────────
+let locations = window.loadOmnipLocations().map(l => JSON.parse(JSON.stringify(l)));
+let editingIdx = -1; // -1 = nada seleccionado; -2 = nueva (todavía sin guardar)
+let pendingPin = false;
+
+const SURF_TYPES = ['pantalla','escaparate','mostrador','vending','pwa'];
+const STATUSES = [
+  {v:'live',  l:'● LIVE'},
+  {v:'sched', l:'PROG'},
+  {v:'idle',  l:'IDLE'},
+];
+
+// ─── Helpers ───────────────────────────────────────────────────────
+function $(id) { return document.getElementById(id); }
+function showToast(msg, kind) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (kind === 'err' ? ' err' : '');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function persistAndRefresh() {
+  window.saveOmnipLocations(locations);
+  renderList();
+  renderMap();
+}
+
+// ─── Lista lateral ─────────────────────────────────────────────────
+function renderList() {
+  $('lh-count').textContent = locations.length;
+  const ul = $('bo-list-ul');
+  ul.innerHTML = locations.map((l, i) => {
+    const live = l.surfaces.filter(s=>s.status==='live').length;
+    return `<li data-idx="${i}" class="${i===editingIdx?'active':''}">
+      <div class="nm">${escHtml(l.name||'(sin nombre)')}</div>
+      <div class="ad">${escHtml(l.addr||'—')}</div>
+      <div class="sf">${l.surfaces.length} surfaces · ${live} LIVE</div>
+    </li>`;
+  }).join('');
+  ul.querySelectorAll('li').forEach(li => {
+    li.addEventListener('click', () => editLocation(parseInt(li.dataset.idx, 10)));
+  });
+}
+
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ─── Editor ────────────────────────────────────────────────────────
+function blankLocation() {
+  return {
+    id:'', name:'', kind:'', addr:'',
+    coords: map ? [map.getCenter().lng, map.getCenter().lat] : [-3.7, 40.4],
+    surfaces: [],
+  };
+}
+
+function editLocation(idx) {
+  editingIdx = idx;
+  const loc = locations[idx];
+  if (!loc) return;
+  $('bo-empty').hidden = true;
+  $('bo-editor').hidden = false;
+  $('btn-delete').hidden = false;
+  $('f-title').textContent = loc.name || '(sin nombre)';
+  $('f-sub').textContent = '· editando';
+  $('f-id').value = loc.id || '';
+  $('f-id').disabled = true; // id no editable una vez creada (evita romper recientes)
+  $('f-name').value = loc.name || '';
+  $('f-kind').value = loc.kind || '';
+  $('f-addr').value = loc.addr || '';
+  $('f-lat').value = loc.coords ? loc.coords[1] : '';
+  $('f-lng').value = loc.coords ? loc.coords[0] : '';
+  renderSurfaces(loc.surfaces);
+  renderList();
+  if (loc.coords && map) map.flyTo({center: loc.coords, zoom: 14, duration: 600});
+}
+
+function newLocation() {
+  editingIdx = -2;
+  const loc = blankLocation();
+  // empuja una surface plantilla para no salir vacío
+  loc.surfaces = [{name:'LED Frontal', desc:'', status:'live', impr:200, cpm:'€5', surface:'pantalla'}];
+  $('bo-empty').hidden = true;
+  $('bo-editor').hidden = false;
+  $('btn-delete').hidden = true;
+  $('f-title').textContent = 'Nueva tienda';
+  $('f-sub').textContent = '· sin guardar';
+  $('f-id').value = '';
+  $('f-id').disabled = false;
+  $('f-name').value = '';
+  $('f-kind').value = '';
+  $('f-addr').value = '';
+  $('f-lat').value = loc.coords[1];
+  $('f-lng').value = loc.coords[0];
+  renderSurfaces(loc.surfaces);
+  renderList();
+}
+
+function closeEditor() {
+  editingIdx = -1;
+  $('bo-empty').hidden = false;
+  $('bo-editor').hidden = true;
+  renderList();
+}
+
+function readForm() {
+  const lat = parseFloat($('f-lat').value);
+  const lng = parseFloat($('f-lng').value);
+  const surfaces = [...document.querySelectorAll('#surf-list .surf-row')].map(row => ({
+    name: row.querySelector('[data-k=name]').value.trim(),
+    desc: row.querySelector('[data-k=desc]').value.trim(),
+    status: row.querySelector('[data-k=status]').value,
+    impr: parseInt(row.querySelector('[data-k=impr]').value, 10) || 0,
+    cpm: row.querySelector('[data-k=cpm]').value.trim() || '€0',
+    surface: row.querySelector('[data-k=surface]').value,
+  })).filter(s => s.name); // descarta filas vacías
+  return {
+    id: $('f-id').value.trim(),
+    name: $('f-name').value.trim(),
+    kind: $('f-kind').value.trim(),
+    addr: $('f-addr').value.trim(),
+    coords: [Number.isFinite(lng) ? lng : 0, Number.isFinite(lat) ? lat : 0],
+    surfaces,
+  };
+}
+
+function validateLocation(loc, isNew) {
+  if (!loc.id) return 'El id es obligatorio.';
+  if (!/^[a-z0-9-]+$/.test(loc.id)) return 'El id solo admite minúsculas, números y guiones.';
+  if (!loc.name) return 'El nombre es obligatorio.';
+  if (!Number.isFinite(loc.coords[0]) || !Number.isFinite(loc.coords[1])) return 'Coordenadas inválidas.';
+  if (Math.abs(loc.coords[1]) > 90 || Math.abs(loc.coords[0]) > 180) return 'Coordenadas fuera de rango.';
+  if (isNew && locations.some(l => l.id === loc.id)) return 'Ya existe una tienda con ese id.';
+  return null;
+}
+
+function saveLocation() {
+  const loc = readForm();
+  const isNew = editingIdx === -2;
+  const err = validateLocation(loc, isNew);
+  if (err) { showToast(err, 'err'); return; }
+  if (isNew) {
+    locations.push(loc);
+    editingIdx = locations.length - 1;
+  } else {
+    const orig = locations[editingIdx];
+    // Conservar el id original (no editable)
+    loc.id = orig.id;
+    locations[editingIdx] = loc;
+  }
+  persistAndRefresh();
+  // Re-cargar el formulario en modo edición (para reflejar el nuevo orden de id en list y desactivar el id input)
+  editLocation(editingIdx);
+  showToast('Guardado · ' + loc.name);
+}
+
+function deleteLocation() {
+  if (editingIdx < 0) return;
+  const loc = locations[editingIdx];
+  if (!confirm('¿Eliminar la tienda "' + (loc.name || loc.id) + '"? Esta acción solo afecta a este navegador (localStorage).')) return;
+  locations.splice(editingIdx, 1);
+  closeEditor();
+  persistAndRefresh();
+  showToast('Eliminada');
+}
+
+// ─── Surfaces editor ───────────────────────────────────────────────
+function renderSurfaces(arr) {
+  const list = $('surf-list');
+  list.innerHTML = arr.map((s, i) => surfaceRow(s, i)).join('');
+}
+function surfaceRow(s, i) {
+  return `<div class="surf-row" data-i="${i}">
+    <input data-k="name" type="text" placeholder="LED Frontal" value="${escHtml(s.name||'')}">
+    <input data-k="desc" type="text" placeholder="Descripción visible en el panel" value="${escHtml(s.desc||'')}">
+    <select data-k="status">${STATUSES.map(st => `<option value="${st.v}"${s.status===st.v?' selected':''}>${st.l}</option>`).join('')}</select>
+    <input data-k="impr" type="number" min="0" placeholder="200" value="${s.impr ?? ''}">
+    <input data-k="cpm" type="text" placeholder="€5" value="${escHtml(s.cpm||'')}">
+    <select data-k="surface">${SURF_TYPES.map(t => `<option value="${t}"${s.surface===t?' selected':''}>${t}</option>`).join('')}</select>
+    <button type="button" class="del" title="Eliminar surface">×</button>
+  </div>`;
+}
+function bindSurfaces() {
+  $('surf-list').addEventListener('click', e => {
+    const btn = e.target.closest('.del');
+    if (!btn) return;
+    const row = btn.closest('.surf-row');
+    if (row) row.remove();
+  });
+  $('btn-surf-add').addEventListener('click', () => {
+    const newSurf = {name:'', desc:'', status:'live', impr:0, cpm:'€0', surface:'pantalla'};
+    $('surf-list').insertAdjacentHTML('beforeend', surfaceRow(newSurf, $('surf-list').children.length));
+  });
+}
+
+// ─── Geocoder ──────────────────────────────────────────────────────
+async function geocodeAddress() {
+  const q = $('f-addr').value.trim();
+  if (!q) { showToast('Escribe primero una dirección', 'err'); return; }
+  showToast('Buscando "' + q.slice(0,40) + '"...');
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+    const r = await fetch(url, {headers:{'Accept':'application/json'}});
+    const d = await r.json();
+    if (!d.length) throw new Error('sin resultados');
+    const lat = parseFloat(d[0].lat), lng = parseFloat(d[0].lon);
+    $('f-lat').value = lat.toFixed(6);
+    $('f-lng').value = lng.toFixed(6);
+    if (map) map.flyTo({center:[lng, lat], zoom:15, duration: 800});
+    showToast('Coordenadas fijadas: ' + lat.toFixed(4) + ', ' + lng.toFixed(4));
+  } catch (e) {
+    showToast('Sin resultados — escribe la dirección completa', 'err');
+  }
+}
+
+// ─── Mapa ──────────────────────────────────────────────────────────
+let map = null;
+let pinMarker = null;
+let locMarkers = [];
+
+function initMap() {
+  map = new maplibregl.Map({
+    container:'bo-map',
+    style:'https://tiles.openfreemap.org/styles/liberty',
+    center:[-3.7, 40.4], zoom:5, attributionControl:false,
+    renderWorldCopies:false,
+  });
+  map.addControl(new maplibregl.AttributionControl({compact:true}), 'bottom-left');
+  map.addControl(new maplibregl.NavigationControl({visualizePitch:false}), 'top-right');
+  map.on('move', () => {
+    const c = map.getCenter();
+    $('m-center').textContent = c.lng.toFixed(3) + ', ' + c.lat.toFixed(3);
+    $('m-zoom').textContent = map.getZoom().toFixed(1);
+  });
+  map.on('load', () => {
+    map.getCanvas().addEventListener('click', () => {}); // no-op, real handler abajo
+    renderMap();
+  });
+  // Click en mapa fija coords si hay un editor abierto
+  map.on('click', (e) => {
+    if (editingIdx === -1) return; // no hay editor abierto
+    const {lng, lat} = e.lngLat;
+    $('f-lat').value = lat.toFixed(6);
+    $('f-lng').value = lng.toFixed(6);
+    placePinMarker(lng, lat);
+    showToast('Pin: ' + lat.toFixed(4) + ', ' + lng.toFixed(4));
+  });
+}
+
+function placePinMarker(lng, lat) {
+  if (pinMarker) pinMarker.remove();
+  const el = document.createElement('div');
+  el.style.cssText = 'width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#88ffaa,#1a5520);border:2px solid var(--good);box-shadow:0 0 12px rgba(136,255,170,.6);';
+  pinMarker = new maplibregl.Marker({element: el, draggable: true}).setLngLat([lng, lat]).addTo(map);
+  pinMarker.on('dragend', () => {
+    const c = pinMarker.getLngLat();
+    $('f-lat').value = c.lat.toFixed(6);
+    $('f-lng').value = c.lng.toFixed(6);
+  });
+}
+
+function renderMap() {
+  if (!map) return;
+  // Limpia markers existentes
+  locMarkers.forEach(m => m.remove());
+  locMarkers = [];
+  for (const loc of locations) {
+    if (!loc.coords || !Number.isFinite(loc.coords[0]) || !Number.isFinite(loc.coords[1])) continue;
+    const live = loc.surfaces.filter(s => s.status==='live').length;
+    const el = document.createElement('div');
+    el.style.cssText = `width:18px;height:18px;border-radius:50%;background:${live?'radial-gradient(circle at 30% 30%,#ffd866,#7a5d00)':'radial-gradient(circle at 30% 30%,#75aab9,#1a3340)'};border:2px solid ${live?'#ffd866':'#75aab9'};box-shadow:0 0 8px rgba(${live?'255,216,102':'117,170,185'},.4);cursor:pointer`;
+    el.title = loc.name + ' · ' + loc.addr;
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = locations.findIndex(l => l.id === loc.id);
+      if (idx >= 0) editLocation(idx);
+    });
+    locMarkers.push(new maplibregl.Marker({element: el}).setLngLat(loc.coords).addTo(map));
+  }
+}
+
+// ─── Import / Export / Reset ───────────────────────────────────────
+function openModal({title, value, allowEdit, confirmLabel, onConfirm, showCopy, showDownload}) {
+  $('mo-title').textContent = title;
+  $('mo-text').value = value || '';
+  $('mo-text').readOnly = !allowEdit;
+  $('mo-confirm').hidden = !onConfirm;
+  $('mo-confirm').textContent = confirmLabel || 'Confirmar';
+  $('mo-copy').hidden = !showCopy;
+  $('mo-download').hidden = !showDownload;
+  $('modal').classList.add('show');
+  $('mo-confirm').onclick = () => {
+    try { onConfirm($('mo-text').value); $('modal').classList.remove('show'); }
+    catch (e) { showToast(String(e.message || e), 'err'); }
+  };
+  $('mo-copy').onclick = async () => {
+    try { await navigator.clipboard.writeText($('mo-text').value); showToast('Copiado'); }
+    catch { showToast('No se pudo copiar', 'err'); }
+  };
+  $('mo-download').onclick = () => {
+    const content = `// OmniPublicity — catálogo de tiendas (gemelos digitales).\n// Generado por backoffice.html · ${new Date().toISOString()}\nwindow.OMNIP_LOCATIONS_DEFAULT = ${$('mo-text').value};\nwindow.OMNIP_STORE_KEY = 'omnip-locations';\nwindow.loadOmnipLocations = function() {\n  try {\n    const raw = localStorage.getItem(window.OMNIP_STORE_KEY);\n    if (raw) { const p = JSON.parse(raw); if (Array.isArray(p) && p.length) return p; }\n  } catch (e) {}\n  return window.OMNIP_LOCATIONS_DEFAULT;\n};\nwindow.saveOmnipLocations = function(arr) {\n  try { localStorage.setItem(window.OMNIP_STORE_KEY, JSON.stringify(arr)); return true; }\n  catch (e) { return false; }\n};\n`;
+    const blob = new Blob([content], {type:'text/javascript'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'locations.js'; a.click();
+    URL.revokeObjectURL(url);
+    showToast('Descargado locations.js');
+  };
+}
+$('mo-cancel').addEventListener('click', () => $('modal').classList.remove('show'));
+
+function exportJSON() {
+  const json = JSON.stringify(locations, null, 2);
+  openModal({
+    title: 'Exportar · ' + locations.length + ' tiendas · ' + new Blob([json]).size + ' bytes',
+    value: json,
+    allowEdit: false,
+    showCopy: true,
+    showDownload: true,
+  });
+}
+
+function importJSON() {
+  openModal({
+    title: 'Importar JSON · pega aquí el array de tiendas',
+    value: '',
+    allowEdit: true,
+    confirmLabel: 'Reemplazar catálogo',
+    onConfirm: (text) => {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new Error('El JSON debe ser un array');
+      // Validación básica: todos tienen id y coords
+      for (const l of parsed) {
+        if (!l.id || !Array.isArray(l.coords) || l.coords.length !== 2) throw new Error('Tienda inválida: ' + (l.name || l.id || '?'));
+        if (!Array.isArray(l.surfaces)) l.surfaces = [];
+      }
+      locations = parsed;
+      closeEditor();
+      persistAndRefresh();
+      showToast('Importadas ' + parsed.length + ' tiendas');
+    },
+  });
+}
+
+function resetToDefault() {
+  if (!confirm('¿Borrar todos los cambios locales y restaurar el catálogo por defecto (' + window.OMNIP_LOCATIONS_DEFAULT.length + ' tiendas)?')) return;
+  try { localStorage.removeItem(window.OMNIP_STORE_KEY); } catch {}
+  locations = window.OMNIP_LOCATIONS_DEFAULT.map(l => JSON.parse(JSON.stringify(l)));
+  closeEditor();
+  persistAndRefresh();
+  showToast('Catálogo restaurado');
+}
+
+// ─── Bindings ──────────────────────────────────────────────────────
+$('btn-new').addEventListener('click', newLocation);
+$('btn-save').addEventListener('click', saveLocation);
+$('btn-cancel').addEventListener('click', closeEditor);
+$('btn-delete').addEventListener('click', deleteLocation);
+$('btn-geocode').addEventListener('click', geocodeAddress);
+$('btn-pin').addEventListener('click', () => {
+  const lat = parseFloat($('f-lat').value), lng = parseFloat($('f-lng').value);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    placePinMarker(lng, lat);
+    map.flyTo({center:[lng, lat], zoom:16, duration:800});
+  } else if (map) {
+    showToast('Click en el mapa para fijar el pin');
+    map.flyTo({zoom:13, duration:600});
+  }
+});
+$('btn-import').addEventListener('click', importJSON);
+$('btn-export').addEventListener('click', exportJSON);
+$('btn-reset').addEventListener('click', resetToDefault);
+
+// Re-renderiza cuando los inputs cambian (para el title "editando")
+['f-name'].forEach(id => $(id).addEventListener('input', e => {
+  $('f-title').textContent = e.target.value || '(sin nombre)';
+}));
+
+// ─── Init ──────────────────────────────────────────────────────────
+bindSurfaces();
+initMap();
+renderList();
+</script>
+
+</body>
+</html>
