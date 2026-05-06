@@ -136,12 +136,6 @@
   .layer-btn .t-mapa{background:linear-gradient(135deg,#2a4d6e 0%,#5d8fb5 50%,#a9c5dc 100%);position:relative}
   .layer-btn .t-mapa::after{content:"";position:absolute;inset:6px 4px;background:linear-gradient(90deg,transparent 47%,rgba(255,255,255,.5) 47% 53%,transparent 53%),linear-gradient(0deg,transparent 60%,rgba(255,255,255,.4) 60% 64%,transparent 64%);border-radius:3px}
   .layer-btn .t-relieve{background:linear-gradient(135deg,#3d4a2a 0%,#7a8b4d 35%,#c4a566 65%,#e8d8a8 100%)}
-  .layer-btn .t-trafico{background:linear-gradient(135deg,#1a2438 0%,#3a4868 100%);position:relative}
-  .layer-btn .t-trafico::after{content:"";position:absolute;inset:0;background:linear-gradient(45deg,#88ffaa 12%,transparent 13% 35%,#ffd866 35% 38%,transparent 38% 60%,#ff5e3a 60% 64%,transparent 64%);opacity:.85;border-radius:5px}
-
-  .demo-pill{position:fixed;bottom:88px;left:22px;background:rgba(255,94,58,.12);border:1px solid rgba(255,94,58,.5);color:#ffb39e;font-family:monospace;font-size:11px;letter-spacing:.05em;padding:7px 14px;border-radius:8px;z-index:8;display:none;backdrop-filter:blur(6px)}
-  .demo-pill.show{display:block}
-  .demo-pill b{color:var(--warn);letter-spacing:.16em;margin-right:6px}
 
   /* Marker custom */
   .marker-pin{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd866,#7a5d00);border:2px solid var(--accent);box-shadow:0 0 18px rgba(255,216,102,.5),0 0 0 6px rgba(255,216,102,.18);display:flex;align-items:center;justify-content:center;color:#1a0e00;font-weight:800;font-family:monospace;font-size:11px;letter-spacing:.04em;cursor:pointer;animation:ping 2.4s ease-in-out infinite}
@@ -213,12 +207,7 @@
   <button class="layer-btn" data-layer="relieve" title="Vista de relieve / topográfica">
     <span class="thumb t-relieve"></span><span class="lbl">Relieve</span>
   </button>
-  <button class="layer-btn" data-layer="trafico" title="Tráfico (datos demo — sin API real)">
-    <span class="thumb t-trafico"></span><span class="lbl">Tráfico</span>
-  </button>
 </div>
-
-<div class="demo-pill" id="demo-pill"><b>DEMO</b> · Tráfico simulado · sin proveedor real conectado todavía</div>
 
 <div class="status-pill" id="status">
   <b>Buscando…</b> <span id="status-msg"></span>
@@ -342,7 +331,7 @@ const STYLE_RELIEVE = {
 // ─── Map ───────────────────────────────────────────────────────────
 const map = new maplibregl.Map({
   container: 'map', style: STYLE_MAPA,
-  center: [10, 25], zoom: 0, pitch: 0,
+  center: [-3, 30], zoom: 1.6, pitch: 0,
   projection: 'globe', attributionControl: false,
   renderWorldCopies: false,
 });
@@ -364,7 +353,6 @@ function applySky() {
 map.on('style.load', () => {
   applySky();
   addLocationsLayer();
-  if (currentLayer === 'trafico') ensureTrafficOverlay();
 });
 map.on('load', applySky);
 
@@ -458,42 +446,15 @@ function addLocationsLayer() {
   }
 }
 
-// ─── Tráfico demo overlay ──────────────────────────────────────────
-const TRAFFIC_DEMO = {
-  type:'FeatureCollection',
-  features:[
-    {type:'Feature',properties:{c:'#ff5e3a',label:'denso'},geometry:{type:'LineString',coordinates:[[-3.7305,40.4042],[-3.7283,40.4036],[-3.7261,40.4030]]}},
-    {type:'Feature',properties:{c:'#ffd866',label:'medio'},geometry:{type:'LineString',coordinates:[[-3.7283,40.4036],[-3.7280,40.4055],[-3.7268,40.4068]]}},
-    {type:'Feature',properties:{c:'#88ffaa',label:'fluido'},geometry:{type:'LineString',coordinates:[[-3.7283,40.4036],[-3.7295,40.4022],[-3.7310,40.4010]]}},
-    {type:'Feature',properties:{c:'#ff5e3a',label:'denso'},geometry:{type:'LineString',coordinates:[[-3.7330,40.4055],[-3.7295,40.4055],[-3.7275,40.4060]]}},
-    {type:'Feature',properties:{c:'#ffd866',label:'medio'},geometry:{type:'LineString',coordinates:[[-3.7275,40.4060],[-3.7250,40.4045]]}},
-    {type:'Feature',properties:{c:'#88ffaa',label:'fluido'},geometry:{type:'LineString',coordinates:[[-3.7250,40.4045],[-3.7230,40.4030]]}},
-  ],
-};
-function ensureTrafficOverlay() {
-  if (!map.isStyleLoaded()) { map.once('style.load', ensureTrafficOverlay); return; }
-  if (map.getSource('traffic-demo')) return;
-  map.addSource('traffic-demo', {type:'geojson', data: TRAFFIC_DEMO});
-  map.addLayer({
-    id:'traffic-demo-line', type:'line', source:'traffic-demo',
-    paint:{
-      'line-color':['get','c'],
-      'line-width':['interpolate',['linear'],['zoom'], 10, 1, 14, 4, 18, 9],
-      'line-opacity':0.85, 'line-blur':0.4,
-    },
-  });
-}
-
 function setLayer(name) {
   if (name === currentLayer) return;
   currentLayer = name;
   document.querySelectorAll('.layer-btn').forEach(b => b.classList.toggle('active', b.dataset.layer === name));
-  if (name === 'mapa' || name === 'trafico') {
+  if (name === 'mapa') {
     map.setStyle(STYLE_MAPA);
   } else if (name === 'relieve') {
     map.setStyle(STYLE_RELIEVE);
   }
-  document.getElementById('demo-pill').classList.toggle('show', name === 'trafico');
 }
 
 function setView(mode) {
