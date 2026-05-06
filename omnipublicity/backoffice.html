@@ -24,6 +24,30 @@
   nav a{color:var(--mut)}
   nav a:hover{color:var(--ink)}
   nav .badge{font-size:10px;color:var(--accent);border:1px solid rgba(255,216,102,.4);padding:1px 6px;border-radius:3px;letter-spacing:.1em}
+  nav .logout{background:transparent;border:1px solid var(--line);border-radius:6px;color:var(--mut);font-family:monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:5px 10px;cursor:pointer;transition:border-color .12s,color .12s}
+  nav .logout:hover{border-color:var(--danger);color:var(--danger)}
+
+  /* Login gate */
+  .gate{position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(120,243,255,.12),transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(255,216,102,.08),transparent 55%),var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;padding:24px}
+  .gate.hidden{display:none}
+  .gate .gbox{max-width:420px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:32px 28px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .gate .glogo{font-family:monospace;font-size:13px;letter-spacing:.16em;color:var(--accent);font-weight:bold;text-align:center;margin-bottom:6px}
+  .gate .glogo .dot{color:var(--brand)}
+  .gate h2{margin:0 0 6px;font-size:24px;text-align:center;letter-spacing:-.01em}
+  .gate .gsub{color:var(--mut);font-size:13px;text-align:center;margin:0 0 22px;line-height:1.5}
+  .gate .gsub b{color:var(--brand);font-family:monospace}
+  .gate input[type=password]{width:100%;background:rgba(2,8,13,.85);border:1px solid var(--line);border-radius:8px;padding:12px 14px;color:var(--ink);font-family:monospace;font-size:14px;outline:0;letter-spacing:.04em;transition:border-color .15s,box-shadow .15s}
+  .gate input[type=password]:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(120,243,255,.15)}
+  .gate input[type=password].err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(255,79,94,.18);animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+  .gate .grow{display:flex;align-items:center;gap:8px;margin:14px 0 18px;color:var(--mut);font-size:12px;font-family:monospace;letter-spacing:.04em;cursor:pointer;user-select:none}
+  .gate .grow input[type=checkbox]{width:14px;height:14px;accent-color:var(--brand);cursor:pointer}
+  .gate button.gsubmit{width:100%;background:var(--brand);color:#001620;border:0;border-radius:8px;padding:12px;font-family:monospace;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .12s,transform .12s}
+  .gate button.gsubmit:hover{background:var(--accent)}
+  .gate button.gsubmit:active{transform:scale(.98)}
+  .gate .gerr{margin-top:14px;color:var(--warn);font-family:monospace;font-size:12px;text-align:center;min-height:14px;letter-spacing:.04em}
+  .gate .gfoot{margin-top:22px;padding-top:18px;border-top:1px solid var(--line);color:var(--mut);font-size:11px;text-align:center}
+  .gate .gfoot a{color:var(--brand)}
 
   .shell{display:grid;grid-template-columns:280px 1fr 380px;gap:0;height:calc(100vh - 65px);min-height:0}
   @media(max-width:1100px){.shell{grid-template-columns:240px 1fr 320px}}
@@ -120,11 +144,28 @@
 </head>
 <body>
 
+<!-- Login gate -->
+<div class="gate" id="gate">
+  <div class="gbox">
+    <div class="glogo">OMNI<span class="dot">·</span>PUBLICITY</div>
+    <h2>Backoffice</h2>
+    <p class="gsub">Acceso restringido. Introduce el password para gestionar gemelos digitales en <b>OmniPublicity</b>.</p>
+    <input id="g-pass" type="password" placeholder="Password" autocomplete="current-password" autofocus>
+    <label class="grow"><input id="g-remember" type="checkbox" checked> Recordar en este navegador</label>
+    <button class="gsubmit" id="g-submit">Entrar</button>
+    <div class="gerr" id="g-err"></div>
+    <div class="gfoot">¿Vienes a mirar el mapa? <a href="index.html">Ir al mapa público →</a></div>
+  </div>
+</div>
+
 <header>
   <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="sub">/ backoffice</span></span>
   <nav>
-    <a href="index.html">↗ Mapa público</a>
+    <a href="index.html">Mapa público</a>
     <a href="about.html">Concepto RTB</a>
+    <a href="../xpace-os/">Xpace OS</a>
+    <a href="../01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Admira XP</a>
+    <button id="btn-logout" class="logout">Logout</button>
     <span class="badge">LOCAL · localStorage</span>
   </nav>
 </header>
@@ -226,10 +267,80 @@
 </div>
 
 <script>
-// ─── State ─────────────────────────────────────────────────────────
-let locations = window.loadOmnipLocations().map(l => JSON.parse(JSON.stringify(l)));
+// ─── Login gate ────────────────────────────────────────────────────
+// SHA-256("Nomeacuerd0!") — cualquier cambio se hace regenerando el hash.
+const PASS_HASH = 'e6f45147f091328d3300df63f8fdc719982a56e74bd8d8f7dfa088cc8ce0eb60';
+const AUTH_KEY = 'omnip-bo-auth';
+
+async function sha256Hex(str) {
+  const buf = new TextEncoder().encode(str);
+  const h = await crypto.subtle.digest('SHA-256', buf);
+  return [...new Uint8Array(h)].map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function isAuthed() {
+  try {
+    const v = localStorage.getItem(AUTH_KEY) || sessionStorage.getItem(AUTH_KEY);
+    return v === PASS_HASH;
+  } catch { return false; }
+}
+
+function setAuthed(remember) {
+  try {
+    if (remember) localStorage.setItem(AUTH_KEY, PASS_HASH);
+    else sessionStorage.setItem(AUTH_KEY, PASS_HASH);
+  } catch {}
+}
+
+function clearAuth() {
+  try { localStorage.removeItem(AUTH_KEY); sessionStorage.removeItem(AUTH_KEY); } catch {}
+}
+
+const gate = document.getElementById('gate');
+const gPass = document.getElementById('g-pass');
+const gErr = document.getElementById('g-err');
+const gRemember = document.getElementById('g-remember');
+
+async function tryUnlock() {
+  const v = gPass.value;
+  if (!v) { gPass.classList.add('err'); setTimeout(()=>gPass.classList.remove('err'), 400); return; }
+  const h = await sha256Hex(v);
+  if (h !== PASS_HASH) {
+    gPass.classList.add('err');
+    gErr.textContent = '✕ Password incorrecto';
+    setTimeout(()=>gPass.classList.remove('err'), 400);
+    gPass.select();
+    return;
+  }
+  setAuthed(gRemember.checked);
+  gErr.textContent = '';
+  gate.classList.add('hidden');
+  bootBackoffice();
+}
+document.getElementById('g-submit').addEventListener('click', tryUnlock);
+gPass.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+gPass.addEventListener('input', () => { gErr.textContent = ''; });
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  if (!confirm('¿Cerrar sesión del backoffice?')) return;
+  clearAuth();
+  location.reload();
+});
+
+// ─── State (se inicializa cuando hay auth) ─────────────────────────
+let locations = [];
 let editingIdx = -1; // -1 = nada seleccionado; -2 = nueva (todavía sin guardar)
 let pendingPin = false;
+let booted = false;
+
+function bootBackoffice() {
+  if (booted) return;
+  booted = true;
+  locations = window.loadOmnipLocations().map(l => JSON.parse(JSON.stringify(l)));
+  bindSurfaces();
+  initMap();
+  renderList();
+}
 
 const SURF_TYPES = ['pantalla','escaparate','mostrador','vending','pwa'];
 const STATUSES = [
@@ -607,9 +718,15 @@ $('btn-reset').addEventListener('click', resetToDefault);
 }));
 
 // ─── Init ──────────────────────────────────────────────────────────
-bindSurfaces();
-initMap();
-renderList();
+// El boot real (locations, map, list) vive en bootBackoffice() y solo
+// se dispara tras autenticar correctamente. Si la auth ya está en
+// localStorage, levantamos sesión inmediatamente y saltamos el gate.
+// Esta comprobación tiene que ir AL FINAL para que las let de arriba
+// (locations, booted, ...) ya estén fuera de la TDZ cuando bootBackoffice corra.
+if (isAuthed()) {
+  gate.classList.add('hidden');
+  bootBackoffice();
+}
 </script>
 
 </body>
