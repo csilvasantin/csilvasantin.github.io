@@ -2,7 +2,13 @@
 // Orden de carga: worker omnipublicity-api (KV) → localStorage → bundled default.
 //
 // Schema: { id, name, kind, addr, coords:[lng,lat], surfaces:[
-//   { name, desc, status:'live'|'sched'|'idle', impr:Number, cpm:String, surface:'pantalla'|'escaparate'|'mostrador'|'vending'|'pwa' }
+//   { name, desc, status:'live'|'sched'|'idle', impr:Number, cpm:String,
+//     surface:'pantalla'|'escaparate'|'mostrador'|'vending'|'pwa',
+//     pixerScreens?:[<string>]   // opcional. IDs de screens en pixer-eleven
+//                                // que pintan en esta surface (ej: 'xtore-lg8qao').
+//                                // Si está, los items que llegan a esos screens
+//                                // se inyectan como bids LIVE en el feed.
+//   }
 // ] }
 window.OMNIP_API = 'https://omnipublicity-api.csilvasantin.workers.dev';
 window.OMNIP_STORE_KEY = 'omnip-locations';
@@ -12,7 +18,7 @@ window.OMNIP_LOCATIONS_DEFAULT = [
     id:'xtanco', name:'Xtanco', kind:'Estanco · Retail físico',
     addr:'Calle de Santa Rosa 4 · Madrid', coords:[-3.7283, 40.4036],
     surfaces:[
-      { name:'LED Frontal',          desc:'Pantalla principal sobre el mostrador · 1920×1080 · 24h', status:'live',  impr:540, cpm:'€8',  surface:'pantalla' },
+      { name:'LED Frontal',          desc:'Pantalla principal sobre el mostrador · 1920×1080 · 24h', status:'live',  impr:540, cpm:'€8',  surface:'pantalla', pixerScreens:['xtore-lg8qao','xtore-07313n'] },
       { name:'LED Vertical',         desc:'Display lateral del producto destacado · 1080×1920',      status:'live',  impr:380, cpm:'€6',  surface:'pantalla' },
       { name:'Escaparate exterior',  desc:'LED en la fachada visible desde la calle · noche',        status:'sched', impr:210, cpm:'€5',  surface:'escaparate' },
       { name:'Mostrador panel',      desc:'Panel táctil del mostrador · interacción cliente',        status:'live',  impr:90,  cpm:'€4',  surface:'mostrador' },

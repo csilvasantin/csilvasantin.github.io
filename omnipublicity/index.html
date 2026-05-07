@@ -93,6 +93,8 @@
   .bid-row .bf-surf{color:var(--mut);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .bid-row .bf-ts{color:var(--mut);font-size:9.5px;text-align:right}
   .bid-row.fresh{background:rgba(136,255,170,.10)}
+  .bid-row.real{border-left:2px solid var(--good)}
+  .bid-row .bf-live{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.08em;color:#001620;background:var(--good);padding:1px 4px;border-radius:2px;margin-right:5px;vertical-align:middle}
   .bidfeed-empty{color:var(--mut);font-family:monospace;font-size:11px;padding:8px;border-radius:6px;background:rgba(10,22,32,.5)}
 
   aside.panel .actions{display:flex;gap:10px;margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
@@ -157,7 +159,7 @@
 <body>
 
 <header>
-  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="ver" id="omnip-ver">AdmiraNext v26.05.07.1</span></span>
+  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="ver" id="omnip-ver">AdmiraNext v26.05.07.2</span></span>
   <div class="search-wrap">
     <label class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -440,6 +442,7 @@ function setStatus(msg) {
 panelClose.addEventListener('click', () => {
   panel.classList.remove('open');
   stopBidFeed();
+  activeLocation = null;
 });
 
 // ─── Controles derecha ─────────────────────────────────────────────
@@ -578,15 +581,16 @@ function spawnBid(loc) {
   globalImprCount++;
   document.getElementById('t-impr').textContent = globalImprCount.toLocaleString('es');
 }
+function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function renderBidFeed() {
   const el = document.getElementById('bidfeed');
   if (!el || !bidFeedItems.length) return;
   el.innerHTML = bidFeedItems.map((b,i) => `
-    <div class="bid-row${i===0?' fresh':''}">
-      <span class="bf-price">€${b.price}</span>
-      <span class="bf-adv">${b.advertiser}</span>
-      <span class="bf-surf">${b.surface}</span>
-      <span class="bf-ts">${b.ts}</span>
+    <div class="bid-row${i===0?' fresh':''}${b.real?' real':''}">
+      <span class="bf-price">€${escHtml(b.price)}</span>
+      <span class="bf-adv">${b.real?'<span class="bf-live">LIVE</span>':''}${escHtml(b.advertiser)}</span>
+      <span class="bf-surf">${escHtml(b.surface)}</span>
+      <span class="bf-ts">${escHtml(b.ts)}</span>
     </div>
   `).join('');
 }
@@ -604,7 +608,6 @@ function startBidFeed(loc) {
 function stopBidFeed() {
   if (bidFeedTimer) clearInterval(bidFeedTimer);
   bidFeedTimer = null;
-  activeLocation = null;
 }
 
 // Background ticker — sigue subiendo aunque no haya panel abierto
@@ -639,6 +642,79 @@ async function loadRealMetrics() {
 loadRealMetrics();
 // Re-fetch cada 30s para mantener el ticker honesto
 setInterval(loadRealMetrics, 30000);
+
+// ─── RTB feed real: poll de pixer-eleven /signage/feed ────────────
+// Cada display real (ack del screen) entra como puja LIVE en el panel
+// si el screen está mapeado a una surface (campo pixerScreens).
+let pixerSeenIds = new Set();
+let pixerBootstrapped = false;
+
+function findSurfaceByPixerScreen(screenId) {
+  for (const loc of LOCATIONS) {
+    for (const surf of loc.surfaces) {
+      if (Array.isArray(surf.pixerScreens) && surf.pixerScreens.includes(screenId)) {
+        return { loc, surf };
+      }
+    }
+  }
+  return null;
+}
+
+function spawnRealBid(loc, surf, item) {
+  const cpm = parseFloat(String(surf.cpm).replace(/[^\d.]/g, '')) || 1;
+  const winCents = Math.max(0.0008, (cpm * (0.6 + Math.random() * 0.45) / 1000));
+  const advRaw = String(item.title || 'creativo').replace(/^AdmiraNext\s*\/\/\s*/i, '').trim();
+  const advertiser = advRaw.length > 28 ? advRaw.slice(0, 26) + '…' : (advRaw || 'creativo');
+  const tsMs = Number(item.acked_at || item.ts) || Date.now();
+  const ts = new Date(tsMs).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  bidFeedItems.unshift({ advertiser, surface: surf.name, price: winCents.toFixed(4), ts, real: true });
+  if (bidFeedItems.length > 12) bidFeedItems.pop();
+  renderBidFeed();
+}
+
+function handlePixerItem(item) {
+  if (!item || !item.id || !item.screen) return;
+  const match = findSurfaceByPixerScreen(item.screen);
+  if (!match) return;
+  if (activeLocation && activeLocation.id === match.loc.id) {
+    spawnRealBid(match.loc, match.surf, item);
+  }
+  // Cualquier item real cuenta para el ticker global, haya panel abierto o no.
+  globalImprCount++;
+  document.getElementById('t-impr').textContent = globalImprCount.toLocaleString('es');
+}
+
+async function pollPixerFeed() {
+  try {
+    const r = await fetch(PIXER + '/signage/feed?limit=20', {cache:'no-store'});
+    if (!r.ok) return;
+    const d = await r.json();
+    const items = Array.isArray(d && d.items) ? d.items : [];
+    if (!pixerBootstrapped) {
+      // Primera carga: marcamos histórico como "ya visto" para no volcar
+      // 20 pujas viejas de golpe al abrir Xtanco.
+      items.forEach(it => it && it.id && pixerSeenIds.add(it.id));
+      pixerBootstrapped = true;
+      return;
+    }
+    // /signage/feed devuelve los items más recientes primero. Procesamos
+    // en orden cronológico (más antiguo primero) para que la fila más reciente
+    // quede arriba.
+    for (let i = items.length - 1; i >= 0; i--) {
+      const item = items[i];
+      if (!item || !item.id || pixerSeenIds.has(item.id)) continue;
+      pixerSeenIds.add(item.id);
+      handlePixerItem(item);
+    }
+    // Trim del Set si crece demasiado.
+    if (pixerSeenIds.size > 500) {
+      const arr = Array.from(pixerSeenIds);
+      pixerSeenIds = new Set(arr.slice(-300));
+    }
+  } catch { /* worker dormido — el simulador sigue dando vida al feed */ }
+}
+pollPixerFeed();
+setInterval(pollPixerFeed, 5000);
 
 // ─── flyTo + abrir panel ──────────────────────────────────────────
 function flyToLocation(loc) {
@@ -760,6 +836,7 @@ searchInput.addEventListener('keydown', async (e) => {
     map.flyTo({center:[res.lon, res.lat], zoom:16, pitch: currentView==='3d'?55:0, duration:4500, essential:true});
     panel.classList.remove('open');
     stopBidFeed();
+    activeLocation = null;
   } catch {
     setStatus('Sin resultados · prueba "Xtanco", "BCN" o una dirección completa');
   }
