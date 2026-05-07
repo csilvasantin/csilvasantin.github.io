@@ -166,7 +166,7 @@
     <a href="../xpace-os/">Xpace OS</a>
     <a href="../01.-AdmiraXperience-Game/" target="_blank" rel="noopener">↗ Admira XP</a>
     <button id="btn-logout" class="logout">Logout</button>
-    <span class="badge">LOCAL · localStorage</span>
+    <span class="badge" id="badge-mode" title="Estado de sincronización con omnipublicity-api">CARGANDO…</span>
   </nav>
 </header>
 
@@ -181,8 +181,10 @@
     <button class="new" id="btn-new">+ Nueva tienda</button>
     <ul id="bo-list-ul"></ul>
     <div class="tools">
+      <button id="btn-publish" style="border-color:rgba(120,243,255,.5);color:var(--brand)">☁ Publicar al sitio</button>
       <button id="btn-import">📥 Importar JSON</button>
       <button id="btn-export">📤 Exportar JSON</button>
+      <button id="btn-token">🔑 Cambiar API token</button>
       <button id="btn-reset" class="danger">↺ Reset al catálogo por defecto</button>
     </div>
   </aside>
@@ -192,8 +194,7 @@
     <div class="empty" id="bo-empty">
       <span class="big">🏪</span>
       Selecciona una tienda de la lista o pulsa <b style="color:var(--brand)">+ Nueva tienda</b> para empezar.<br><br>
-      Los cambios se guardan en <b>localStorage</b> de este navegador.<br>
-      Para deployarlos al sitio público, exporta el JSON y commitéalo a <code style="color:var(--accent)">locations.js</code>.
+      Los cambios se guardan en <b>localStorage</b> mientras editas. Cuando termines, pulsa <b style="color:var(--brand)">☁ Publicar al sitio</b> para subirlos al worker (KV) y que se vean en el mapa público.
     </div>
     <div id="bo-editor" hidden>
       <div class="formhead">
@@ -333,13 +334,112 @@ let editingIdx = -1; // -1 = nada seleccionado; -2 = nueva (todavía sin guardar
 let pendingPin = false;
 let booted = false;
 
-function bootBackoffice() {
+async function bootBackoffice() {
   if (booted) return;
   booted = true;
+  // Arranque sincrónico para no esperar al worker.
   locations = window.loadOmnipLocations().map(l => JSON.parse(JSON.stringify(l)));
   bindSurfaces();
   initMap();
   renderList();
+  setBadge('local', null);
+  // Refresh asincrónico desde el worker. Si la KV trae algo más nuevo,
+  // re-render. Si falla, nos quedamos con lo local.
+  try {
+    const res = await window.loadOmnipLocationsAsync(4000);
+    if (res && Array.isArray(res.locations) && res.locations.length) {
+      const a = JSON.stringify(locations), b = JSON.stringify(res.locations);
+      if (a !== b) {
+        locations = res.locations.map(l => JSON.parse(JSON.stringify(l)));
+        renderList();
+        if (typeof renderMap === 'function') renderMap();
+      }
+      setBadge(res.source === 'kv' ? 'kv' : 'local', res.updatedAt);
+    } else {
+      setBadge('local', null);
+    }
+  } catch { setBadge('offline', null); }
+}
+
+// ─── Badge de estado de sincronización ─────────────────────────────
+function setBadge(mode, updatedAt) {
+  const el = document.getElementById('badge-mode'); if (!el) return;
+  if (mode === 'kv') {
+    const when = updatedAt ? new Date(updatedAt * 1000).toLocaleString('es-ES', {dateStyle:'short', timeStyle:'short'}) : '';
+    el.textContent = 'KV · sincronizado' + (when ? ' · ' + when : '');
+    el.style.color = 'var(--good)';
+    el.style.borderColor = 'rgba(136,255,170,.4)';
+  } else if (mode === 'offline') {
+    el.textContent = 'OFFLINE · solo local';
+    el.style.color = 'var(--warn)';
+    el.style.borderColor = 'rgba(255,136,102,.4)';
+  } else if (mode === 'dirty') {
+    el.textContent = 'CAMBIOS SIN PUBLICAR';
+    el.style.color = 'var(--accent)';
+    el.style.borderColor = 'rgba(255,216,102,.5)';
+  } else {
+    el.textContent = 'LOCAL · localStorage';
+    el.style.color = 'var(--accent)';
+    el.style.borderColor = 'rgba(255,216,102,.4)';
+  }
+}
+
+// ─── API token storage ────────────────────────────────────────────
+const TOKEN_KEY = 'omnip-bo-api-token';
+function getApiToken() {
+  try { return localStorage.getItem(TOKEN_KEY) || ''; } catch { return ''; }
+}
+function setApiToken(t) {
+  try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch {}
+}
+function promptApiToken(reason) {
+  return new Promise((resolve) => {
+    const current = getApiToken();
+    openModal({
+      title: reason || 'API token (Bearer) para publicar al worker',
+      value: current,
+      allowEdit: true,
+      confirmLabel: current ? 'Actualizar token' : 'Guardar token',
+      onConfirm: (text) => {
+        const t = String(text || '').trim();
+        if (!t) throw new Error('Token vacío');
+        setApiToken(t);
+        showToast('Token guardado en este navegador');
+        resolve(t);
+      },
+    });
+    // Si el usuario cierra sin confirmar, resolvemos null tras un tick
+    document.getElementById('mo-cancel').addEventListener('click', () => resolve(null), { once: true });
+  });
+}
+
+// ─── Publicar al worker ────────────────────────────────────────────
+async function publishToWorker() {
+  if (!locations.length) { showToast('Catálogo vacío', 'err'); return; }
+  let token = getApiToken();
+  if (!token) {
+    token = await promptApiToken('Pega aquí el ADMIN_TOKEN del worker omnipublicity-api');
+    if (!token) return;
+  }
+  const btn = document.getElementById('btn-publish');
+  const orig = btn.textContent;
+  btn.textContent = '⏳ Publicando…'; btn.disabled = true;
+  try {
+    const res = await window.publishOmnipLocations(locations, token);
+    setBadge('kv', res.updatedAt);
+    showToast('Publicadas ' + res.count + ' tiendas al worker');
+  } catch (e) {
+    const msg = String(e.message || e);
+    if (msg === 'invalid_token') {
+      showToast('Token inválido — corrígelo', 'err');
+      setApiToken('');
+      await promptApiToken('Token rechazado. Pega el ADMIN_TOKEN correcto');
+    } else {
+      showToast('Error: ' + msg, 'err');
+    }
+  } finally {
+    btn.textContent = orig; btn.disabled = false;
+  }
 }
 
 const SURF_TYPES = ['pantalla','escaparate','mostrador','vending','pwa'];
@@ -363,6 +463,8 @@ function persistAndRefresh() {
   window.saveOmnipLocations(locations);
   renderList();
   renderMap();
+  // Marcar dirty para que el usuario sepa que hay que publicar.
+  if (typeof setBadge === 'function') setBadge('dirty', null);
 }
 
 // ─── Lista lateral ─────────────────────────────────────────────────
@@ -711,6 +813,8 @@ $('btn-pin').addEventListener('click', () => {
 $('btn-import').addEventListener('click', importJSON);
 $('btn-export').addEventListener('click', exportJSON);
 $('btn-reset').addEventListener('click', resetToDefault);
+$('btn-publish').addEventListener('click', publishToWorker);
+$('btn-token').addEventListener('click', () => promptApiToken('Editar API token (Bearer) — se guarda en localStorage de este navegador'));
 
 // Re-renderiza cuando los inputs cambian (para el title "editando")
 ['f-name'].forEach(id => $(id).addEventListener('input', e => {

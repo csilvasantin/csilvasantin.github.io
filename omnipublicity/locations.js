@@ -1,10 +1,12 @@
 // OmniPublicity — catálogo por defecto de tiendas (gemelos digitales).
-// Tanto el mapa público como el backoffice leen primero de localStorage
-// ('omnip-locations'); si no hay nada, caen a este array.
+// Orden de carga: worker omnipublicity-api (KV) → localStorage → bundled default.
 //
 // Schema: { id, name, kind, addr, coords:[lng,lat], surfaces:[
 //   { name, desc, status:'live'|'sched'|'idle', impr:Number, cpm:String, surface:'pantalla'|'escaparate'|'mostrador'|'vending'|'pwa' }
 // ] }
+window.OMNIP_API = 'https://omnipublicity-api.csilvasantin.workers.dev';
+window.OMNIP_STORE_KEY = 'omnip-locations';
+
 window.OMNIP_LOCATIONS_DEFAULT = [
   {
     id:'xtanco', name:'Xtanco', kind:'Estanco · Retail físico',
@@ -60,8 +62,7 @@ window.OMNIP_LOCATIONS_DEFAULT = [
   },
 ];
 
-window.OMNIP_STORE_KEY = 'omnip-locations';
-
+// Sync: localStorage → bundled default. Sin red. Para arranque inmediato.
 window.loadOmnipLocations = function() {
   try {
     const raw = localStorage.getItem(window.OMNIP_STORE_KEY);
@@ -73,9 +74,42 @@ window.loadOmnipLocations = function() {
   return window.OMNIP_LOCATIONS_DEFAULT;
 };
 
+// Async: worker KV → cachea en localStorage → fallback a sync. Devuelve
+// también un flag `source` para que la UI pueda mostrar de dónde viene.
+window.loadOmnipLocationsAsync = async function(timeoutMs = 4000) {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    const r = await fetch(window.OMNIP_API + '/locations', {signal: ctrl.signal, cache: 'no-store'});
+    clearTimeout(t);
+    if (!r.ok) throw new Error('http ' + r.status);
+    const d = await r.json();
+    if (d && Array.isArray(d.locations) && d.locations.length) {
+      try { localStorage.setItem(window.OMNIP_STORE_KEY, JSON.stringify(d.locations)); } catch {}
+      return { locations: d.locations, source: d.source || 'kv', updatedAt: d.updatedAt || null };
+    }
+  } catch (e) { /* offline / worker dormido / timeout */ }
+  return { locations: window.loadOmnipLocations(), source: 'local', updatedAt: null };
+};
+
+// Guarda en localStorage (cache local del backoffice). NO publica.
 window.saveOmnipLocations = function(arr) {
   try {
     localStorage.setItem(window.OMNIP_STORE_KEY, JSON.stringify(arr));
     return true;
   } catch (e) { return false; }
+};
+
+// Publica al worker (PUT /locations con Bearer token). Lanza si falla.
+window.publishOmnipLocations = async function(arr, token) {
+  if (!Array.isArray(arr) || !arr.length) throw new Error('empty_array');
+  if (!token) throw new Error('missing_token');
+  const r = await fetch(window.OMNIP_API + '/locations', {
+    method: 'PUT',
+    headers: { 'Content-Type':'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ locations: arr }),
+  });
+  let d = null; try { d = await r.json(); } catch {}
+  if (!r.ok) throw new Error((d && d.error) || ('http ' + r.status));
+  return d;
 };

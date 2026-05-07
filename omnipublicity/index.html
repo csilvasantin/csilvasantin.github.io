@@ -245,9 +245,11 @@
 </aside>
 
 <script>
-// Catálogo de tiendas: localStorage si existe (editado en backoffice), si
-// no el bundled OMNIP_LOCATIONS_DEFAULT (cargado por locations.js).
-const LOCATIONS = window.loadOmnipLocations();
+// Catálogo: arrancamos sincrónicamente con localStorage o el bundled default
+// para no bloquear el render. En paralelo, refrescamos desde el worker
+// omnipublicity-api (KV) y, si trae algo distinto, re-renderizamos sources +
+// counters. Primer load = instantáneo; segundo paint = autoritativo.
+let LOCATIONS = window.loadOmnipLocations();
 
 // ─── Workers (mismos que xpace-os) ────────────────────────────────
 const PIXER = 'https://pixer-eleven.csilvasantin.workers.dev';
@@ -764,6 +766,26 @@ searchInput.addEventListener('keydown', async (e) => {
 
 // ─── Counters iniciales ───────────────────────────────────────────
 document.getElementById('t-locs').textContent = LOCATIONS.length;
+
+// ─── Refresh asincrónico desde el worker (KV) ─────────────────────
+// El sync arrancó con localStorage/default. Si la KV trae algo nuevo,
+// reescribimos LOCATIONS, refrescamos el source del mapa y los counters.
+(async () => {
+  try {
+    const res = await window.loadOmnipLocationsAsync(4500);
+    if (!res || !Array.isArray(res.locations) || !res.locations.length) return;
+    if (JSON.stringify(res.locations) === JSON.stringify(LOCATIONS)) return;
+    LOCATIONS = res.locations;
+    document.getElementById('t-locs').textContent = LOCATIONS.length;
+    const cpms = LOCATIONS.flatMap(l => l.surfaces.map(s => parseFloat(String(s.cpm).replace(/[^\d.]/g,'')))).filter(Boolean);
+    if (cpms.length) {
+      const lo = Math.min(...cpms), hi = Math.max(...cpms);
+      const el = document.getElementById('p-cpm'); if (el) el.textContent = lo === hi ? `€${lo}` : `€${lo}-€${hi}`;
+    }
+    const src = map && map.getSource && map.getSource('locs');
+    if (src) src.setData(locationsGeoJSON());
+  } catch {}
+})();
 
 // ─── Auto-rotación lenta del globo ────────────────────────────────
 let rotating = true;
