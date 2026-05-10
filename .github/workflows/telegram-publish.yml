@@ -25,8 +25,7 @@ jobs:
             exit 0
           fi
 
-          MESSAGE="Admira.shop actualizado: ${SITE_URL}
-Commit: ${COMMIT_URL}"
+          MESSAGE="$(printf 'Admira.shop actualizado: %s\nCommit: %s' "$SITE_URL" "$COMMIT_URL")"
 
           curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
