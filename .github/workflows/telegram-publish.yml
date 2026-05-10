@@ -1,0 +1,33 @@
+name: Notify Admira.shop publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "admira-shop/**"
+      - ".github/workflows/telegram-publish.yml"
+  workflow_dispatch:
+
+jobs:
+  telegram:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Telegram notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SITE_URL: "https://csilvasantin.github.io/admira-shop/"
+          COMMIT_URL: "https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets are not configured."
+            exit 0
+          fi
+
+          MESSAGE="Admira.shop actualizado: ${SITE_URL}
+Commit: ${COMMIT_URL}"
+
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg chat_id "$TELEGRAM_CHAT_ID" --arg text "$MESSAGE" '{chat_id: $chat_id, text: $text, disable_web_page_preview: false}')"
