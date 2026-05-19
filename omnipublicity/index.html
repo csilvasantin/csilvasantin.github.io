@@ -57,6 +57,8 @@
   aside.panel .ph{padding:20px 22px;border-bottom:1px solid var(--line);position:relative}
   aside.panel .ph .kind{font-family:monospace;font-size:10px;color:var(--accent);letter-spacing:.18em;text-transform:uppercase}
   aside.panel .ph h2{margin:6px 0 4px;font-size:24px;letter-spacing:-.01em}
+  aside.panel .ph h2 a{color:var(--ink);text-decoration:none;border-bottom:1px solid rgba(120,243,255,.35)}
+  aside.panel .ph h2 a:hover{color:var(--brand);border-bottom-color:var(--brand)}
   aside.panel .ph .addr{color:var(--mut);font-size:13px}
   aside.panel .ph .meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;font-family:monospace;font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}
   aside.panel .ph .meta b{color:var(--brand);display:block;font-size:18px;letter-spacing:0;text-transform:none;margin-bottom:1px}
@@ -159,7 +161,7 @@
 <body>
 
 <header>
-  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="ver" id="omnip-ver">AdmiraNext v26.05.07.2</span></span>
+  <span class="logo">OMNI<span class="dot">·</span>PUBLICITY <span class="ver" id="omnip-ver">AdmiraMatic v26.05.19.r1</span></span>
   <div class="search-wrap">
     <label class="search">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
@@ -222,7 +224,7 @@
   <div class="ph">
     <button class="close" id="panel-close" aria-label="Cerrar">×</button>
     <div class="kind" id="p-kind">Estanco · Retail físico</div>
-    <h2 id="p-name">Xtanco</h2>
+    <h2><a id="p-name" href="detail.html?loc=xtanco" title="Abrir detalle de tienda">Xtanco</a></h2>
     <div class="addr" id="p-addr">Calle de Santa Rosa 4 · Madrid</div>
     <div class="meta">
       <div><b id="p-surfaces">6</b>surfaces</div>
@@ -306,7 +308,10 @@ map.on('style.load', () => {
   applySky();
   addLocationsLayer();
 });
-map.on('load', applySky);
+map.on('load', () => {
+  applySky();
+  openLocationFromQuery();
+});
 
 // ─── Cluster source con todas las tiendas ──────────────────────────
 function locationsGeoJSON() {
@@ -520,9 +525,11 @@ function thumbFor(kind, status) {
 
 // ─── Renderiza panel para una location ────────────────────────────
 let activeLocation = null;
+let queryLocationOpened = false;
 function renderPanel(loc) {
   activeLocation = loc;
   document.getElementById('p-name').textContent = loc.name;
+  document.getElementById('p-name').href = 'detail.html?loc=' + encodeURIComponent(loc.id);
   document.getElementById('p-addr').textContent = loc.addr;
   document.getElementById('p-kind').textContent = loc.kind;
   document.getElementById('p-surfaces').textContent = loc.surfaces.length;
@@ -728,6 +735,22 @@ function flyToLocation(loc) {
   }, 4600);
 }
 
+function openLocationFromQuery() {
+  if (queryLocationOpened) return;
+  const params = new URLSearchParams(location.search);
+  const locId = params.get('loc');
+  if (!locId) return;
+  const loc = LOCATIONS.find(l => l.id === locId);
+  if (!loc) return;
+  queryLocationOpened = true;
+  splash.classList.add('hidden');
+  map.flyTo({center: loc.coords, zoom: 17.5, pitch: currentView==='3d'?60:0, bearing: -20, duration: 1400, essential: true});
+  setTimeout(() => {
+    renderPanel(loc);
+    panel.classList.add('open');
+  }, 1500);
+}
+
 // ─── Búsqueda ──────────────────────────────────────────────────────
 async function geocodeNominatim(q) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
@@ -841,6 +864,10 @@ searchInput.addEventListener('keydown', async (e) => {
     setStatus('Sin resultados · prueba "Xtanco", "BCN" o una dirección completa');
   }
 });
+
+// Fallback de arranque: en algunos navegadores el evento load del mapa llega
+// después del load del documento, así que reintentamos una vez de forma suave.
+setTimeout(openLocationFromQuery, 1200);
 
 // ─── Counters iniciales ───────────────────────────────────────────
 document.getElementById('t-locs').textContent = LOCATIONS.length;
