@@ -36,9 +36,11 @@
   .metric{border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.035);padding:16px;min-height:92px}
   .metric b{display:block;color:var(--ink);font-size:28px;line-height:1.1}
   .metric span{display:block;margin-top:6px;color:var(--mut);font-family:monospace;font-size:11px;text-transform:uppercase;letter-spacing:.12em}
-  .cockpit{position:relative;margin:0 22px 22px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#02080d}
+  .cockpit{position:relative;display:block;margin:0 22px 22px;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#02080d}
+  .cockpit:hover{border-color:var(--brand)}
   .cockpit img{width:100%;display:block;aspect-ratio:16/7.7;object-fit:cover;opacity:.9}
   .cockpit .badge{position:absolute;right:18px;top:18px;border:1px solid rgba(98,242,155,.45);background:rgba(5,22,15,.82);color:var(--good);border-radius:999px;padding:5px 10px;font-family:monospace;font-size:12px;font-weight:800;letter-spacing:.1em}
+  .cockpit .enter{position:absolute;left:18px;bottom:18px;border:1px solid rgba(40,215,239,.45);background:rgba(4,16,23,.82);color:var(--ink);border-radius:8px;padding:9px 12px;font-size:13px;font-weight:800}
   .live-card{padding:20px}
   .live-card h2,.surface-panel h2,.campaigns h2{font-size:19px;margin-bottom:16px}
   .bid{border-left:3px solid var(--brand);background:rgba(255,255,255,.04);border-radius:8px;padding:14px;margin-bottom:12px}
@@ -101,10 +103,11 @@
           <div class="metric"><b id="m-audience">--</b><span>Audiencia ahora</span></div>
           <div class="metric"><b id="m-cpm">--</b><span>CPM promedio</span></div>
         </div>
-        <div class="cockpit">
+        <a class="cockpit" id="store-3d-link" href="store-3d.html?loc=admira-bcn" aria-label="Entrar en el mapa 3D de la tienda">
           <img src="assets/admira-app-cockpit.png" alt="Cockpit de retail media con tienda, pantallas y pujas">
           <span class="badge">RTB online</span>
-        </div>
+          <span class="enter">Entrar al mapa 3D</span>
+        </a>
       </div>
       <aside class="panel live-card">
         <h2>Live bidding</h2>
@@ -156,9 +159,11 @@ function setText(id, value) {
 
 function renderDetail() {
   const mapHref = 'index.html?loc=' + encodeURIComponent(loc.id);
+  const store3dHref = 'store-3d.html?loc=' + encodeURIComponent(loc.id);
   document.getElementById('back-map').href = mapHref;
   document.getElementById('side-map').href = mapHref;
   document.getElementById('side-back').href = mapHref;
+  document.getElementById('store-3d-link').href = store3dHref;
   document.title = loc.name + ' | Admira.app';
 
   setText('kind', loc.kind);
