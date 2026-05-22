@@ -406,6 +406,7 @@
             color: #666;
             transition: all 0.3s;
             font-family: inherit;
+            text-decoration: none;
         }
         .demo-toggle:hover { border-color: #555; color: #aaa; }
         .demo-toggle.active {
@@ -466,7 +467,7 @@
         </div>
 
         <div class="footer">
-            AdmiraNext v0.2.0 · Última comprobación: <span id="last-check">—</span>
+            AdmiraNext v26.22.05.1 · Última comprobación: <span id="last-check">—</span>
         </div>
     </div>
 
@@ -476,9 +477,9 @@
         <div class="screen-overlay-label" id="screen-overlay-label"></div>
     </div>
 
-    <button class="demo-toggle" id="demo-btn" onclick="toggleDemo()">
+    <a class="demo-toggle" id="demo-btn" href="https://www.admira.studio/" target="_blank" rel="noopener" title="Abrir admira.studio">
         <span class="demo-dot"></span> DEMO
-    </button>
+    </a>
 
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";

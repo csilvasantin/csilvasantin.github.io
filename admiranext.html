@@ -155,6 +155,65 @@
         .side-panel.creativo { border-color: #e74c3c; }
         .side-panel.racional { border-color: #3498db; }
 
+        .debate-board {
+            margin: 0 auto 1.5rem;
+            max-width: 1000px;
+            background: #151225;
+            border: 2px solid #b8860b;
+            box-shadow: 0 0 18px rgba(218, 165, 32, 0.18);
+            padding: 0.9rem 1rem;
+        }
+        .debate-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            color: #ffd866;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.7rem;
+        }
+        .debate-count { color: #777; font-size: 0.68rem; }
+        .debate-list { display: grid; gap: 0.55rem; }
+        .debate-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.6rem;
+            align-items: center;
+            padding: 0.65rem 0.75rem;
+            background: rgba(0, 0, 0, 0.26);
+            border-left: 4px solid #3498db;
+        }
+        .debate-title {
+            color: #f4f4f4;
+            font-size: 0.88rem;
+            font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .debate-meta {
+            color: #888;
+            font-size: 0.72rem;
+            margin-top: 0.15rem;
+        }
+        .debate-link {
+            color: #78f3ff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-decoration: none;
+            border: 1px solid rgba(120, 243, 255, 0.35);
+            padding: 0.35rem 0.55rem;
+        }
+        .debate-link:hover { background: rgba(120, 243, 255, 0.12); }
+        .debate-empty {
+            color: #666;
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
         .side-title {
             font-size: 1.1rem;
             font-weight: 700;
@@ -451,6 +510,7 @@
             color: #666;
             transition: all 0.3s;
             font-family: inherit;
+            text-decoration: none;
         }
         .demo-toggle:hover { border-color: #555; color: #aaa; }
         .demo-toggle.active {
@@ -646,6 +706,7 @@
 
         @media (max-width: 768px) {
             .status-grid { grid-template-columns: 1fr; }
+            .debate-item { grid-template-columns: 1fr; }
             .gen-btn { padding: 0.5rem 1.2rem; font-size: 0.85rem; }
             .hack-grid { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
         }
@@ -671,6 +732,16 @@
             <div class="nameplates" id="nameplates"></div>
         </div>
 
+        <section class="debate-board" aria-labelledby="debate-title">
+            <div class="debate-head">
+                <span id="debate-title">Mesa de debate · Studio imports</span>
+                <span class="debate-count" id="debate-count">sin temas</span>
+            </div>
+            <div class="debate-list" id="debate-list">
+                <div class="debate-empty">Esperando material interesante desde admira.studio...</div>
+            </div>
+        </section>
+
         <div class="status-grid">
             <div class="side-panel racional">
                 <div class="side-title">🧠 Racional <span class="side-machines">🔴 Sillas rojas</span></div>
@@ -683,7 +754,7 @@
         </div>
 
         <div class="footer">
-            AdmiraNext v26.22.04.1 · Última comprobación: <span id="last-check">—</span>
+            AdmiraNext v26.22.05.1 · Última comprobación: <span id="last-check">—</span>
         </div>
     </div>
 
@@ -707,15 +778,16 @@
         <span class="control-dot" style="background:#88cc55;"></span> ADMIRA XP
     </a>
 
-    <button class="demo-toggle" id="demo-btn" onclick="toggleDemo()">
+    <a class="demo-toggle" id="demo-btn" href="https://www.admira.studio/" target="_blank" rel="noopener" title="Abrir admira.studio">
         <span class="demo-dot"></span> DEMO
-    </button>
+    </a>
 
     <script>
     const CONTROL_API = "https://macmini.tail48b61c.ts.net/api/machines";
     const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/03-ControlCodexClaude/main/data/machines.json";
     const DEMO_API = "https://macmini.tail48b61c.ts.net/demo/status";
     const DEMO_PING = "https://macmini.tail48b61c.ts.net/demo/ping";
+    const COUNCIL_DEBATE_API = "https://pixer-eleven.csilvasantin.workers.dev/council/debate/feed?limit=5";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
@@ -775,9 +847,62 @@
     let machineStatus = {};
     let apiOk = false;
     let currentGen = "leyendas";
+    let councilDebates = [];
     // Maquinas dormidas manualmente desde el dashboard (display sleep)
     // El Mac sigue en Tailscale como "online" pero la pantalla esta apagada
     const sleepingMachines = new Set();
+
+    function escapeHTML(value) {
+        return String(value || "").replace(/[&<>"']/g, ch => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        }[ch]));
+    }
+
+    async function fetchCouncilDebates() {
+        try {
+            const res = await fetch(COUNCIL_DEBATE_API + "&t=" + Date.now(), {
+                signal: AbortSignal.timeout(3000),
+                cache: "no-store"
+            });
+            if (!res.ok) throw new Error("debate-feed-" + res.status);
+            const data = await res.json();
+            councilDebates = Array.isArray(data.items) ? data.items : [];
+        } catch (e) {
+            councilDebates = councilDebates || [];
+        }
+    }
+
+    function renderDebateBoard() {
+        const list = document.getElementById("debate-list");
+        const count = document.getElementById("debate-count");
+        if (!list || !count) return;
+        count.textContent = councilDebates.length ? `${councilDebates.length} tema${councilDebates.length === 1 ? "" : "s"}` : "sin temas";
+        if (!councilDebates.length) {
+            list.innerHTML = '<div class="debate-empty">Esperando material interesante desde admira.studio...</div>';
+            return;
+        }
+        list.innerHTML = councilDebates.map(item => {
+            const title = escapeHTML(item.title || "Import sin titulo");
+            const mediaType = escapeHTML(item.mediaType || "asset");
+            const source = escapeHTML(item.source || "admira.studio");
+            const date = item.createdAt ? new Date(item.createdAt).toLocaleString("es-ES", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" }) : "";
+            const href = /^https?:\/\//i.test(item.url || "") ? item.url : "";
+            const link = href ? `<a class="debate-link" href="${escapeHTML(href)}" target="_blank" rel="noopener">Abrir</a>` : '<span class="debate-link">Debatir</span>';
+            return `
+                <article class="debate-item">
+                    <div>
+                        <div class="debate-title">${title}</div>
+                        <div class="debate-meta">${mediaType} · ${source}${date ? " · " + escapeHTML(date) : ""}</div>
+                    </div>
+                    ${link}
+                </article>
+            `;
+        }).join("");
+    }
 
     function setGen(gen) {
         currentGen = gen;
@@ -897,6 +1022,7 @@
         const liveEl = document.querySelector(".live");
         liveEl.textContent = apiOk ? "● LIVE" : "● OFFLINE";
         liveEl.style.color = apiOk ? "#44bb44" : "#e74c3c";
+        renderDebateBoard();
 
         let onlineCount = 0;
         let offlineCount = 0;
@@ -1147,7 +1273,7 @@
     }
 
     async function refresh() {
-        await fetchMachines();
+        await Promise.all([fetchMachines(), fetchCouncilDebates()]);
         render();
     }
 
