@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admira Next | Portal principal</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --bg: #f6efe4;
+      --bg-strong: #efe2cc;
+      --surface: rgba(255, 250, 241, 0.82);
+      --surface-strong: #fffaf1;
+      --ink: #1e1f1f;
+      --muted: #60594f;
+      --line: rgba(65, 54, 37, 0.14);
+      --teal: #167c80;
+      --red: #af3c2d;
+      --gold: #c2862f;
+      --blue: #2f5d96;
+      --shadow: 0 22px 60px rgba(93, 66, 21, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: 'Space Grotesk', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(22, 124, 128, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(175, 60, 45, 0.10), transparent 30%),
+        linear-gradient(180deg, #fbf7ef 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; }
+
+    .texture {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(65, 54, 37, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(65, 54, 37, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent);
+    }
+
+    #lock-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px 24px 40px;
+      background: #000 url('./assets/lock-bg.jpg') center top/cover no-repeat;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+      overflow-y: auto;
+    }
+
+    /* --- TV retro 80s --- */
+    .tv-frame {
+      margin-top: 680px;
+      position: relative;
+      width: min(620px, 92vw);
+      aspect-ratio: 4 / 3.2;
+      background: linear-gradient(170deg, #e8dcc8 0%, #d4c5a8 40%, #c2b08a 100%);
+      border-radius: 22px 22px 18px 18px;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.6),
+        inset 0 2px 0 rgba(255,255,255,0.35),
+        inset 0 -3px 0 rgba(0,0,0,0.15);
+      padding: 24px 28px 28px;
+      display: flex;
+      gap: 14px;
+    }
+
+    .tv-frame::before {
+      content: '';
+      position: absolute;
+      top: 6px;
+      left: 20px;
+      right: 20px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+      border-radius: 2px;
+    }
+
+    .tv-screen-wrap {
+      flex: 1;
+      position: relative;
+      border-radius: 20px / 18px;
+      overflow: hidden;
+      background: #0a0a0a;
+      box-shadow:
+        inset 0 0 30px rgba(0,0,0,0.9),
+        inset 0 0 6px rgba(0,0,0,1),
+        0 0 0 4px #1a1a1a,
+        0 0 0 6px #333;
+    }
+
+    .tv-screen-wrap video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px / 14px;
+    }
+
+    /* CRT scanlines */
+    .tv-screen-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px / 14px;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0,0,0,0.12) 0px,
+          rgba(0,0,0,0.12) 1px,
+          transparent 1px,
+          transparent 3px
+        );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Brillo / reflejo del cristal curvado */
+    .tv-glare {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px / 14px;
+      pointer-events: none;
+      z-index: 3;
+      background:
+        radial-gradient(ellipse 50% 40% at 30% 25%, rgba(255,255,255,0.18), transparent 70%),
+        radial-gradient(ellipse 80% 60% at 70% 80%, rgba(255,255,255,0.05), transparent 60%),
+        linear-gradient(150deg, rgba(255,255,255,0.08) 0%, transparent 40%);
+    }
+
+    /* Panel lateral de botones */
+    .tv-controls {
+      width: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      padding-top: 8px;
+    }
+
+    .tv-brand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: #6b5d4a;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .tv-btn {
+      width: 42px;
+      height: 14px;
+      border-radius: 3px;
+      background: linear-gradient(180deg, #d8ccb4 0%, #bfb096 100%);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4);
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .tv-btn.active {
+      background: linear-gradient(180deg, #c44 0%, #a33 100%);
+      box-shadow: 0 0 6px rgba(255,80,60,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .tv-dial {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, #444, #1a1a1a);
+      border: 2px solid #555;
+      margin-top: auto;
+      margin-bottom: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    .tv-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5rem;
+      color: #8a7a64;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 520px) {
+      .tv-controls { display: none; }
+      .tv-frame { padding: 16px; margin-top: 240px; }
+    }
+
+    #lock-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .lock-shell {
+      width: min(760px, 100%);
+      padding: 18px 28px;
+      border-radius: 22px;
+      border: 1px solid rgba(180, 255, 180, 0.12);
+      background: rgba(0, 0, 0, 0.72);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(16px);
+      color: #e0ffe0;
+    }
+
+    .lock-title {
+      max-width: 100%;
+      font-size: clamp(0.85rem, 1.9vw, 1.25rem);
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      color: #e0ffe0;
+      white-space: nowrap;
+    }
+
+    .google-custom-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 28px;
+      border-radius: 40px;
+      border: 1px solid rgba(180, 255, 180, 0.2);
+      background: rgba(255, 255, 255, 0.08);
+      color: #e0ffe0;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .google-custom-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: rgba(180, 255, 180, 0.35);
+    }
+
+    .lock-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .lock-panel {
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .lock-panel strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.08rem;
+    }
+
+    .lock-panel p {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .lock-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .lock-form input {
+      flex: 1 1 240px;
+      min-width: 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(65, 54, 37, 0.18);
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      font: inherit;
+      outline: none;
+    }
+
+    .lock-form input:focus {
+      border-color: rgba(22, 124, 128, 0.42);
+      box-shadow: 0 0 0 4px rgba(22, 124, 128, 0.12);
+    }
+
+    #lock-screen .eyebrow {
+      color: rgba(180, 255, 180, 0.6);
+    }
+
+    .lock-error {
+      display: none;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 100, 80, 0.3);
+      background: rgba(255, 60, 40, 0.12);
+      color: #ff9080;
+      line-height: 1.6;
+    }
+
+    .lock-error.visible {
+      display: block;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 24px 0 72px;
+    }
+
+    .hero,
+    .panel,
+    .project-card,
+    .route-card,
+    .output-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero {
+      overflow: hidden;
+      padding: 28px;
+    }
+
+    .eyebrow,
+    .micro,
+    .pill,
+    .route-step,
+    .project-meta,
+    .output-type {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .eyebrow {
+      margin: 0 0 14px;
+      color: var(--teal);
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      max-width: 10ch;
+      font-size: clamp(3rem, 7vw, 6rem);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+    }
+
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      line-height: 1.02;
+    }
+
+    .lead {
+      max-width: 62ch;
+      margin-top: 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .hero-grid,
+    .two-col,
+    .tri-col,
+    .project-grid,
+    .output-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .hero-grid {
+      grid-template-columns: 1.25fr 0.75fr;
+      align-items: end;
+    }
+
+    .hero-actions,
+    .hero-pills,
+    .card-links,
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-actions { margin-top: 26px; }
+    .hero-pills { margin-top: 24px; }
+
+    .button,
+    .button-ghost {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .button {
+      color: #fff8eb;
+      background: linear-gradient(135deg, var(--red), #d75d3f);
+      box-shadow: 0 16px 34px rgba(175, 60, 45, 0.22);
+    }
+
+    .button-ghost {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.34);
+      color: var(--ink);
+    }
+
+    .button:hover,
+    .button-ghost:hover {
+      transform: translateY(-2px);
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(22, 124, 128, 0.10);
+      border: 1px solid rgba(22, 124, 128, 0.16);
+      color: var(--teal);
+      font-size: 0.78rem;
+    }
+
+    .dashboard-mark {
+      min-height: 100%;
+      border-radius: 22px;
+      padding: 22px;
+      background:
+        linear-gradient(135deg, rgba(194, 134, 47, 0.18), rgba(22, 124, 128, 0.14)),
+        var(--bg-strong);
+      display: grid;
+      align-content: space-between;
+      gap: 18px;
+    }
+
+    .dashboard-mark strong {
+      display: block;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      line-height: 1;
+    }
+
+    .dashboard-mark p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .sections { margin-top: 20px; }
+
+    .two-col { grid-template-columns: 1fr 1fr; }
+    .tri-col { grid-template-columns: repeat(3, 1fr); }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel-copy {
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .route-card {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 22px;
+    }
+
+    .route-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      font-size: 0.9rem;
+      color: var(--red);
+      margin-bottom: 14px;
+    }
+
+    .route-card p {
+      color: var(--muted);
+      line-height: 1.65;
+      margin-top: 10px;
+    }
+
+    .project-grid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      margin-top: 18px;
+    }
+
+    .project-card {
+      display: grid;
+      gap: 14px;
+      text-decoration: none;
+      padding: 22px;
+      min-height: 260px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 100%;
+      height: 5px;
+      background: var(--accent, var(--teal));
+    }
+
+    .project-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(65, 54, 37, 0.22);
+    }
+
+    .project-meta {
+      color: var(--accent, var(--teal));
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .project-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .project-tags span {
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.46);
+      font-size: 0.78rem;
+      color: var(--ink);
+    }
+
+    .card-links a,
+    .output-links a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .output-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      margin-top: 18px;
+    }
+
+    .output-card {
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .output-type {
+      color: var(--gold);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .output-card p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .warning {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(175, 60, 45, 0.18);
+      background: rgba(175, 60, 45, 0.06);
+      color: #6f2a22;
+      line-height: 1.65;
+    }
+
+    .footer {
+      margin-top: 26px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    @media (max-width: 940px) {
+      .hero-grid,
+      .two-col,
+      .tri-col,
+      .lock-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="lock-screen">
+    <section class="lock-shell" aria-labelledby="lock-title">
+      <h1 id="lock-title" class="lock-title">El único movimiento para ganar es no jugar. War Games 1.983</h1>
+      <div id="google-signin-btn" style="display:flex;justify-content:center;margin:14px 0 4px;"></div>
+      <div id="lock-error" class="lock-error">El acceso no es correcto.</div>
+    </section>
+    <div class="tv-frame">
+      <div class="tv-screen-wrap">
+        <video controls preload="metadata">
+          <source src="./assets/lock-video.mp4" type="video/mp4">
+        </video>
+        <div class="tv-glare"></div>
+      </div>
+      <div class="tv-controls">
+        <span class="tv-brand">SHARP</span>
+        <div class="tv-btn active"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-label">CH</div>
+        <div class="tv-btn"></div>
+        <div class="tv-btn"></div>
+        <div class="tv-dial"></div>
+      </div>
+    </div>
+  </div>
+  <div class="texture"></div>
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <img src="./assets/admira-logo.png" alt="Admira" style="width:120px;margin-bottom:12px;">
+          <p class="eyebrow">Portal principal</p>
+          <h1>Vision global</h1>
+          <p class="lead">
+            Esta portada pasa a ser el primer nivel del estudio. Desde aqui se ve el mapa de
+            proyectos, el flujo comun de trabajo y las salidas HTML publicas que permiten
+            comprobar si el sistema se esta ejecutando como toca.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="https://github.com/csilvasantin" target="_blank" rel="noreferrer">Abrir GitHub</a>
+            <a class="button-ghost" href="https://github.com/csilvasantin/onboarding" target="_blank" rel="noreferrer">Abrir onboarding</a>
+            <button class="button-ghost" id="btn-actualizar" onclick="lanzarActualizacion()" style="cursor:pointer;">&#x21bb; Actualizar Tareas</button>
+            <a class="button-ghost" href="https://csilvasantin.github.io/18.-diario/" target="_blank" rel="noreferrer">Diario</a>
+          </div>
+          <div class="hero-pills">
+            <span class="pill" id="pill-ultima" style="background:var(--teal);color:#fff;">&#x23f1; Cargando...</span>
+            <span class="pill">1 2 3 comun en todos los repos</span>
+            <span class="pill">Cierre en HTML + URL publica</span>
+            <span class="pill">GitHub Pages como capa visible</span>
+          </div>
+        </div>
+        <aside class="dashboard-mark">
+          <div>
+            <p class="eyebrow">Estado del sistema</p>
+            <strong>Onboarding primero. Trabajo despues.</strong>
+          </div>
+          <p>
+            El portal no sustituye al contexto maestro. La regla sigue siendo: abrir
+            <strong>onboarding</strong>, hacer onboarding y despues entrar en el repo activo.
+          </p>
+          <div style="padding-top:16px;border-top:1px solid rgba(0,0,0,.08);">
+            <a href="ranking.html" target="_blank" style="display:block;text-decoration:none;font-weight:600;margin-bottom:12px;color:var(--teal);">Ver ranking completo de proyectos &rarr;</a>
+            <p class="eyebrow" style="margin-bottom:8px;">Ultimos Proyectos</p>
+            <div id="ultimos-proyectos-lista">Cargando...</div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="sections two-col">
+      <section class="panel">
+        <p class="eyebrow">1 2 3 basico</p>
+        <h2>La secuencia que manda sobre todo lo demas</h2>
+        <div class="tri-col" style="margin-top:18px;">
+          <article class="route-card">
+            <div class="route-step">1</div>
+            <h3>Abrir y actualizar onboarding</h3>
+            <p>
+              El punto de entrada sigue siendo <strong>onboarding</strong>. Si algo no esta
+              claro, se vuelve ahi antes de improvisar.
+            </p>
+          </article>
+          <article class="route-card">
+            <div class="route-step">2</div>
+            <h3>Hacer onboarding y entrar en el repo correcto</h3>
+            <p>
+              La sesion no arranca desde cero. Primero se absorbe el contexto compartido y
+              despues se toca solo el proyecto implicado.
+            </p>
+          </article>
+          <article class="route-card">
+            <div class="route-step">3</div>
+            <h3>Cerrar con HTML y URL publica</h3>
+            <p>
+              Todo trabajo relevante debe acabar con una salida HTML visible y una URL publica
+              comprobable para verificar el resultado.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <p class="eyebrow">Puertas maestras</p>
+        <h2>Que abre el sistema desde arriba</h2>
+        <p class="panel-copy">
+          El estudio se organiza con dos puertas principales: una para contexto y otra para
+          ejecucion. Este portal queda por encima como mapa general.
+        </p>
+        <div class="project-grid">
+          <a class="project-card" href="https://github.com/csilvasantin/onboarding" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+            <span class="project-meta">Contexto maestro</span>
+            <h3>onboarding</h3>
+            <p>Reglas comunes, estado actual, sesion de arranque y prioridad 1 2 3 para todas las IAs y maquinas.</p>
+            <div class="project-tags">
+              <span>Repo</span>
+              <span>Guia</span>
+              <span>Primero</span>
+            </div>
+          </a>
+          <a class="project-card" href="https://github.com/csilvasantin/EmpezarTrabajo" target="_blank" rel="noreferrer" style="--accent:#af3c2d;">
+            <span class="project-meta">Arranque operativo</span>
+            <h3>EmpezarTrabajo</h3>
+            <p>Script de inicio de sesion, sincronizacion de repos y recordatorio de que todo pasa por onboarding antes de trabajar.</p>
+            <div class="project-tags">
+              <span>Repo</span>
+              <span>Inicio</span>
+              <span>Ops</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <p class="eyebrow">Mapa de proyectos</p>
+      <h2>Repos activos y para que sirve cada uno</h2>
+      <div class="project-grid">
+        <a class="project-card" href="https://github.com/csilvasantin/game-platform" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+          <span class="project-meta">Plataforma</span>
+          <h3>game-platform</h3>
+          <p>Base multi-cliente para el juego generico y la variante Altadis Xtancos sin duplicar arquitectura.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/game-platform" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/diario" target="_blank" rel="noreferrer" style="--accent:#c2862f;">
+          <span class="project-meta">Memoria longitudinal</span>
+          <h3>diario</h3>
+          <p>Registro cronologico del trabajo con IA. Es la referencia principal para comprobar avances publicados en HTML.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/diario" target="_blank" rel="noreferrer">Repositorio</a>
+            <a href="https://csilvasantin.github.io/18.-diario/" target="_blank" rel="noreferrer">HTML publica</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/ClaudeBot" target="_blank" rel="noreferrer" style="--accent:#2f5d96;">
+          <span class="project-meta">Automatizacion</span>
+          <h3>ClaudeBot</h3>
+          <p>Bot para vigilar Claude Desktop y resolver continuaciones repetitivas en Windows y macOS.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/ClaudeBot" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/CodexBot" target="_blank" rel="noreferrer" style="--accent:#af3c2d;">
+          <span class="project-meta">Automatizacion</span>
+          <h3>CodexBot</h3>
+          <p>Bot de apoyo para reducir aprobaciones manuales y dar continuidad operativa al trabajo con Codex.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/CodexBot" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/xtanco-game" target="_blank" rel="noreferrer" style="--accent:#167c80;">
+          <span class="project-meta">Producto visible</span>
+          <h3>xtanco-game</h3>
+          <p>Digital twin jugable en HTML5 Canvas con deploy simple y una URL publica ya lista para revisar.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/xtanco-game" target="_blank" rel="noreferrer">Repositorio</a>
+            <a href="https://csilvasantin.github.io/xtanco-game/" target="_blank" rel="noreferrer">HTML publica</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/AdmiraNext-Team" target="_blank" rel="noreferrer" style="--accent:#2f5d96;">
+          <span class="project-meta">Control operativo</span>
+          <h3>AdmiraNext Control</h3>
+          <p>Panel ligero para ver la flota real de Admira Next, el estado de cada maquina, su foco actual y la ultima actualizacion operativa.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/AdmiraNext-Team" target="_blank" rel="noreferrer">Repositorio</a>
+            <a href="https://csilvasantin.github.io/AdmiraNext-Team/" target="_blank" rel="noreferrer">HTML publica</a>
+          </div>
+        </a>
+
+        <a class="project-card" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer" style="--accent:#c2862f;">
+          <span class="project-meta">Capa publica</span>
+          <h3>csilvasantin.github.io</h3>
+          <p>Portal de primer nivel donde se ve el mapa general, se concentran entradas publicas y se hace visible el estado del estudio.</p>
+          <div class="card-links">
+            <a href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Repositorio</a>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px;">
+      <p class="eyebrow">HTML publicas</p>
+      <h2>Salidas visibles para comprobar que las cosas se estan haciendo bien</h2>
+      <div class="output-grid">
+        <article class="output-card">
+          <span class="output-type">Seguimiento</span>
+          <h3>diario</h3>
+          <p>Publica las novedades del trabajo en formato HTML y sirve como verificacion principal del cierre de una sesion.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/18.-diario/" target="_blank" rel="noreferrer">Abrir diario</a>
+          </div>
+        </article>
+
+        <article class="output-card">
+          <span class="output-type">Producto</span>
+          <h3>xtanco-game</h3>
+          <p>Salida publica interactiva del juego digital twin para comprobar estado y direccion del producto.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/xtanco-game/" target="_blank" rel="noreferrer">Abrir xtanco-game</a>
+          </div>
+        </article>
+
+        <article class="output-card">
+          <span class="output-type">Control</span>
+          <h3>AdmiraNext Control</h3>
+          <p>Vista publica del panel de flota para comprobar equipos, estados, foco de trabajo y salud operativa del equipo Admira Next.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/AdmiraNext-Team/" target="_blank" rel="noreferrer">Abrir AdmiraNext Control</a>
+          </div>
+        </article>
+
+        <article class="output-card">
+          <span class="output-type">Portal</span>
+          <h3>Esta portada</h3>
+          <p>El primer nivel del dominio queda reservado para la vision global del estudio y el acceso rapido a los proyectos.</p>
+          <div class="output-links">
+            <a href="https://csilvasantin.github.io/" target="_blank" rel="noreferrer">Abrir portal principal</a>
+          </div>
+        </article>
+      </div>
+      <div class="warning">
+        Cualquier cierre ligero de acceso en estas paginas debe considerarse una barrera de
+        conveniencia. No debe tratarse como proteccion real para informacion sensible.
+      </div>
+    </section>
+
+    <p class="footer">
+      Portal principal de trabajo de csilvasantin. Primero contexto. Despues ejecucion. Siempre cierre visible.
+    </p>
+  </main>
+  <script src="./assets/home-lock.js?v=16"></script>
+  <script>
+    /* --- Mostrar hora de última actualización --- */
+    (function () {
+      var pill = document.getElementById('pill-ultima');
+      if (!pill) return;
+      fetch('./assets/ultima-actualizacion.json?t=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
+        })
+        .catch(function () {
+          pill.textContent = '\u23f1 Sin datos de actualizacion';
+        });
+    })();
+
+    /* --- Cargar últimos proyectos dinámicamente --- */
+    (function () {
+      var cont = document.getElementById('ultimos-proyectos-lista');
+      if (!cont) return;
+      fetch('./assets/ultimos-proyectos.json?t=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .then(function (lista) {
+          cont.innerHTML = '';
+          lista.forEach(function (repo, i) {
+            var div = document.createElement('div');
+            div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:' + (i < lista.length - 1 ? '6px' : '0');
+            var a = document.createElement('a');
+            a.href = 'https://github.com/csilvasantin/' + repo;
+            a.target = '_blank';
+            a.rel = 'noreferrer';
+            a.style.cssText = 'text-decoration:none;color:inherit;font-weight:500;';
+            a.textContent = repo;
+            var pill = document.createElement('a');
+            pill.href = 'https://csilvasantin.github.io/' + repo + '/';
+            pill.target = '_blank';
+            pill.rel = 'noreferrer';
+            pill.className = 'pill';
+            pill.style.cssText = 'text-decoration:none;font-size:.75rem;';
+            pill.textContent = 'HTML publica';
+            div.appendChild(a);
+            div.appendChild(pill);
+            cont.appendChild(div);
+          });
+        })
+        .catch(function () {
+          cont.textContent = 'No se pudo cargar la lista';
+        });
+    })();
+
+    /* --- Botón Actualizar --- */
+    var ACTUALIZAR_URL = 'http://localhost:7891';
+
+    function lanzarActualizacion() {
+      var btn = document.getElementById('btn-actualizar');
+      var pill = document.getElementById('pill-ultima');
+      btn.textContent = '\u23f3 Guardando cambios\u2026';
+      btn.disabled = true;
+
+      fetch(ACTUALIZAR_URL + '/actualizar')
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          btn.innerHTML = '&#x21bb; Actualizar Tareas';
+          btn.disabled = false;
+          if (d.status === 'ok') {
+            var nombres = d.lista && d.lista.length ? '\n\n' + d.lista.map(function(r){ return '  \u2022 ' + r; }).join('\n') : '';
+            var msg = d.repos > 0
+              ? '\u2705 Actualizado: ' + d.repos + ' repos con cambios subidos a GitHub.' + nombres
+              : '\u2705 Todo al dia. No habia cambios pendientes.';
+            if (pill) {
+              pill.textContent = '\u23f1 Ultima actualizacion: ' + d.fecha + ' ' + d.hora + (d.repos > 0 ? ' (' + d.repos + ' repos)' : '');
+            }
+            alert(msg);
+            // Recargar lista de últimos proyectos
+            setTimeout(function(){ location.reload(); }, 500);
+          } else {
+            alert('\u26a0\ufe0f Error: ' + (d.msg || 'Error desconocido'));
+          }
+        })
+        .catch(function () {
+          btn.innerHTML = '&#x21bb; Actualizar Tareas';
+          btn.disabled = false;
+          alert(
+            '\u26a0\ufe0f El servidor de actualizacion no esta corriendo.\n\n' +
+            'Este boton NO esta guardando nada.\n\n' +
+            'Para activarlo, ejecuta en Terminal:\n' +
+            'python3 ~/GitHub/00.-csilvasantin.github.io/assets/actualizar-server.py'
+          );
+        });
+    }
+  </script>
+</body>
+</html>
