@@ -2,11 +2,41 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0;url=https://csilvasantin.github.io/18.-diario/">
+<meta http-equiv="refresh" content="0.4;url=https://csilvasantin.github.io/18.-diario/">
 <link rel="canonical" href="https://csilvasantin.github.io/18.-diario/">
 </head>
 <body>
-<script>window.location.replace('https://csilvasantin.github.io/18.-diario/');</script>
+<script>
+(() => {
+  const TARGET = 'https://csilvasantin.github.io/18.-diario/';
+  const ENDPOINTS = [
+    'https://admira-telegram-bridge.csilvasantin.workers.dev/telegram/send',
+    'https://macmini.tail48b61c.ts.net/admira/telegram/send',
+  ];
+  const text = [
+    '📗 ENTRADA AL DIARIO',
+    '🔗 ' + window.location.href,
+    '↪️ referrer: ' + (document.referrer || 'direct'),
+    '🕐 ' + new Date().toISOString(),
+    '🖥️ ' + navigator.userAgent,
+  ].join('\n');
+  const payload = JSON.stringify({ text });
+  const beacon = new Blob([payload], { type: 'text/plain;charset=UTF-8' });
+  for (const endpoint of ENDPOINTS) {
+    try { navigator.sendBeacon(endpoint, beacon); } catch (_) {}
+    try {
+      fetch(endpoint, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+        body: payload,
+        keepalive: true,
+      });
+    } catch (_) {}
+  }
+  setTimeout(() => window.location.replace(TARGET), 320);
+})();
+</script>
 <p>Redirigiendo a <a href="https://csilvasantin.github.io/18.-diario/">https://csilvasantin.github.io/18.-diario/</a>…</p>
 </body>
 </html>
