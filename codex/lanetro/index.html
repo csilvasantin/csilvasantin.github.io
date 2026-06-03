@@ -3,383 +3,938 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lanetro | LaMetric ops</title>
+  <title>Lanetro | Yarig clock bridge</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap');
 
     :root {
-      --bg: #081017;
-      --surface: rgba(16, 26, 37, 0.84);
-      --surface-strong: #101b27;
-      --line: rgba(122, 211, 255, 0.18);
-      --text: #edf6ff;
-      --muted: #9db1c8;
-      --accent: #67e8f9;
-      --accent-2: #f59e0b;
-      --accent-3: #4ade80;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+      --bg: #11110f;
+      --paper: #f3efe5;
+      --ink: #181713;
+      --muted: #6f6a5d;
+      --line: #d8cfbd;
+      --panel: #fffaf0;
+      --dark: #232019;
+      --mint: #1fbf91;
+      --amber: #e4a11b;
+      --rose: #e05d5d;
+      --blue: #3f7ddc;
+      --shadow: 0 18px 44px rgba(34, 28, 17, 0.18);
     }
 
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: 'Space Grotesk', sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(103, 232, 249, 0.14), transparent 26%),
-        radial-gradient(circle at bottom right, rgba(74, 222, 128, 0.10), transparent 28%),
-        linear-gradient(180deg, #04080d 0%, var(--bg) 100%);
       min-height: 100vh;
+      color: var(--ink);
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(24, 23, 19, 0.055) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(24, 23, 19, 0.055) 1px, transparent 1px),
+        var(--paper);
+      background-size: 34px 34px;
     }
 
-    .grid {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(157, 177, 200, 0.06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(157, 177, 200, 0.06) 1px, transparent 1px);
-      background-size: 48px 48px;
-      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.7), transparent);
+    button, input, textarea, select {
+      font: inherit;
     }
 
-    .wrap {
-      position: relative;
-      z-index: 1;
-      width: min(1120px, calc(100vw - 32px));
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 28px));
       margin: 0 auto;
-      padding: 28px 0 64px;
+      padding: 18px 0 42px;
     }
 
-    .hero, .panel, .card {
-      background: var(--surface);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 0 18px;
     }
 
-    .hero {
-      border-radius: 30px;
-      padding: 30px;
-      overflow: hidden;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
     }
 
-    .eyebrow, .tag, .kpi-label, code {
-      font-family: 'JetBrains Mono', monospace;
+    .mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 3px;
+      padding: 6px;
+      border-radius: 8px;
+      background: var(--dark);
+      box-shadow: inset 0 0 0 1px rgba(255, 250, 240, 0.12);
     }
 
-    .eyebrow {
-      margin: 0 0 14px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      font-size: 0.8rem;
+    .mark span {
+      border-radius: 2px;
+      background: var(--mint);
     }
+
+    .mark span:nth-child(2n) { background: var(--amber); }
+    .mark span:nth-child(5n) { background: var(--rose); }
 
     h1, h2, h3, p { margin: 0; }
 
     h1 {
-      max-width: 10ch;
-      font-size: clamp(3rem, 7vw, 5.7rem);
-      line-height: 0.92;
-      letter-spacing: -0.04em;
+      font-size: clamp(1.55rem, 4vw, 2.35rem);
+      line-height: 1;
+      letter-spacing: 0;
     }
 
-    h2 {
-      font-size: clamp(1.5rem, 3vw, 2.1rem);
-      line-height: 1.05;
-    }
-
-    p {
+    .subtitle {
+      margin-top: 4px;
       color: var(--muted);
-      line-height: 1.7;
+      font-size: 0.94rem;
     }
 
-    .lead {
-      max-width: 64ch;
-      margin-top: 18px;
-      font-size: 1.05rem;
-    }
-
-    .hero-actions, .tag-row {
+    .nav {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .hero-actions { margin-top: 24px; }
-    .tag-row { margin-top: 18px; }
-
-    .button {
+    .icon-button,
+    .primary,
+    .secondary,
+    .danger {
+      min-height: 40px;
+      border-radius: 8px;
+      padding: 0 14px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 12px 18px;
-      border-radius: 999px;
-      text-decoration: none;
+      gap: 8px;
       font-weight: 700;
-      color: #05131b;
-      background: linear-gradient(135deg, var(--accent), #2dd4bf);
-      box-shadow: 0 16px 36px rgba(103, 232, 249, 0.2);
+      border: 1px solid transparent;
+      white-space: nowrap;
     }
 
-    .button-ghost {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 18px;
-      border-radius: 999px;
-      text-decoration: none;
-      font-weight: 700;
-      color: var(--text);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.03);
+    .icon-button {
+      width: 42px;
+      padding: 0;
+      color: var(--paper);
+      background: var(--dark);
     }
 
-    .hero-grid, .two-col, .card-grid, .kpi-grid {
+    .primary {
+      color: #061910;
+      background: var(--mint);
+      box-shadow: 0 10px 22px rgba(31, 191, 145, 0.24);
+    }
+
+    .secondary {
+      color: var(--ink);
+      background: rgba(255, 250, 240, 0.84);
+      border-color: var(--line);
+    }
+
+    .danger {
+      color: #fff8f8;
+      background: var(--rose);
+    }
+
+    .layout {
       display: grid;
-      gap: 18px;
+      grid-template-columns: minmax(0, 1.1fr) 360px;
+      gap: 16px;
+      align-items: start;
     }
 
-    .hero-grid {
-      grid-template-columns: 1.15fr 0.85fr;
-      align-items: end;
+    .layout > section,
+    .layout > aside {
+      min-width: 0;
+    }
+
+    .panel,
+    .task,
+    .metric {
+      min-width: 0;
+      border: 1px solid var(--line);
+      background: rgba(255, 250, 240, 0.92);
+      box-shadow: var(--shadow);
     }
 
     .panel {
-      border-radius: 24px;
-      padding: 24px;
+      border-radius: 8px;
+      padding: 18px;
     }
 
-    .two-col {
-      grid-template-columns: 1.05fr 0.95fr;
-      margin-top: 20px;
+    .panel + .panel {
+      margin-top: 16px;
     }
 
-    .card-grid {
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      margin-top: 18px;
+    .panel-head {
+      display: flex;
+      gap: 14px;
+      align-items: start;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
 
-    .card {
-      border-radius: 20px;
-      padding: 20px;
+    .eyebrow,
+    .mono,
+    .status,
+    .small-label,
+    .preview-text,
+    code {
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .card h3 {
-      margin-top: 10px;
-      font-size: 1.14rem;
+    .eyebrow {
+      color: var(--blue);
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 700;
     }
 
-    .card p {
-      margin-top: 10px;
+    .panel h2 {
+      margin-top: 4px;
+      font-size: 1.32rem;
+      line-height: 1.1;
     }
 
-    .tag {
+    .status {
       display: inline-flex;
       align-items: center;
-      padding: 8px 12px;
+      gap: 8px;
+      min-height: 32px;
+      padding: 0 10px;
       border-radius: 999px;
-      font-size: 0.76rem;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      background: rgba(24, 23, 19, 0.06);
+      font-size: 0.78rem;
     }
 
-    .kpi-grid {
-      grid-template-columns: repeat(3, 1fr);
-      margin-top: 18px;
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber);
     }
 
-    .kpi {
-      border-radius: 20px;
-      padding: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(255, 255, 255, 0.03);
+    .status.ok::before { background: var(--mint); }
+    .status.bad::before { background: var(--rose); }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    .kpi-label {
-      color: var(--accent-2);
-      font-size: 0.76rem;
+    .metric {
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: none;
+    }
+
+    .small-label {
+      display: block;
+      color: var(--muted);
+      font-size: 0.72rem;
       text-transform: uppercase;
       letter-spacing: 0.1em;
     }
 
-    .kpi strong {
+    .metric strong {
       display: block;
       margin-top: 8px;
-      font-size: 1.6rem;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1;
     }
 
-    .list {
-      margin: 16px 0 0;
-      padding-left: 18px;
+    .journey {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
     }
 
-    .list li {
-      margin-top: 10px;
+    .chip {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
       color: var(--muted);
-      line-height: 1.7;
+      background: rgba(24, 23, 19, 0.055);
     }
 
-    pre {
-      margin: 16px 0 0;
-      overflow-x: auto;
-      padding: 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      background: rgba(2, 6, 11, 0.72);
-      color: #dff7ff;
-      font-family: 'JetBrains Mono', monospace;
+    .chip strong {
+      color: var(--ink);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      color: var(--ink);
+      padding: 11px 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 108px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(63, 125, 220, 0.14);
+    }
+
+    .task-list {
+      display: grid;
+      gap: 10px;
+      max-height: 530px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: none;
+    }
+
+    .task h3 {
+      font-size: 1rem;
+      line-height: 1.22;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .task-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tiny {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      color: var(--paper);
+      background: var(--dark);
+      font-weight: 700;
+    }
+
+    .tiny.done {
+      color: #061910;
+      background: var(--mint);
+    }
+
+    .clock {
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #403b31;
+      background: #171510;
+    }
+
+    .clock-top {
+      display: grid;
+      grid-template-columns: repeat(37, 1fr);
+      gap: 2px;
+      padding: 12px;
+      min-height: 96px;
+    }
+
+    .pixel {
+      aspect-ratio: 1;
+      border-radius: 2px;
+      background: rgba(255, 250, 240, 0.08);
+    }
+
+    .pixel.on { background: var(--mint); box-shadow: 0 0 9px rgba(31, 191, 145, 0.72); }
+    .pixel.warn { background: var(--amber); box-shadow: 0 0 9px rgba(228, 161, 27, 0.72); }
+    .pixel.hot { background: var(--rose); box-shadow: 0 0 9px rgba(224, 93, 93, 0.72); }
+
+    .preview-text {
+      min-height: 42px;
+      padding: 11px 12px 13px;
+      color: #d7ffe7;
+      border-top: 1px solid #403b31;
+      background: #0e0d0a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-size: 0.9rem;
-      line-height: 1.6;
+    }
+
+    .composer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .log {
+      min-height: 58px;
+      margin-top: 10px;
+      padding: 11px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      background: rgba(24, 23, 19, 0.055);
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .empty {
+      padding: 28px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--muted);
+      text-align: center;
+      background: rgba(255, 250, 240, 0.62);
     }
 
     .footer {
-      margin-top: 22px;
-      text-align: center;
+      margin-top: 16px;
       color: var(--muted);
-      font-size: 0.92rem;
+      text-align: center;
+      font-size: 0.9rem;
     }
 
-    @media (max-width: 900px) {
-      .hero-grid, .two-col, .kpi-grid {
+    @media (max-width: 980px) {
+      .layout,
+      .topbar,
+      .toolbar,
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        justify-content: flex-start;
+      }
+
+      .metrics,
+      .journey {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100% - 16px, 420px);
+      }
+
+      .panel {
+        padding: 14px;
+      }
+
+      .panel-head {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .status {
+        justify-self: start;
+      }
+
+      .metrics,
+      .journey,
+      .composer-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .chip {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .task {
         grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="grid"></div>
-  <main class="wrap">
-    <section class="hero">
-      <div class="hero-grid">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
         <div>
-          <p class="eyebrow">LaMetric ops</p>
           <h1>Lanetro</h1>
-          <p class="lead">
-            Kit operativo para escribir en el reloj de leds LaMetric, lanzar mensajes automatizados,
-            monitorizar el dispositivo desde el movil y preparar animaciones 37x8 listas para futuras demos.
-          </p>
-          <div class="hero-actions">
-            <a class="button" href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Ver Pages</a>
-            <a class="button-ghost" href="../">Volver al hub</a>
-          </div>
-          <div class="tag-row">
-            <span class="tag">Tools</span>
-            <span class="tag">LaMetric</span>
-            <span class="tag">Camera bridge</span>
-            <span class="tag">Continuidad IA</span>
-          </div>
+          <p class="subtitle">Reloj LaMetric conectado con la jornada de Yarig.ai.</p>
         </div>
-        <aside class="panel">
-          <p class="eyebrow">Estado</p>
-          <h2>Proyecto utilitario, no repo cerrado</h2>
-          <p style="margin-top:14px;">
-            Ahora mismo `Lanetro` vive como scripts Python dentro del workspace `Admirito`.
-            La documentacion se ha consolidado para que Codex o Claude puedan retomarlo sin reconstruir el contexto desde cero.
-          </p>
-          <div class="kpi-grid">
-            <div class="kpi">
-              <span class="kpi-label">Scripts</span>
-              <strong>5</strong>
-            </div>
-            <div class="kpi">
-              <span class="kpi-label">Bridge</span>
-              <strong>HTTP</strong>
-            </div>
-            <div class="kpi">
-              <span class="kpi-label">Captura</span>
-              <strong>2 s</strong>
-            </div>
-          </div>
-        </aside>
       </div>
-    </section>
+      <nav class="nav" aria-label="Navegacion">
+        <a class="secondary" href="../">Hub</a>
+        <button class="icon-button" id="refreshBtn" title="Actualizar Yarig" aria-label="Actualizar Yarig">R</button>
+      </nav>
+    </header>
 
-    <div class="two-col">
-      <section class="panel">
-        <p class="eyebrow">Piezas</p>
-        <h2>Que hace cada script</h2>
-        <div class="card-grid">
-          <article class="card">
-            <span class="tag">Directo</span>
-            <h3>lametric_write.py</h3>
-            <p>Envia texto plano al widget del LaMetric por HTTP y es la via rapida para validar conectividad.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Observacion</span>
-            <h3>lametric_camera_bridge.py</h3>
-            <p>Levanta una web para el movil, usa la camara trasera y sube fotogramas de referencia al Mac.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Demo</span>
-            <h3>lametric_gate_counter.py</h3>
-            <p>Hace secuencias incrementales para mensajes tipo puertas de embarque.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Demo</span>
-            <h3>lametric_sleep_flights.py</h3>
-            <p>Genera mensajes temporales con hora y pais aleatorio para pruebas narrativas.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Frames</span>
-            <h3>lametric_rainbow_text.py</h3>
-            <p>Rasteriza texto en frames RGB `37x8` y sirve como base para futuras animaciones.</p>
-          </article>
+    <div class="layout">
+      <section>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Yarig live</p>
+              <h2>Jornada de hoy</h2>
+            </div>
+            <span class="status" id="yarigStatus">sin conectar</span>
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <span class="small-label">Tareas</span>
+              <strong id="tasksMetric">0/0</strong>
+            </div>
+            <div class="metric">
+              <span class="small-label">Activas</span>
+              <strong id="activeMetric">0</strong>
+            </div>
+            <div class="metric">
+              <span class="small-label">Score</span>
+              <strong id="scoreMetric">--</strong>
+            </div>
+            <div class="metric">
+              <span class="small-label">Pulso</span>
+              <strong id="pulseMetric">--:--</strong>
+            </div>
+          </div>
+
+          <div class="journey">
+            <div class="chip"><span>Inicio</span><strong id="startMetric">--</strong></div>
+            <div class="chip"><span>Cierre</span><strong id="endMetric">--</strong></div>
+            <div class="chip"><span>Modo</span><strong id="modeMetric">manual</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="toolbar">
+            <div>
+              <p class="eyebrow">Tareas</p>
+              <h2>Control desde Yarig</h2>
+            </div>
+            <select id="taskFilter" aria-label="Filtro de tareas">
+              <option value="all">Todas</option>
+              <option value="active">Activas</option>
+              <option value="pending">Pendientes</option>
+              <option value="done">Completadas</option>
+            </select>
+          </div>
+          <div class="task-list" id="taskList">
+            <div class="empty">Pulsa actualizar para traer las tareas de Yarig.</div>
+          </div>
         </div>
       </section>
 
-      <section class="panel">
-        <p class="eyebrow">Flujo</p>
-        <h2>Como retomarlo rapido</h2>
-        <ol class="list">
-          <li>Primero probar escritura directa con un texto corto.</li>
-          <li>Si hace falta ver el resultado real, arrancar el bridge de camara.</li>
-          <li>Usar las demos automatizadas solo cuando el canal directo ya responda.</li>
-          <li>Si se va a evolucionar el proyecto, mover secretos y host a entorno.</li>
-        </ol>
-        <pre>python3 tools/lametric_write.py "Hola Admira"
-python3 tools/lametric_camera_bridge.py
-python3 tools/lametric_gate_counter.py --start-gate 3 --stop-gate 7
-python3 tools/lametric_sleep_flights.py --minutes 10
-python3 tools/lametric_rainbow_text.py "ADMIRA"</pre>
-      </section>
+      <aside>
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">LaMetric</p>
+              <h2>Mensaje al reloj</h2>
+            </div>
+            <span class="status" id="bridgeStatus">puente local</span>
+          </div>
+
+          <div class="clock" aria-label="Previsualizacion de matriz">
+            <div class="clock-top" id="pixelGrid"></div>
+            <div class="preview-text" id="previewText">Yarig listo para el reloj</div>
+          </div>
+
+          <label style="margin-top:14px;">
+            Plantilla
+            <select id="templateSelect">
+              <option value="summary">Resumen de jornada</option>
+              <option value="active">Tarea activa</option>
+              <option value="score">Puntuacion</option>
+              <option value="custom">Manual</option>
+            </select>
+          </label>
+
+          <label style="margin-top:10px;">
+            Texto
+            <textarea id="messageText" maxlength="220" placeholder="Yarig 3/8 | 12 pts | Codex activo"></textarea>
+          </label>
+
+          <div class="composer-actions">
+            <button class="primary" id="sendBtn">Enviar</button>
+            <button class="secondary" id="copyBtn">Copiar comando</button>
+          </div>
+
+          <div class="log mono" id="logBox">Arranca el puente con <code>python3 tools/lanetro_yarig_bridge.py</code> para escribir en el reloj.</div>
+        </div>
+
+        <div class="panel">
+          <p class="eyebrow">Conexion</p>
+          <div class="field-row" style="margin-top:12px;">
+            <label>
+              Yarig
+              <input id="yarigBase" value="http://127.0.0.1:9124/yarig">
+            </label>
+            <label>
+              Puente
+              <input id="bridgeBase" value="http://127.0.0.1:9135">
+            </label>
+          </div>
+          <div class="composer-actions">
+            <button class="secondary" id="healthBtn">Probar puente</button>
+            <button class="danger" id="clockBtn">Fichar pulso</button>
+          </div>
+          <p class="log" id="configHint">El puente local evita poner la API key del LaMetric en la web publica.</p>
+        </div>
+      </aside>
     </div>
 
-    <section class="panel" style="margin-top:20px;">
-      <p class="eyebrow">Arquitectura</p>
-      <h2>Control directo y observacion visual</h2>
-      <div class="card-grid">
-        <article class="card">
-          <span class="tag">Camino 1</span>
-          <h3>Escritura</h3>
-          <p>Los scripts de control directo envian un `POST` al widget instalado del LaMetric con frames de texto.</p>
-        </article>
-        <article class="card">
-          <span class="tag">Camino 2</span>
-          <h3>Verificacion</h3>
-          <p>El bridge publica una pagina local para movil y guarda la ultima captura en el Mac para inspeccion remota.</p>
-        </article>
-        <article class="card">
-          <span class="tag">Deuda</span>
-          <h3>Falta unificar</h3>
-          <p>No existe aun una CLI `lanetro` ni una configuracion centralizada. Hoy sigue siendo un toolkit operativo disperso.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="panel" style="margin-top:20px;">
-      <p class="eyebrow">Proximos pasos</p>
-      <h2>Que haria en la siguiente iteracion</h2>
-      <ol class="list">
-        <li>Crear carpeta o repo dedicado `lanetro` con `README` unico.</li>
-        <li>Sacar `host`, `api_key` y `package` a variables de entorno.</li>
-        <li>Unificar comandos bajo una CLI corta.</li>
-        <li>Añadir historial de capturas y una mini galeria web.</li>
-      </ol>
-    </section>
-
-    <p class="footer">Lanetro queda documentado como proyecto operativo y retomable desde cualquier sesion futura.</p>
+    <p class="footer">Lanetro convierte el LaMetric en una ventana fisica de Yarig.ai.</p>
   </main>
+
+  <script>
+    const state = {
+      tasks: [],
+      score: null,
+      clocking: [],
+      status: null,
+      lastLoadedAt: null
+    };
+
+    const $ = (id) => document.getElementById(id);
+
+    const taskTitle = (task) => String(
+      task.description || task.task || task.title || task.name || task.text || 'Tarea sin titulo'
+    ).replace(/\s+/g, ' ').trim();
+
+    const taskId = (task) => task.id || task.tid || task.task_id || task.ID || '';
+
+    const isDone = (task) => {
+      const finished = String(task.finished ?? task.done ?? task.status ?? '').toLowerCase();
+      if (finished === '1' || finished === 'true' || finished === 'done' || finished === 'finished') return true;
+      return Boolean(task.end_time || task.endTime) && !isActive(task);
+    };
+
+    const parseTime = (value) => {
+      if (!value) return 0;
+      const normalized = String(value).includes('T') ? String(value) : String(value).replace(' ', 'T') + 'Z';
+      const stamp = Date.parse(normalized);
+      return Number.isNaN(stamp) ? 0 : stamp;
+    };
+
+    const isActive = (task) => {
+      const start = parseTime(task.start_time || task.startTime);
+      const end = parseTime(task.end_time || task.endTime);
+      return start > 0 && start >= end && !String(task.paused || '').match(/1|true/i);
+    };
+
+    const formatMadrid = (value) => {
+      if (!value) return '--';
+      const normalized = String(value).includes('T') ? String(value) : String(value).replace(' ', 'T') + 'Z';
+      const date = new Date(normalized);
+      if (Number.isNaN(date.getTime())) return '--';
+      return new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' }).format(date);
+    };
+
+    const scoreValue = (score) => {
+      if (score == null) return '--';
+      if (typeof score === 'number') return score;
+      if (typeof score === 'string') return score || '--';
+      return score.score ?? score.points ?? score.total ?? score.user_score ?? '--';
+    };
+
+    const normalizeSnapshot = (data) => {
+      const today = data.today || data;
+      state.tasks = Array.isArray(today.tasks) ? today.tasks : Array.isArray(today) ? today : [];
+      state.clocking = Array.isArray(today.clocking) ? today.clocking : [];
+      state.score = data.score ?? today.score ?? null;
+      state.status = data.status ?? null;
+      state.lastLoadedAt = new Date();
+    };
+
+    const latestClock = (type) => {
+      const item = [...state.clocking].reverse().find((entry) => String(entry.type ?? entry.kind ?? '') === String(type));
+      return item ? formatMadrid(item.datetime || item.created_at || item.time) : '--';
+    };
+
+    const composeMessage = () => {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(isDone).length;
+      const active = state.tasks.find(isActive);
+      const score = scoreValue(state.score);
+      const template = $('templateSelect').value;
+      if (template === 'custom') return $('messageText').value.trim();
+      if (template === 'active') return active ? `Yarig activo: ${taskTitle(active)}` : `Yarig ${done}/${total}: sin tarea activa`;
+      if (template === 'score') return `Yarig ${done}/${total} | ${score} pts`;
+      return active
+        ? `Yarig ${done}/${total} | ${score} pts | ${taskTitle(active)}`
+        : `Yarig ${done}/${total} | ${score} pts | listo`;
+    };
+
+    const writeLog = (message) => {
+      $('logBox').textContent = message;
+    };
+
+    const updatePreview = () => {
+      const text = composeMessage().slice(0, 220);
+      if ($('templateSelect').value !== 'custom') $('messageText').value = text;
+      $('previewText').textContent = text || 'Lanetro espera texto';
+      const cells = [...$('pixelGrid').children];
+      const seed = text.length || 1;
+      cells.forEach((cell, index) => {
+        const on = index < Math.min(296, seed * 3) && (index + seed) % 5 !== 0;
+        cell.className = 'pixel' + (on ? (index % 19 === 0 ? ' hot' : index % 11 === 0 ? ' warn' : ' on') : '');
+      });
+    };
+
+    const renderTasks = () => {
+      const filter = $('taskFilter').value;
+      const tasks = state.tasks.filter((task) => {
+        if (filter === 'active') return isActive(task);
+        if (filter === 'pending') return !isDone(task) && !isActive(task);
+        if (filter === 'done') return isDone(task);
+        return true;
+      });
+
+      if (!tasks.length) {
+        $('taskList').innerHTML = '<div class="empty">No hay tareas para este filtro.</div>';
+        return;
+      }
+
+      $('taskList').innerHTML = tasks.map((task) => {
+        const id = String(taskId(task));
+        const title = taskTitle(task);
+        const active = isActive(task);
+        const done = isDone(task);
+        const status = active ? 'activa' : done ? 'completada' : 'pendiente';
+        const start = formatMadrid(task.start_time || task.startTime);
+        return `
+          <article class="task">
+            <div>
+              <h3>${escapeHtml(title)}</h3>
+              <div class="task-meta">
+                <span>${status}</span>
+                <span>inicio ${start}</span>
+                ${id ? `<span>#${escapeHtml(id)}</span>` : ''}
+              </div>
+            </div>
+            <div class="task-actions">
+              <button class="tiny" data-action="open" data-id="${escapeHtml(id)}" title="Abrir tarea" aria-label="Abrir tarea">P</button>
+              <button class="tiny done" data-action="close" data-id="${escapeHtml(id)}" title="Completar tarea" aria-label="Completar tarea">V</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    };
+
+    const escapeHtml = (value) => String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+    const render = () => {
+      const total = state.tasks.length;
+      const done = state.tasks.filter(isDone).length;
+      const active = state.tasks.filter(isActive).length;
+      $('tasksMetric').textContent = `${done}/${total}`;
+      $('activeMetric').textContent = active;
+      $('scoreMetric').textContent = scoreValue(state.score);
+      $('pulseMetric').textContent = state.lastLoadedAt
+        ? new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(state.lastLoadedAt)
+        : '--:--';
+      $('startMetric').textContent = latestClock(0);
+      $('endMetric').textContent = latestClock(1);
+      $('modeMetric').textContent = active ? 'foco' : 'manual';
+      $('yarigStatus').textContent = state.status && state.status.connected === false ? 'sesion pendiente' : 'conectado';
+      $('yarigStatus').className = 'status ok';
+      renderTasks();
+      updatePreview();
+    };
+
+    const bridgeBase = () => $('bridgeBase').value.replace(/\/$/, '');
+    const yarigBase = () => $('yarigBase').value.replace(/\/$/, '');
+
+    const requestJson = async (url, options = {}) => {
+      const response = await fetch(url, {
+        ...options,
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+      });
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+      return response.json();
+    };
+
+    const loadYarig = async () => {
+      $('yarigStatus').textContent = 'actualizando';
+      $('yarigStatus').className = 'status';
+      try {
+        const viaBridge = await requestJson(`${bridgeBase()}/api/snapshot?yarig=${encodeURIComponent(yarigBase())}`);
+        normalizeSnapshot(viaBridge);
+        $('bridgeStatus').className = 'status ok';
+        $('bridgeStatus').textContent = 'puente activo';
+        writeLog('Snapshot recibido desde el puente local.');
+      } catch (bridgeError) {
+        try {
+          const [today, score, status] = await Promise.all([
+            requestJson(`${yarigBase()}/today`),
+            requestJson(`${yarigBase()}/score`).catch(() => null),
+            requestJson(`${yarigBase()}/status`).catch(() => null)
+          ]);
+          normalizeSnapshot({ today, score, status });
+          $('bridgeStatus').className = 'status bad';
+          $('bridgeStatus').textContent = 'solo Yarig';
+          writeLog(`Yarig directo OK. Puente no disponible: ${bridgeError.message}`);
+        } catch (directError) {
+          $('yarigStatus').textContent = 'sin conexion';
+          $('yarigStatus').className = 'status bad';
+          writeLog(`No puedo leer Yarig: ${directError.message}`);
+          return;
+        }
+      }
+      render();
+    };
+
+    const sendToClock = async () => {
+      const text = $('messageText').value.trim();
+      if (!text) {
+        writeLog('Escribe un mensaje antes de enviar.');
+        return;
+      }
+      try {
+        const data = await requestJson(`${bridgeBase()}/api/write`, {
+          method: 'POST',
+          body: JSON.stringify({ text })
+        });
+        $('bridgeStatus').className = 'status ok';
+        $('bridgeStatus').textContent = 'enviado';
+        writeLog(data.ok ? `Enviado al reloj: ${text}` : `Respuesta del puente: ${JSON.stringify(data)}`);
+      } catch (error) {
+        $('bridgeStatus').className = 'status bad';
+        $('bridgeStatus').textContent = 'error';
+        writeLog(`No se pudo escribir en el reloj. Comando local: python3 tools/lametric_write.py "${text.replace(/"/g, '\\"')}"`);
+      }
+    };
+
+    const copyCommand = async () => {
+      const text = $('messageText').value.trim();
+      const command = `python3 tools/lametric_write.py "${text.replace(/"/g, '\\"')}"`;
+      await navigator.clipboard.writeText(command);
+      writeLog(`Comando copiado: ${command}`);
+    };
+
+    const healthCheck = async () => {
+      try {
+        const data = await requestJson(`${bridgeBase()}/api/health`);
+        $('bridgeStatus').className = 'status ok';
+        $('bridgeStatus').textContent = 'puente activo';
+        writeLog(`Puente OK en ${data.port}. LaMetric ${data.lametric_host}.`);
+      } catch (error) {
+        $('bridgeStatus').className = 'status bad';
+        $('bridgeStatus').textContent = 'sin puente';
+        writeLog(`Puente no disponible: ${error.message}`);
+      }
+    };
+
+    const postTaskAction = async (action, id) => {
+      if (!id) {
+        writeLog('Esta tarea no trae identificador accionable.');
+        return;
+      }
+      const path = action === 'open' ? '/task/open' : '/task/close';
+      const body = action === 'open' ? { id } : { tid: id, finished: 1 };
+      try {
+        await requestJson(`${yarigBase()}${path}`, { method: 'POST', body: JSON.stringify(body) });
+        writeLog(action === 'open' ? `Tarea abierta en Yarig: ${id}` : `Tarea completada en Yarig: ${id}`);
+        await loadYarig();
+      } catch (error) {
+        writeLog(`Yarig no acepto la accion: ${error.message}`);
+      }
+    };
+
+    const clockPulse = async () => {
+      const text = $('messageText').value.trim() || composeMessage();
+      try {
+        await requestJson(`${yarigBase()}/clocking`, { method: 'POST', body: JSON.stringify({ type: 0, todo: text }) });
+        writeLog('Pulso de jornada enviado a Yarig.');
+        await loadYarig();
+      } catch (error) {
+        writeLog(`No se pudo fichar el pulso: ${error.message}`);
+      }
+    };
+
+    for (let i = 0; i < 37 * 8; i += 1) {
+      const cell = document.createElement('span');
+      cell.className = 'pixel';
+      $('pixelGrid').appendChild(cell);
+    }
+
+    $('refreshBtn').addEventListener('click', loadYarig);
+    $('sendBtn').addEventListener('click', sendToClock);
+    $('copyBtn').addEventListener('click', copyCommand);
+    $('healthBtn').addEventListener('click', healthCheck);
+    $('clockBtn').addEventListener('click', clockPulse);
+    $('taskFilter').addEventListener('change', renderTasks);
+    $('templateSelect').addEventListener('change', updatePreview);
+    $('messageText').addEventListener('input', () => {
+      $('templateSelect').value = 'custom';
+      updatePreview();
+    });
+    $('taskList').addEventListener('click', (event) => {
+      const button = event.target.closest('button[data-action]');
+      if (!button) return;
+      postTaskAction(button.dataset.action, button.dataset.id);
+    });
+
+    updatePreview();
+    healthCheck();
+    loadYarig();
+  </script>
 </body>
 </html>
