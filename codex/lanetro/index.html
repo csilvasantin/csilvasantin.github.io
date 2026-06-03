@@ -811,6 +811,18 @@
       return response.json();
     };
 
+    const postYarig = async (path, payload) => {
+      try {
+        return await requestJson(`${bridgeBase()}/api/yarig`, {
+          method: 'POST',
+          body: JSON.stringify({ yarig: yarigBase(), path, payload })
+        });
+      } catch (bridgeError) {
+        writeLog(`Puente Yarig no disponible: ${bridgeError.message}. Intento directo.`);
+        return requestJson(`${yarigBase()}${path}`, { method: 'POST', body: JSON.stringify(payload) });
+      }
+    };
+
     const loadYarig = async () => {
       $('yarigStatus').textContent = 'actualizando';
       $('yarigStatus').className = 'status';
@@ -890,7 +902,7 @@
       const path = action === 'open' ? '/task/open' : '/task/close';
       const body = action === 'open' ? { id } : { tid: id, finished: 1 };
       try {
-        await requestJson(`${yarigBase()}${path}`, { method: 'POST', body: JSON.stringify(body) });
+        await postYarig(path, body);
         writeLog(action === 'open' ? `Tarea abierta en Yarig: ${id}` : `Tarea completada en Yarig: ${id}`);
         await loadYarig();
       } catch (error) {
@@ -901,7 +913,7 @@
     const clockPulse = async () => {
       const text = $('messageText').value.trim() || composeMessage();
       try {
-        await requestJson(`${yarigBase()}/clocking`, { method: 'POST', body: JSON.stringify({ type: 0, todo: text }) });
+        await postYarig('/clocking', { type: 0, todo: text });
         writeLog('Pulso de jornada enviado a Yarig.');
         await loadYarig();
       } catch (error) {
