@@ -17,7 +17,7 @@ from typing import Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from lametric_write import LaMetricConfigError, send_notification  # noqa: E402
+from lametric_write import LaMetricConfigError, send_text  # noqa: E402
 
 
 DEFAULT_HOST = "127.0.0.1"
@@ -124,13 +124,22 @@ class LanetroHandler(BaseHTTPRequestHandler):
 
     def handle_health(self) -> None:
         host = os.getenv("LAMETRIC_HOST", "")
+        push_url = os.getenv("LAMETRIC_PUSH_URL", "")
+        push_token = os.getenv("LAMETRIC_PUSH_TOKEN") or os.getenv("LAMETRIC_ACCESS_TOKEN")
+        mode = os.getenv("LAMETRIC_MODE", "auto")
+        push_ready = bool(push_url and push_token)
+        notification_ready = bool(host and os.getenv("LAMETRIC_API_KEY"))
         self.send_json(
             HTTPStatus.OK,
             {
                 "ok": True,
                 "port": self.server.server_port,  # type: ignore[attr-defined]
+                "lametric_mode": mode,
                 "lametric_host": host or None,
-                "lametric_ready": bool(host and os.getenv("LAMETRIC_API_KEY")),
+                "lametric_push_url": push_url or None,
+                "lametric_push_ready": push_ready,
+                "lametric_notification_ready": notification_ready,
+                "lametric_ready": push_ready or notification_ready,
                 "yarig_default": os.getenv("YARIG_BASE", DEFAULT_YARIG_BASE),
             },
         )
@@ -155,7 +164,7 @@ class LanetroHandler(BaseHTTPRequestHandler):
         if not text:
             self.send_json(HTTPStatus.BAD_REQUEST, {"ok": False, "error": "Missing text."})
             return
-        result = send_notification(
+        result = send_text(
             text[:220],
             icon=str(data.get("icon") or os.getenv("LAMETRIC_ICON", "a2867")),
             priority=str(data.get("priority") or os.getenv("LAMETRIC_PRIORITY", "info")),
@@ -192,7 +201,7 @@ def main(argv: list[str]) -> int:
     server = LanetroServer((args.host, args.port), LanetroHandler)
     server.quiet = args.quiet
     print(f"Lanetro bridge listening on http://{args.host}:{args.port}")
-    print("Set LAMETRIC_HOST and LAMETRIC_API_KEY before using /api/write.")
+    print("Set LAMETRIC_PUSH_URL + LAMETRIC_PUSH_TOKEN, or LAMETRIC_HOST + LAMETRIC_API_KEY, before using /api/write.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

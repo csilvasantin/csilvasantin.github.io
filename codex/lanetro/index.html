@@ -885,8 +885,13 @@
       try {
         const data = await requestJson(`${bridgeBase()}/api/health`);
         $('bridgeStatus').className = 'status ok';
-        $('bridgeStatus').textContent = 'puente activo';
-        writeLog(`Puente OK en ${data.port}. LaMetric ${data.lametric_host}.`);
+        $('bridgeStatus').textContent = data.lametric_ready ? 'puente listo' : 'puente sin reloj';
+        const clockTarget = data.lametric_push_ready
+          ? 'app push'
+          : data.lametric_notification_ready
+            ? data.lametric_host
+            : 'sin credenciales';
+        writeLog(`Puente OK en ${data.port}. Modo ${data.lametric_mode}; LaMetric ${clockTarget}.`);
       } catch (error) {
         $('bridgeStatus').className = 'status bad';
         $('bridgeStatus').textContent = 'sin puente';
