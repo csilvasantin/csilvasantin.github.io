@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdmiraNext | Documentacion publica</title>
+  <style>
+    :root {
+      --bg: #f7f3ec;
+      --ink: #202124;
+      --muted: #5f625f;
+      --line: rgba(32, 33, 36, 0.14);
+      --surface: #fffdf8;
+      --teal: #167c80;
+      --red: #af3c2d;
+      --gold: #c2862f;
+      --blue: #2f5d96;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        linear-gradient(90deg, rgba(22, 124, 128, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(47, 93, 150, 0.06) 1px, transparent 1px),
+        var(--bg);
+      background-size: 40px 40px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.92);
+    }
+
+    .wrap {
+      width: min(1080px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 0;
+    }
+
+    .brand {
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .button {
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: var(--surface);
+      text-decoration: none;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+
+    main {
+      padding: 46px 0 72px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 28px;
+      align-items: end;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--teal);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(2.3rem, 6vw, 5rem);
+      line-height: 0.98;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(1.45rem, 3vw, 2.3rem);
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 1.12rem;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .status {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--teal);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 28px;
+    }
+
+    .section {
+      margin-top: 34px;
+      padding-top: 34px;
+      border-top: 1px solid var(--line);
+    }
+
+    .card {
+      background: rgba(255, 253, 248, 0.94);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .card.telegram { border-top: 5px solid var(--blue); }
+    .card.claude { border-top: 5px solid var(--gold); }
+
+    ol,
+    ul {
+      margin: 12px 0 0;
+      padding-left: 22px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    code {
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      color: #111827;
+      background: #efe8da;
+      border: 1px solid rgba(32, 33, 36, 0.10);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      margin: 12px 0 0;
+      padding: 14px;
+      border-radius: 8px;
+      background: #111827;
+      color: #f9fafb;
+      line-height: 1.6;
+    }
+
+    pre code {
+      display: block;
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      border: 0;
+    }
+
+    .note {
+      margin-top: 18px;
+      border-left: 5px solid var(--red);
+      background: #fff8f5;
+      padding: 14px 16px;
+      border-radius: 8px;
+    }
+
+    .links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    footer {
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      padding: 22px 0 34px;
+    }
+
+    @media (max-width: 760px) {
+      .topbar,
+      .hero {
+        display: block;
+      }
+
+      .nav {
+        justify-content: flex-start;
+        margin-top: 14px;
+      }
+
+      .status {
+        margin-top: 22px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <a class="brand" href="../">AdmiraNext</a>
+      <nav class="nav" aria-label="Navegacion principal">
+        <a href="../">Portal</a>
+        <a href="https://github.com/csilvasantin/csilvasantin.github.io" target="_blank" rel="noreferrer">Repositorio</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Documentacion publica</p>
+        <h1>Instalacion de Telegram Desktop y Claude Code</h1>
+      </div>
+      <aside class="status">
+        <h3>Estado verificado</h3>
+        <p>Telegram Desktop reinstalado y Claude Code disponible como binario nativo en Windows. Esta pagina deja el procedimiento visible para repetirlo en cualquier equipo de AdmiraNext.</p>
+      </aside>
+    </section>
+
+    <section class="section">
+      <h2>Resumen operativo</h2>
+      <div class="grid">
+        <article class="card telegram">
+          <h3>Telegram Desktop</h3>
+          <p>Instalacion oficial para comunicacion y coordinacion diaria.</p>
+          <ul>
+            <li>Ruta habitual: <code>%APPDATA%\Telegram Desktop\Telegram.exe</code></li>
+            <li>Descarga oficial: <code>https://telegram.org/dl/desktop/win64</code></li>
+            <li>Acceso directo: menu Inicio y escritorio si el instalador lo crea.</li>
+          </ul>
+        </article>
+
+        <article class="card claude">
+          <h3>Claude Code</h3>
+          <p>CLI nativo para trabajar con Anthropic Claude Code desde terminal.</p>
+          <ul>
+            <li>Ruta recomendada: <code>%USERPROFILE%\.local\bin\claude.exe</code></li>
+            <li>Comprobacion: <code>claude --version</code></li>
+            <li>El directorio <code>.local\bin</code> debe estar en el PATH de usuario.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Reinstalar Telegram Desktop</h2>
+      <ol>
+        <li>Cerrar Telegram si esta abierto.</li>
+        <li>Ejecutar el desinstalador de Telegram Desktop si existe en <code>%APPDATA%\Telegram Desktop\unins000.exe</code>.</li>
+        <li>Descargar el instalador oficial desde Telegram.</li>
+        <li>Ejecutar el instalador y abrir Telegram para iniciar sesion.</li>
+      </ol>
+      <pre><code>Invoke-WebRequest -Uri "https://telegram.org/dl/desktop/win64" -OutFile "$env:TEMP\tsetup-x64.exe"
+Start-Process -FilePath "$env:TEMP\tsetup-x64.exe" -Wait</code></pre>
+      <div class="links">
+        <a class="button" href="https://telegram.org/dl/desktop/win64" target="_blank" rel="noreferrer">Descargar Telegram</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Instalar Claude Code</h2>
+      <p>La instalacion recomendada por Anthropic para Windows usa PowerShell y descarga el instalador oficial.</p>
+      <pre><code>irm https://claude.ai/install.ps1 | iex</code></pre>
+      <p style="margin-top:14px;">Despues, cerrar y abrir la terminal, y verificar:</p>
+      <pre><code>claude --version</code></pre>
+      <div class="links">
+        <a class="button" href="https://code.claude.com/docs/en/installation" target="_blank" rel="noreferrer">Documentacion oficial</a>
+      </div>
+      <div class="note">
+        <p>Si Windows tiene la fecha u hora incorrectas, los certificados HTTPS pueden fallar aunque la URL sea oficial. Antes de reinstalar, conviene activar la sincronizacion automatica de hora en Configuracion de Windows.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Checklist de verificacion</h2>
+      <ul>
+        <li><code>Telegram.exe</code> existe dentro de <code>%APPDATA%\Telegram Desktop</code>.</li>
+        <li><code>claude.exe</code> responde con una version de Claude Code.</li>
+        <li><code>%USERPROFILE%\.local\bin</code> aparece en el PATH de usuario.</li>
+        <li>La fecha de Windows coincide con la fecha real para evitar errores de certificados.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Desde AdmiraNext creamos experiencias innovadoras combinando la creatividad y la tecnologia.
+    </div>
+  </footer>
+</body>
+</html>
