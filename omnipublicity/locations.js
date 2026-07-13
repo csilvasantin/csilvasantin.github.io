@@ -27,6 +27,18 @@ window.OMNIP_LOCATIONS_DEFAULT = [
     ],
   },
   {
+    id:'xtanco-valencia', name:'Xtanco Valencia', kind:'Estanco · Retail físico · Gemelo digital',
+    addr:'Carrer de Colón 22 · Valencia 46004', coords:[-0.3739, 39.4685],
+    surfaces:[
+      { name:'LED Frontal',         desc:'Pantalla principal sobre el mostrador · 1920×1080 · 24h',      status:'live',  impr:610, cpm:'€8', surface:'pantalla' },
+      { name:'LED Vertical',        desc:'Producto destacado + promo Fallas · 1080×1920',                status:'live',  impr:420, cpm:'€7', surface:'pantalla' },
+      { name:'Escaparate Colón',    desc:'LED en fachada · eje comercial Colón · alto tráfico turístico', status:'live',  impr:560, cpm:'€9', surface:'escaparate', pixerScreens:['xtore-escaparate-pn1w'] },
+      { name:'Mostrador panel',     desc:'Panel táctil del mostrador · valenciano/castellano/inglés',    status:'live',  impr:110, cpm:'€4', surface:'mostrador' },
+      { name:'Vending / cigarreras',desc:'Display digital del vending · loop comercial',                 status:'sched', impr:70,  cpm:'€3', surface:'vending' },
+      { name:'PWA Xtanco Club',     desc:'Push contextual a socios cercanos · eventos ciudad',           status:'live',  impr:150, cpm:'€2', surface:'pwa' },
+    ],
+  },
+  {
     id:'admira-loterias', name:'Admira Loterías', kind:'Loterías · Punto autorizado',
     addr:'Gran Vía 32 · Madrid', coords:[-3.7037, 40.4204],
     surfaces:[
