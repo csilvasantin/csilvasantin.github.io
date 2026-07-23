@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Narrativa de Impacto AdmiraNeXT — historias que conectan la señalización digital con la vida real de las personas. Campaña para clientes y socios.">
+  <title>Narrativa de Impacto · AdmiraNeXT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070b12;
+      --bg2: #0d1420;
+      --card: rgba(16, 24, 38, 0.92);
+      --ink: #e8eef8;
+      --muted: #93a4bb;
+      --line: rgba(148, 178, 220, 0.16);
+      --gold: #e8b84a;
+      --gold-soft: rgba(232, 184, 74, 0.14);
+      --teal: #3fd0c9;
+      --teal-soft: rgba(63, 208, 201, 0.12);
+      --rose: #f071a5;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, rgba(63, 208, 201, 0.16), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 90% 0%, rgba(232, 184, 74, 0.12), transparent 45%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, rgba(240, 113, 165, 0.08), transparent 50%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      min-height: 100vh;
+    }
+    a { color: var(--teal); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+
+    header.nav {
+      position: sticky; top: 0; z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 11, 18, 0.78);
+      border-bottom: 1px solid var(--line);
+    }
+    header.nav .inner {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 14px 0; flex-wrap: wrap;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); text-decoration: none;
+    }
+    .brand span {
+      width: 28px; height: 28px; border-radius: 8px;
+      display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--gold), #b8872a);
+      color: #1a1205; font-weight: 700;
+    }
+    nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.86rem; }
+    nav a { color: var(--muted); text-decoration: none; }
+    nav a:hover { color: var(--ink); }
+
+    .hero { padding: 72px 0 48px; }
+    .eyebrow {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--teal); margin: 0 0 14px;
+    }
+    h1 {
+      font-family: Fraunces, Georgia, serif;
+      font-size: clamp(2.6rem, 6.5vw, 4.6rem);
+      line-height: 0.98; margin: 0; max-width: 14ch;
+      letter-spacing: -0.02em;
+    }
+    h1 em { font-style: italic; color: var(--gold); }
+    .lead {
+      max-width: 58ch; margin: 22px 0 0;
+      font-size: 1.12rem; line-height: 1.75; color: var(--muted);
+    }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+    .button {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 18px; border-radius: 999px;
+      background: linear-gradient(135deg, var(--teal), #2a9f99);
+      color: #041716; font-weight: 700; text-decoration: none;
+      border: 0; cursor: pointer;
+    }
+    .button.ghost {
+      background: transparent; color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .button:hover { text-decoration: none; filter: brightness(1.05); }
+    .meta-row {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px;
+    }
+    .chip {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 7px 11px; border-radius: 999px;
+      border: 1px solid var(--line); color: var(--muted);
+      background: rgba(255,255,255,0.02);
+    }
+    .chip strong { color: var(--gold); font-weight: 500; }
+
+    section { padding: 36px 0; }
+    .section-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 32px;
+    }
+    h2 {
+      font-family: Fraunces, Georgia, serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.35rem);
+      margin: 0 0 12px; line-height: 1.15;
+    }
+    h2 em { color: var(--gold); font-style: italic; }
+    h3 {
+      font-family: Fraunces, Georgia, serif;
+      font-size: 1.28rem; margin: 0 0 8px;
+    }
+    p, li { color: var(--muted); line-height: 1.7; }
+    .section-lead { max-width: 62ch; margin: 0 0 22px; }
+
+    .grid-3, .grid-2, .stories {
+      display: grid; gap: 16px;
+    }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+    .pillar, .story, .channel, .msg {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+    }
+    .pillar .num, .story .tag {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 10px;
+    }
+    .pillar h3 { color: var(--ink); }
+    .story h3 { color: var(--ink); margin-bottom: 6px; }
+    .story .place {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem; color: var(--teal); margin-bottom: 12px;
+    }
+    .story .arc {
+      display: grid; gap: 8px; margin: 14px 0;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.22);
+      border: 1px solid var(--line);
+    }
+    .story .arc b {
+      color: var(--ink); font-size: 0.82rem;
+      font-family: "JetBrains Mono", monospace; letter-spacing: 0.04em;
+    }
+    .story .arc span { color: var(--muted); font-size: 0.92rem; }
+    .story .impact {
+      margin: 0; padding-top: 10px;
+      border-top: 1px solid var(--line);
+      color: var(--ink); font-weight: 500;
+    }
+
+    .journey {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px; margin-top: 18px;
+    }
+    .step {
+      padding: 16px;
+      border-radius: 16px;
+      background: var(--gold-soft);
+      border: 1px solid rgba(232, 184, 74, 0.25);
+    }
+    .step b {
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.1em;
+      color: var(--gold); margin-bottom: 8px;
+    }
+    .step p { margin: 0; color: var(--ink); font-size: 0.95rem; }
+
+    .quote {
+      margin: 22px 0 0;
+      padding: 22px 24px;
+      border-left: 3px solid var(--gold);
+      background: rgba(232, 184, 74, 0.06);
+      border-radius: 0 16px 16px 0;
+    }
+    .quote p {
+      margin: 0;
+      font-family: Fraunces, Georgia, serif;
+      font-size: 1.25rem; line-height: 1.45; color: var(--ink);
+    }
+    .quote cite {
+      display: block; margin-top: 10px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.75rem; font-style: normal;
+      letter-spacing: 0.08em; color: var(--muted);
+    }
+
+    .msg h3 { color: var(--ink); }
+    .msg ul { margin: 10px 0 0; padding-left: 18px; }
+    .msg li { margin-bottom: 6px; }
+
+    .channel .who {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--teal); margin-bottom: 8px;
+    }
+
+    .cta-box {
+      display: grid; gap: 18px;
+      grid-template-columns: 1.4fr 1fr;
+      align-items: center;
+    }
+    @media (max-width: 760px) {
+      .cta-box { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
+    }
+    .cta-list { margin: 0; padding-left: 18px; }
+    .cta-list li { margin-bottom: 8px; color: var(--ink); }
+
+    footer {
+      padding: 40px 0 56px;
+      border-top: 1px solid var(--line);
+      margin-top: 20px;
+      color: var(--muted); font-size: 0.9rem;
+    }
+    footer .brand { margin-bottom: 12px; }
+    .sig {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--muted); margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap inner">
+      <a class="brand" href="./"><span>A</span> AdmiraNeXT · Narrativa de Impacto</a>
+      <nav aria-label="Secciones">
+        <a href="#mitologia">Mitología</a>
+        <a href="#pilares">Pilares</a>
+        <a href="#historias">Historias</a>
+        <a href="#campana">Campaña</a>
+        <a href="#mensajes">Mensajes</a>
+        <a href="#kit">Kit</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero wrap">
+      <p class="eyebrow">CSO · George Lucas · Encargo #993</p>
+      <h1>La tecnología solo importa cuando <em>cambia un día real.</em></h1>
+      <p class="lead">
+        Narrativa de Impacto AdmiraNeXT: un marco de historias que conecta la señalización digital
+        con la vida cotidiana de las personas. No vendemos pantallas. Contamos cómo una red de
+        contenido en el mundo físico reduce fricción, da orientación, genera confianza y hace
+        visibles promesas de marca en el momento exacto.
+      </p>
+      <div class="actions">
+        <a class="button" href="#historias">Leer las 5 historias →</a>
+        <a class="button ghost" href="#kit">Usar el kit de campaña</a>
+      </div>
+      <div class="meta-row">
+        <span class="chip"><strong>Audiencia:</strong> clientes · socios · partners</span>
+        <span class="chip"><strong>Objetivo:</strong> empatía + comprensión de valor</span>
+        <span class="chip"><strong>Formato:</strong> saga de impacto, no features</span>
+        <span class="chip"><strong>Firma:</strong> subSmith Plata · MacMini</span>
+      </div>
+    </section>
+
+    <section class="wrap" id="mitologia">
+      <div class="section-card">
+        <p class="eyebrow">01 · Mitología de marca</p>
+        <h2>Toda gran marca necesita su <em>universo.</em></h2>
+        <p class="section-lead">
+          AdmiraNeXT no es un catálogo de players y CMS. Es la fuerza que pone la información
+          correcta frente a la persona correcta, en el lugar físico donde decide, espera, compra
+          o se orienta. La mitología es simple y memorable:
+        </p>
+        <div class="grid-3">
+          <article class="pillar">
+            <div class="num">Arquetipo</div>
+            <h3>El guía en la Matrix física</h3>
+            <p>En un mundo saturado de ruido digital en el bolsillo, la pantalla en el espacio real es un mentor: aclara, reduce ansiedad y acorta el camino.</p>
+          </article>
+          <article class="pillar">
+            <div class="num">Conflicto</div>
+            <h3>Información vs. fricción</h3>
+            <p>Sin señalización inteligente: colas, dudas, mensajes rotos, marcas invisibles. Con AdmiraNeXT: contexto en el punto de decisión.</p>
+          </article>
+          <article class="pillar">
+            <div class="num">Promesa</div>
+            <h3>Impacto que se ve y se siente</h3>
+            <p>No medimos solo impresiones: medimos orientaciones logradas, tiempos ahorrados, confianza recuperada y conversiones en el mundo físico.</p>
+          </article>
+        </div>
+        <div class="quote">
+          <p>«La tecnología debe estar al servicio de la historia, nunca al revés. Cada marca tiene su Star Wars por contar: hay que encontrar su mitología.»</p>
+          <cite>— George Lucas · CSO (Leyenda) · Consejo Creativo AdmiraNeXT</cite>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="pilares">
+      <div class="section-card">
+        <p class="eyebrow">02 · Pilares de impacto</p>
+        <h2>Cuatro fuerzas que hacen <em>humana</em> la red.</h2>
+        <p class="section-lead">Toda pieza de campaña, case study o pitch de partner debe aterrizar en al menos un pilar. Así la flota narrativa no se diluye en features.</p>
+        <div class="grid-2">
+          <article class="pillar">
+            <div class="num">Pilar I · Orientar</div>
+            <h3>Menos pérdida, más calma</h3>
+            <p>Ayudar a encontrar puerta, puerta de embarque, pasillo, producto o servicio. El valor se siente en el cuerpo: menos estrés, menos preguntas al personal.</p>
+          </article>
+          <article class="pillar">
+            <div class="num">Pilar II · Informar</div>
+            <h3>La verdad en el momento</h3>
+            <p>Horarios, incidencias, promociones, protocolos. Contenido vivo que evita la decepción de un cartel muerto o un rumor de pasillo.</p>
+          </article>
+          <article class="pillar">
+            <div class="num">Pilar III · Conectar</div>
+            <h3>Marca que acompaña</h3>
+            <p>La señalización no interrumpe: acompaña. Une la promesa digital de la marca con el gesto físico de la persona en la tienda, el aeropuerto o el hospital.</p>
+          </article>
+          <article class="pillar">
+            <div class="num">Pilar IV · Demostrar</div>
+            <h3>Prueba de impacto</h3>
+            <p>Proof-of-play, métricas de red, historias de usuario. Convertimos “funciona la pantalla” en “mejoró el día de alguien” — y lo documentamos.</p>
+          </article>
+        </div>
+
+        <h3 style="margin-top:28px;color:var(--ink)">Viaje del héroe (versión B2B)</h3>
+        <div class="journey">
+          <div class="step"><b>01 · Mundo ordinario</b><p>Operación con carteles estáticos y silos de contenido.</p></div>
+          <div class="step"><b>02 · Llamada</b><p>Un incidente, una expansión o un cliente exige agilidad.</p></div>
+          <div class="step"><b>03 · Mentor</b><p>AdmiraNeXT + partner: mapa, red y narrativa operativa.</p></div>
+          <div class="step"><b>04 · Pruebas</b><p>Piloto medible en un site o vertical crítico.</p></div>
+          <div class="step"><b>05 · Transformación</b><p>La red responde en minutos; el equipo deja de apagar fuegos.</p></div>
+          <div class="step"><b>06 · Regreso</b><p>Historia de impacto para vender, retener y expandir.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="historias">
+      <div class="section-card">
+        <p class="eyebrow">03 · Cinco historias de impacto</p>
+        <h2>Personas primero. La tech <em>aparece al final.</em></h2>
+        <p class="section-lead">
+          Cada historia sigue el arco: persona → tensión → momento de verdad → resolución con
+          señalización digital AdmiraNeXT → impacto medible o sentido. Listas para web, LinkedIn,
+          one-pagers de partner y guiones de vídeo corto.
+        </p>
+        <div class="stories grid-2">
+          <article class="story">
+            <div class="tag">Historia 01 · Aeropuerto</div>
+            <h3>Marta y la puerta que se movió</h3>
+            <div class="place">Terminal · familia con conexión · 18 minutos</div>
+            <p>Marta viaja con su hijo y una conexión ajustada. El vuelo cambia de puerta. En el pasillo, las pantallas de la red actualizan el nuevo gate y el tiempo de camino. No grita. No corre a ciegas. Llega.</p>
+            <div class="arc">
+              <div><b>TENSIÓN</b><span> — Ansiedad de perder el vuelo y la confianza en el aeropuerto.</span></div>
+              <div><b>MOMENTO</b><span> — La pantalla del corredor dice la verdad antes que el rumor.</span></div>
+              <div><b>RESOLUCIÓN</b><span> — Red AdmiraNeXT con contenido operativo en tiempo casi real.</span></div>
+            </div>
+            <p class="impact">Impacto: menos estrés del pasajero · menos carga en mostradores · marca del operador percibida como fiable.</p>
+          </article>
+
+          <article class="story">
+            <div class="tag">Historia 02 · Retail</div>
+            <h3>Luis y la oferta que no era humo</h3>
+            <div class="place">Gran superficie · fin de semana · zona electro</div>
+            <p>Luis compara en el móvil una promo que “ya no está”. En el pasillo, la pantalla de categoría muestra el stock y el precio vigente de esa tienda. La promesa digital y el suelo físico coinciden.</p>
+            <div class="arc">
+              <div><b>TENSIÓN</b><span> — Desconfianza por precios fantasma y personal desbordado.</span></div>
+              <div><b>MOMENTO</b><span> — Contenido localizado y actualizado en el punto de decisión.</span></div>
+              <div><b>RESOLUCIÓN</b><span> — Campañas y fichas de producto orquestadas desde la red.</span></div>
+            </div>
+            <p class="impact">Impacto: conversión en pasillo · menos fricción con staff · coherencia omnichannel real.</p>
+          </article>
+
+          <article class="story">
+            <div class="tag">Historia 03 · Salud</div>
+            <h3>Ana y la sala que explica</h3>
+            <div class="place">Centro hospitalario · acompañante · espera larga</div>
+            <p>Ana acompaña a su padre. No entiende el flujo. Las pantallas de sala no solo muestran un número: explican el siguiente paso, el tiempo estimado y dónde pedir ayuda. La espera sigue, pero deja de ser un vacío hostil.</p>
+            <div class="arc">
+              <div><b>TENSIÓN</b><span> — Incertidumbre y sensación de abandono en entornos clínicos.</span></div>
+              <div><b>MOMENTO</b><span> — Información humana, clara y actualizada en la pared.</span></div>
+              <div><b>RESOLUCIÓN</b><span> — Señalización de wayfinding y estado de servicio gestionada centralmente.</span></div>
+            </div>
+            <p class="impact">Impacto: percepción de cuidado · menos interrupciones al personal · dignidad en la espera.</p>
+          </article>
+
+          <article class="story">
+            <div class="tag">Historia 04 · Movilidad</div>
+            <h3>Diego y el andén que avisa</h3>
+            <div class="place">Estación · hora punta · incidencia de línea</div>
+            <p>Una avería corta la línea. Diego ve en las pantallas la alternativa, el tiempo y el mensaje de la operadora — no un “fuera de servicio” mudo. Decide en 10 segundos y sigue su día.</p>
+            <div class="arc">
+              <div><b>TENSIÓN</b><span> — Caos colectivo y rumor en redes sin guía en el lugar.</span></div>
+              <div><b>MOMENTO</b><span> — Mensaje oficial, multi-idioma si hace falta, en la red física.</span></div>
+              <div><b>RESOLUCIÓN</b><span> — Publicación rápida multi-pantalla desde un solo control.</span></div>
+            </div>
+            <p class="impact">Impacto: contención del caos · confianza en el operador · menos picos de atención en mostradores.</p>
+          </article>
+
+          <article class="story" style="grid-column: 1 / -1;">
+            <div class="tag">Historia 05 · Partner / sede</div>
+            <h3>Nora y la sala que demuestra valor</h3>
+            <div class="place">Partner tecnológico · visita de cliente · demo live</div>
+            <p>Nora es partner. En la sala de demos, no proyecta un PDF: muestra una red viva — prueba de emisión, cambio de campaña en caliente, historia de impacto de un site real. El cliente no compra “software”: compra la capacidad de tocar la vida de sus usuarios.</p>
+            <div class="arc">
+              <div><b>TENSIÓN</b><span> — Features técnicas que no se entienden fuera del equipo IT.</span></div>
+              <div><b>MOMENTO</b><span> — Narrativa de impacto + proof-of-play en vivo.</span></div>
+              <div><b>RESOLUCIÓN</b><span> — Kit de historias + demo AdmiraNeXT alineados al vertical del cliente.</span></div>
+            </div>
+            <p class="impact">Impacto: ciclo de venta más corto · partner como storyteller · diferenciación frente a “otra pantalla más”.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="campana">
+      <div class="section-card">
+        <p class="eyebrow">04 · Arquitectura de campaña</p>
+        <h2>Una saga, <em>varios frentes.</em></h2>
+        <p class="section-lead">Campañas de marketing dirigidas a clientes y socios potenciales. Cada canal repite el mismo universo con el formato que le corresponde.</p>
+        <div class="grid-3">
+          <article class="channel">
+            <div class="who">Clientes finales</div>
+            <h3>«El día que la pantalla ayudó»</h3>
+            <p>Serie de 5 micro-historias (web + LinkedIn + one-pager PDF). CTA: piloto en un site crítico en 4–6 semanas.</p>
+          </article>
+          <article class="channel">
+            <div class="who">Socios / partners</div>
+            <h3>«Vende el impacto, no el player»</h3>
+            <p>Playbook de storytelling para partners: arco del héroe B2B, preguntas de descubrimiento por vertical, demo script de 8 minutos.</p>
+          </article>
+          <article class="channel">
+            <div class="who">Eventos & demos</div>
+            <h3>«Proof of humanity»</h3>
+            <p>En stand o sala: pantalla que cuenta una historia real + contador de “momentos orientados hoy”. Cierre con métrica del piloto del visitante.</p>
+          </article>
+        </div>
+
+        <div class="grid-2" style="margin-top:16px">
+          <article class="msg">
+            <h3>Secuencia de campaña (6 semanas)</h3>
+            <ul>
+              <li><strong>S1:</strong> Teaser mitología — “la guía en el espacio real”.</li>
+              <li><strong>S2–S3:</strong> Historias 01–03 (aeropuerto, retail, salud).</li>
+              <li><strong>S4:</strong> Historia 04 + prueba social / métricas de red.</li>
+              <li><strong>S5:</strong> Historia 05 partner + webinar corto.</li>
+              <li><strong>S6:</strong> CTA piloto medible + retargeting a leads calientes.</li>
+            </ul>
+          </article>
+          <article class="msg">
+            <h3>KPIs de empatía y valor (no vanity)</h3>
+            <ul>
+              <li>Tiempo de permanencia en piezas de historia vs. fichas de producto.</li>
+              <li>% de demos que arrancan con un caso humano (no con features).</li>
+              <li>Leads que citan un vertical/historia en el formulario.</li>
+              <li>Partners formados en el playbook (adopción del script).</li>
+              <li>Piloto → win rate cuando se usó narrativa de impacto.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="mensajes">
+      <div class="section-card">
+        <p class="eyebrow">05 · Banco de mensajes</p>
+        <h2>Frases que <em>encienden</em> la conversación.</h2>
+        <div class="grid-2">
+          <article class="msg">
+            <h3>Headlines</h3>
+            <ul>
+              <li>La pantalla que llega antes que el rumor.</li>
+              <li>Cuando el contenido sale del bolsillo y entra en la vida.</li>
+              <li>Señalización digital: menos fricción, más humanidad.</li>
+              <li>No vendemos pixels. Entregamos orientaciones logradas.</li>
+              <li>Tu marca, en el momento exacto del mundo físico.</li>
+            </ul>
+          </article>
+          <article class="msg">
+            <h3>Elevator (30 s)</h3>
+            <p>
+              «AdmiraNeXT orquesta redes de señalización digital para que la información correcta
+              llegue a las personas en el lugar donde deciden y se orientan. Ayudamos a aeropuertos,
+              retail, movilidad y partners a convertir pantallas en guías fiables — con control
+              central, prueba de emisión e historias de impacto que el cliente entiende al instante.»
+            </p>
+          </article>
+          <article class="msg">
+            <h3>Para el cliente escéptico</h3>
+            <ul>
+              <li>No pedimos fe: pedimos un piloto en el sitio que más duele.</li>
+              <li>Medimos antes/después: tiempo de respuesta de contenido, incidencias, feedback de planta.</li>
+              <li>Si la historia no se sostiene en el suelo, no es una buena venta.</li>
+            </ul>
+          </article>
+          <article class="msg">
+            <h3>Para el partner</h3>
+            <ul>
+              <li>Empieza siempre por la persona del vertical del cliente.</li>
+              <li>Cierra con proof-of-play y un plan de expansión por sites.</li>
+              <li>Usa este kit: no improvises features sin arco emocional.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="kit">
+      <div class="section-card cta-box">
+        <div>
+          <p class="eyebrow">06 · Kit listo para usar</p>
+          <h2>Qué entregamos <em>hoy</em> con #993</h2>
+          <ul class="cta-list">
+            <li>Mitología de marca + 4 pilares de impacto.</li>
+            <li>Viaje del héroe B2B para pitches y demos.</li>
+            <li>5 historias verticales listas para adaptar (copy base).</li>
+            <li>Arquitectura de campaña 6 semanas + KPIs de empatía.</li>
+            <li>Banco de headlines, elevator y objeciones.</li>
+            <li>Esta landing pública como hub de narrativa.</li>
+          </ul>
+          <p style="margin-top:16px;color:var(--muted);font-size:0.95rem">
+            Siguiente iteración recomendada (fuera de este entregable): vídeos cortos 30–45 s por historia,
+            one-pager PDF partner, y plantillas Notion/CRM con campos “historia usada” y “pilar”.
+          </p>
+        </div>
+        <div class="pillar" style="background:var(--teal-soft);border-color:rgba(63,208,201,0.28)">
+          <div class="num" style="color:var(--teal)">Uso inmediato</div>
+          <h3 style="color:var(--ink)">Checklist pre-demo</h3>
+          <ul style="margin:0;padding-left:18px">
+            <li>Elegir 1 historia del vertical del cliente.</li>
+            <li>Nombrar al “héroe” en la primera frase.</li>
+            <li>Mostrar la tensión antes del producto.</li>
+            <li>Cerrar con un piloto medible, no con un catálogo.</li>
+            <li>Dejar un enlace a esta narrativa.</li>
+          </ul>
+          <div class="actions" style="margin-top:18px">
+            <a class="button" href="#historias">Volver a las historias</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <a class="brand" href="./"><span>A</span> AdmiraNeXT · Narrativa de Impacto</a>
+      <p>Encargo #993 · idea CSO George Lucas · campañas que destacan el impacto positivo de la señalización digital en la vida diaria.</p>
+      <p class="sig">Firmado: subSmith Plata · ejecución en MacMini · 2026-07-23 · misión FLT-993</p>
+    </div>
+  </footer>
+</body>
+</html>
