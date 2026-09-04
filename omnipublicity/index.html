@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="admiranext-version" content="v.04.09.2026.r1.22:31">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>OmniPublicity — Mapa de espacios | AdmiraNext</title>
 <meta name="description" content="Cada hueco del retail físico, subastado por impresión. Busca una tienda, aterriza en su ficha y mira sus surfaces pujando en tiempo real.">
@@ -257,7 +258,8 @@
 let LOCATIONS = window.loadOmnipLocations();
 
 // ─── Workers (mismos que xpace-os) ────────────────────────────────
-const PIXER = 'https://pixer-eleven.csilvasantin.workers.dev';
+// dominio propio: LaLiga bloquea workers.dev en horas de fútbol, FLT-1633
+const PIXER = 'https://api.admira.store';
 
 // ─── Estilos disponibles ───────────────────────────────────────────
 const STYLE_MAPA = 'https://tiles.openfreemap.org/styles/liberty';

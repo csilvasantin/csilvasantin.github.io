@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta name="admiranext-version" content="v.04.09.2026.r1.22:31">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Xpace OS — Las 3 capas de AdmiraNext: Pixer.ai · Admira XP · OmniPublicity</title>
 <meta name="description" content="Xpace OS de AdmiraNext convierte tu retail en un medio publicitario inteligente con tres capas integradas: creación de contenido con IA (Pixer.ai), distribución con Gemelo Digital (Admira XP) y marketplace de subastas en tiempo real (OmniPublicity).">
@@ -252,7 +253,8 @@
 <script>
 // Métricas live — silently fail si los workers están dormidos.
 (async () => {
-  const PIXER = 'https://pixer-eleven.csilvasantin.workers.dev';
+  // dominio propio: LaLiga bloquea workers.dev en horas de fútbol, FLT-1633
+  const PIXER = 'https://api.admira.store';
   const SUNO  = 'https://macmini.tail48b61c.ts.net/suno';
 
   // Pantallas + feed

@@ -10,7 +10,8 @@
 //                                // se inyectan como bids LIVE en el feed.
 //   }
 // ] }
-window.OMNIP_API = 'https://omnipublicity-api.csilvasantin.workers.dev';
+// dominio propio: LaLiga bloquea workers.dev en horas de fútbol, FLT-1633
+window.OMNIP_API = 'https://brain.digitalavatar.ai';
 window.OMNIP_STORE_KEY = 'omnip-locations';
 
 window.OMNIP_LOCATIONS_DEFAULT = [

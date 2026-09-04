@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="admiranext-version" content="v.04.09.2026.r1.22:31">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>XpaceOS powered by ADmira | AdmiraNext Council</title>
     <style>
@@ -787,7 +788,8 @@
     const GITHUB_FALLBACK = "https://raw.githubusercontent.com/csilvasantin/03-ControlCodexClaude/main/data/machines.json";
     const DEMO_API = "https://macmini.tail48b61c.ts.net/demo/status";
     const DEMO_PING = "https://macmini.tail48b61c.ts.net/demo/ping";
-    const COUNCIL_DEBATE_API = "https://pixer-eleven.csilvasantin.workers.dev/council/debate/feed?limit=5";
+    // dominio propio: LaLiga bloquea workers.dev en horas de fútbol, FLT-1633
+    const COUNCIL_DEBATE_API = "https://api.admira.store/council/debate/feed?limit=5";
 
     // All 16 council members — mixed council (racional left/red + creativo right/blue)
     // 1 consejero = 1 máquina. Sin máquina = sin conexión (gris)
