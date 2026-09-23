@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PlayerTaza · desarrollos de la taza</title>
+  <meta name="admiranext-version" content="v.23.09.2026.r1.20:09">
+  <style>
+    :root { --bg:#071014; --ink:#e7f6f8; --dim:#8eacb4; --line:#1d3a42; --cyan:#78f3ff; --good:#7ef7bc; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(1200px 500px at 50% -10%, #12343c, var(--bg)); color:var(--ink); font:16px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    main { max-width:760px; margin:0 auto; padding:28px 18px 56px; }
+    p.kicker { margin:0; color:var(--cyan); letter-spacing:.16em; font-size:12px; text-transform:uppercase; }
+    h1 { margin:8px 0 6px; font-size:clamp(28px, 4vw, 44px); letter-spacing:-.04em; }
+    .lead, .note { color:var(--dim); }
+    a { color:var(--cyan); }
+    section { border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin:14px 0; background:#020607; }
+    h2 { margin:0 0 8px; font-size:16px; letter-spacing:.04em; text-transform:uppercase; }
+    code { color:var(--good); }
+    footer { margin-top:22px; color:var(--dim); font-size:13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="kicker">PlayerTaza · PixelMug · 32×16</p>
+    <h1>Desarrollos de la taza</h1>
+    <p class="lead">Documentación pública del player de la taza con pantalla. Esta página vive en www.carlossilva.info sin mover el dominio: GitHub Pages sigue sirviendo el sitio, incluida la captura del Galleon.</p>
+
+    <section>
+      <h2>Player</h2>
+      <p>El player web está en <a href="https://playertaza.csilvasantin.workers.dev/app">playertaza.csilvasantin.workers.dev/app</a>. La pestaña Admira enseña el mismo corte que la LED cuando la taza tiene estado: la etiqueta es <code>EN TAZA</code> y el GIF es el de 32×16. La antena en ident no pisa ese corte.</p>
+      <p>La antena de admira.tv es <a href="https://www.admira.tv/canal.html?embed=mupi&amp;screen=playertaza">canal playertaza</a>. El canal de Jardinets que el seguidor ya usa es <code>samsung-galaxy-fold-8-mupi</code>.</p>
+    </section>
+
+    <section>
+      <h2>Estado el 23 de septiembre de 2026</h2>
+      <p>El player público responde. La segunda taza, la del alta física, no anuncia por Bluetooth desde el Mac Mini: hace falta encenderla, dejar la pantalla visible y hacer una pulsación larga del Wi-Fi en la red de 2.4 GHz, cerca del Mini. Hasta entonces no hay emparejamiento ni piloto en la matriz.</p>
+      <p class="note">Presets que ya están en el player: Michael Jackson y Queen. El seguidor del Fold y del iPad de Jardinets no se reabre desde esta página.</p>
+    </section>
+
+    <section>
+      <h2>Dónde está publicado</h2>
+      <p>Ruta canónica: <a href="https://www.carlossilva.info/playertaza/">/playertaza/</a>. La misma nota está en <a href="https://www.carlossilva.info/00.-EmpezarTrabajo/taza/">/00.-EmpezarTrabajo/taza/</a>.</p>
+      <p>La captura del teclado sigue en <a href="https://www.carlossilva.info/00.-EmpezarTrabajo/galleon-captura.html">galleon-captura.html</a>. El dominio continúa en los nameservers de GoDaddy (<code>ns71</code> y <code>ns72.domaincontrol.com</code>) y <code>www</code> apunta a GitHub Pages. Pasar el dominio entero a Cloudflare necesita el login de GoDaddy y se dejaría el Galleon fuera de servicio si se hace a ciegas.</p>
+    </section>
+
+    <footer>v.23.09.2026.r1.20:09 · SmithMacMini · FLT-100850. Volver atrás: commit 864114d del repo csilvasantin.github.io.</footer>
+  </main>
+</body>
+</html>
