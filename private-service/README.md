@@ -1,5 +1,13 @@
 # Área privada de carlossilva.info
 
+## Empresas
+
+`/empresas/` contiene fichas de empresa (nombre, NIF/CIF, notas), escrituras enlazadas a Google Drive y cuentas bancarias (banco, titular e IBAN). No hay datos de ejemplo en producción. La cuenta se muestra enmascarada en el listado; el formulario permite verla para editarla y verifica su checksum.
+
+`GET /empresas/api/companies` y `PUT /empresas/api/companies` utilizan el mismo JWT y lista privada de usuarios que Escrituras. El archivo `companies.json` se guarda exclusivamente en R2 privado. Cada modificación requiere origen coincidente y una versión ETag válida, y la escritura condicional evita sobreescribir cambios de otra persona. Se limitan tamaño, estructura y destinos de enlaces. Nunca guardar números de cuenta en Git ni en archivos estáticos.
+
+Al activar Cloudflare Access, añadir también `www.carlossilva.info/empresas` y `carlossilva.info/empresas`, incluidas sus subrutas, con el mismo proveedor Google y las mismas cuentas autorizadas. Para usar la misma `ACCESS_AUD`, deben ser destinos de la misma aplicación Access.
+
 La interfaz estática está en `/escrituras/`. No contiene el inventario, nombres de titulares, direcciones ni enlaces a las escrituras. Los datos se obtienen exclusivamente de `GET /escrituras/api/inventory` tras validar un JWT firmado por Cloudflare Access y la lista privada de cinco cuentas del secreto `ALLOWED_EMAILS`.
 
 ## Infraestructura comprobada el 30/10/2026

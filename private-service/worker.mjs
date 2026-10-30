@@ -1,7 +1,8 @@
 // Configuración privada del Worker; la lista de familiares no se publica en GitHub.
+import {validateCompanies} from '../empresas/model.js';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
-const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:HEADERS});
+const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
 function bytes(segment){return Uint8Array.from(atob(segment.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));}
 function decode(segment){return JSON.parse(new TextDecoder().decode(bytes(segment)));}
 export async function verifyAccess(request,env,fetcher=fetch){
@@ -30,10 +31,12 @@ export async function verifyAccess(request,env,fetcher=fetch){
 }
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
-  if(url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
-  if(request.method!=='GET')return json({error:'Method not allowed'},405);
+  const companies=url.pathname==='/empresas/api/companies';
+  if(!companies&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  if(!['GET',...(companies?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
+  if(companies)return handleCompanies(request,env);
   try{
     const object=await env.INVENTORY.get('inventory.json');
     if(!object)return json({error:'Inventory unavailable'},503);
@@ -41,5 +44,26 @@ export async function handleRequest(request,env,fetcher=fetch){
     if(!Array.isArray(inventory.records)||inventory.headers?.length!==16)return json({error:'Inventory unavailable'},503);
     return json(inventory);
   }catch{return json({error:'Inventory unavailable'},503);}
+}
+async function handleCompanies(request,env){
+  try{
+    if(request.method==='GET'){
+      const object=await env.INVENTORY.get('companies.json');
+      return json(object?validateCompanies(await object.json()):{schemaVersion:1,companies:[]},200,{ETag:object?.httpEtag||'"empty"'});
+    }
+    if(request.headers.get('Origin')!==new URL(request.url).origin)return json({error:'Origin not allowed'},403);
+    if(!request.headers.get('content-type')?.startsWith('application/json'))return json({error:'JSON required'},415);
+    const version=request.headers.get('If-Match');
+    if(!version||!/^"[a-zA-Z0-9-]{1,128}"$/.test(version))return json({error:'Current version required'},428);
+    const reader=request.body?.getReader();if(!reader)return json({error:'Body required'},400);
+    let size=0;const chunks=[];
+    for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>262144){await reader.cancel();return json({error:'Request too large'},413);}chunks.push(value);}
+    const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
+    let value;try{value=validateCompanies(JSON.parse(new TextDecoder().decode(bytes)));}catch{return json({error:'Invalid company, document link or IBAN'},400);}
+    const condition=new Headers(version==='"empty"'?{'If-None-Match':'*'}:{'If-Match':version});
+    const saved=await env.INVENTORY.put('companies.json',JSON.stringify(value),{onlyIf:condition,httpMetadata:{contentType:'application/json',cacheControl:'private, no-store'}});
+    if(!saved)return json({error:'Archive changed; reload before saving'},412);
+    return json(value,200,{ETag:saved.httpEtag});
+  }catch{return json({error:'Company archive unavailable'},503);}
 }
 export default {fetch(request,env){return handleRequest(request,env);}};

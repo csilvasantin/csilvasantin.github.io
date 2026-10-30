@@ -18,6 +18,14 @@ zone_name = "carlossilva.info"
 binding = "INVENTORY"
 bucket_name = "carlossilva-private"
 
+[[routes]]
+pattern = "www.carlossilva.info/empresas/api/*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/empresas/api/*"
+zone_name = "carlossilva.info"
+
 [vars]
 ACCESS_TEAM_DOMAIN = "fragrant-snowflake-5695.cloudflareaccess.com"
 # Falta configurar Google y copiar la audience de Access. Sin audience la API responde 503.
