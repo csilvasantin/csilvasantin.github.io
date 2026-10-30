@@ -1,0 +1,24 @@
+name = "carlossilva-private"
+account_id = "5b14266aa29050f8e5acd442c61b9783"
+main = "worker.mjs"
+compatibility_date = "2026-10-30"
+# La API sólo se sirve en su ruta del dominio. No hay origen workers.dev alternativo.
+workers_dev = false
+preview_urls = false
+
+[[routes]]
+pattern = "www.carlossilva.info/escrituras/api/*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/escrituras/api/*"
+zone_name = "carlossilva.info"
+
+[[r2_buckets]]
+binding = "INVENTORY"
+bucket_name = "carlossilva-private"
+
+[vars]
+ACCESS_TEAM_DOMAIN = "fragrant-snowflake-5695.cloudflareaccess.com"
+# Falta configurar Google y copiar la audience de Access. Sin audience la API responde 503.
+# ACCESS_AUD = "audience de la aplicación Access"
