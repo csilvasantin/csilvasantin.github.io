@@ -55,6 +55,27 @@ test('public origin contains only a login gate rather than private page markup',
   const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
   assert.doesNotMatch(home,/href="\/(memorias|escrituras|empresas|docs)\//);
 });
+test('cached public origin redirects to the protected alternate host rather than itself',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  for(const section of ['intranet','memorias','escrituras','empresas','docs']){
+    for(const file of [`${section}/index.html`,...(['memorias','escrituras','empresas'].includes(section)?[`${section}/api/login/index.html`]:[])]){
+      const html=await readFile(new URL('../'+file,import.meta.url),'utf8');
+      const target=`https://carlossilva-private.csilvasantin.workers.dev/${section}/`;
+      assert.ok(html.includes(`content="0;url=${target}"`));assert.ok(html.includes(`href="${target}"`));assert.ok(!html.includes('https://www.carlossilva.info/intranet/'));
+    }
+  }
+  const home=await readFile(new URL('../index.html',import.meta.url),'utf8');assert.match(home,/href="https:\/\/carlossilva-private\.csilvasantin\.workers\.dev\/intranet\/"/);
+});
+test('alternate host preserves all five family identities and redirects its root only after authentication',async()=>{
+  const base='https://carlossilva-private.csilvasantin.workers.dev';
+  assert.equal((await handleRequest(new Request(base+'/'),env,fetcher)).status,401);
+  for(const email of ALLOWED_EMAILS){
+    const headers={'Cf-Access-Jwt-Assertion':await token({email})};
+    const r=await handleRequest(new Request(base+'/',{headers}),env,fetcher);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/intranet/');
+    assert.equal((await handleRequest(new Request(base+'/intranet/',{headers}),env,fetcher)).status,200);
+    const login=await handleRequest(new Request(base+'/memorias/api/login/',{headers}),env,fetcher);assert.equal(login.status,302);assert.equal(login.headers.get('location'),'/memorias/');
+  }
+});
 test('memories reject anonymous and non-family identities before touching storage',async()=>{for(const method of ['GET','PUT'])for(const assertion of [null,await token({email:'outsider@example.com'})]){let touched=false;const r=await handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{method,headers:assertion?{'Cf-Access-Jwt-Assertion':assertion}:{}}),{...env,INVENTORY:{get:()=>{touched=true;},put:()=>{touched=true;}}},fetcher);assert.equal(r.status,401);assert.equal(touched,false);}});
 test('all five allowed identities read only the private memories object',async()=>{for(const email of ALLOWED_EMAILS){const r=await handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{headers:{'Cf-Access-Jwt-Assertion':await token({email})}}),{...env,INVENTORY:{get:async key=>{assert.equal(key,'memories.json');return {httpEtag:'"v1"',json:async()=>memoryFixture};}}},fetcher);assert.equal(r.status,200);assert.equal(r.headers.get('etag'),'"v1"');assert.equal(r.headers.get('cache-control'),'private, no-store, max-age=0');assert.deepEqual(await r.json(),memoryFixture);}});
 test('memories save to a separate object and enforce origin, validation and concurrency',async()=>{let writes=0;const assertion=await token();let conflict=false;const service={...env,INVENTORY:{put:async(key,body,options)=>{writes++;assert.equal(key,'memories.json');assert.equal(options.onlyIf.get('If-Match'),'"v1"');assert.deepEqual(JSON.parse(body),memoryFixture);return conflict?null:{httpEtag:'"v2"'};}}};const save=(body=memoryFixture,origin='https://www.carlossilva.info')=>handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{method:'PUT',headers:{'Cf-Access-Jwt-Assertion':assertion,'Content-Type':'application/json',Origin:origin,'If-Match':'"v1"'},body:JSON.stringify(body)}),service,fetcher);assert.equal((await save(memoryFixture,'https://attacker.example')).status,403);assert.equal((await save({memories:[{...memoryFixture.memories[0],text:''}]})).status,400);assert.equal(writes,0);assert.equal((await save()).status,200);conflict=true;assert.equal((await save()).status,412);});

@@ -2,8 +2,9 @@ name = "carlossilva-private"
 account_id = "5b14266aa29050f8e5acd442c61b9783"
 main = "worker.mjs"
 compatibility_date = "2026-10-30"
-# Páginas, recursos y API se protegen juntos. Sin origen workers.dev alternativo.
-workers_dev = false
+# Páginas, recursos y API se protegen juntos, incluida la entrada alternativa workers.dev.
+# La aplicación Access tiene como destino el Worker completo (producción y previews).
+workers_dev = true
 preview_urls = false
 
 [[routes]]

@@ -36,13 +36,14 @@ export async function verifyAccess(request,env,fetcher=fetch){
 }
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
-  const login=url.pathname==='/escrituras/api/login'?'/escrituras/':url.pathname==='/empresas/api/login'?'/empresas/':url.pathname==='/memorias/api/login'?'/memorias/':null;
+  const loginPath=url.pathname.replace(/\/$/,'');
+  const login=loginPath==='/escrituras/api/login'?'/escrituras/':loginPath==='/empresas/api/login'?'/empresas/':loginPath==='/memorias/api/login'?'/memorias/':null;
   const companies=url.pathname==='/empresas/api/companies';
   const memories=url.pathname==='/memorias/api/memories';
   const session=url.pathname==='/intranet/api/session';
   const plan=url.pathname==='/empresas/api/family-plan';
   const assistant=url.pathname==='/intranet/api/assistant';
-  const canonical=/^\/(intranet|memorias|escrituras|empresas|docs)(?:\/index\.html)?\/?$/.test(url.pathname)?'/'+url.pathname.split('/')[1]+'/':url.pathname;
+  const canonical=url.pathname==='/'?'/intranet/':/^\/(intranet|memorias|escrituras|empresas|docs)(?:\/index\.html)?\/?$/.test(url.pathname)?'/'+url.pathname.split('/')[1]+'/':url.pathname;
   const page=pages[canonical],asset=assets[url.pathname];
   if(!login&&!companies&&!memories&&!session&&!plan&&!assistant&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
   if(assistant?request.method!=='POST':!['GET',...(companies||memories||plan?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
