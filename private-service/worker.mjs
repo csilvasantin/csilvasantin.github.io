@@ -1,5 +1,6 @@
 // Configuración privada del Worker; la lista de familiares no se publica en GitHub.
 import {validateCompanies} from '../empresas/model.js';
+import {validateMemories} from '../memorias/model.js';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -31,14 +32,16 @@ export async function verifyAccess(request,env,fetcher=fetch){
 }
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
-  const login=url.pathname==='/escrituras/api/login'?'/escrituras/':url.pathname==='/empresas/api/login'?'/empresas/':null;
+  const login=url.pathname==='/escrituras/api/login'?'/escrituras/':url.pathname==='/empresas/api/login'?'/empresas/':url.pathname==='/memorias/api/login'?'/memorias/':null;
   const companies=url.pathname==='/empresas/api/companies';
-  if(!login&&!companies&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
-  if(!['GET',...(companies?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
+  const memories=url.pathname==='/memorias/api/memories';
+  if(!login&&!companies&&!memories&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  if(!['GET',...(companies||memories?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
   if(login)return new Response(null,{status:302,headers:{Location:login,'Cache-Control':'private, no-store'}});
-  if(companies)return handleCompanies(request,env);
+  if(companies)return handleArchive(request,env);
+  if(memories)return handleArchive(request,env,{key:'memories.json',validate:validateMemories,empty:{schemaVersion:1,memories:[]},maxBytes:4194304});
   try{
     const object=await env.INVENTORY.get('inventory.json');
     if(!object)return json({error:'Inventory unavailable'},503);
@@ -47,11 +50,11 @@ export async function handleRequest(request,env,fetcher=fetch){
     return json(inventory);
   }catch{return json({error:'Inventory unavailable'},503);}
 }
-async function handleCompanies(request,env){
+async function handleArchive(request,env,archive={key:'companies.json',validate:validateCompanies,empty:{schemaVersion:1,companies:[]},maxBytes:262144}){
   try{
     if(request.method==='GET'){
-      const object=await env.INVENTORY.get('companies.json');
-      return json(object?validateCompanies(await object.json()):{schemaVersion:1,companies:[]},200,{ETag:object?.httpEtag||'"empty"'});
+      const object=await env.INVENTORY.get(archive.key);
+      return json(object?archive.validate(await object.json()):archive.empty,200,{ETag:object?.httpEtag||'"empty"'});
     }
     if(request.headers.get('Origin')!==new URL(request.url).origin)return json({error:'Origin not allowed'},403);
     if(!request.headers.get('content-type')?.startsWith('application/json'))return json({error:'JSON required'},415);
@@ -59,13 +62,13 @@ async function handleCompanies(request,env){
     if(!version||!/^"[a-zA-Z0-9-]{1,128}"$/.test(version))return json({error:'Current version required'},428);
     const reader=request.body?.getReader();if(!reader)return json({error:'Body required'},400);
     let size=0;const chunks=[];
-    for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>262144){await reader.cancel();return json({error:'Request too large'},413);}chunks.push(value);}
+    for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>archive.maxBytes){await reader.cancel();return json({error:'Request too large'},413);}chunks.push(value);}
     const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
-    let value;try{value=validateCompanies(JSON.parse(new TextDecoder().decode(bytes)));}catch{return json({error:'Invalid company, document link or IBAN'},400);}
+    let value;try{value=archive.validate(JSON.parse(new TextDecoder().decode(bytes)));}catch{return json({error:'Invalid archive entry'},400);}
     const condition=new Headers(version==='"empty"'?{'If-None-Match':'*'}:{'If-Match':version});
-    const saved=await env.INVENTORY.put('companies.json',JSON.stringify(value),{onlyIf:condition,httpMetadata:{contentType:'application/json',cacheControl:'private, no-store'}});
+    const saved=await env.INVENTORY.put(archive.key,JSON.stringify(value),{onlyIf:condition,httpMetadata:{contentType:'application/json',cacheControl:'private, no-store'}});
     if(!saved)return json({error:'Archive changed; reload before saving'},412);
     return json(value,200,{ETag:saved.httpEtag});
-  }catch{return json({error:'Company archive unavailable'},503);}
+  }catch{return json({error:'Private archive unavailable'},503);}
 }
 export default {fetch(request,env){return handleRequest(request,env);}};

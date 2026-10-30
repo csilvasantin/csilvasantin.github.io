@@ -29,3 +29,11 @@ zone_name = "carlossilva.info"
 [vars]
 ACCESS_TEAM_DOMAIN = "fragrant-snowflake-5695.cloudflareaccess.com"
 ACCESS_AUD = "f1dae04df50a656f7d389b4915af1cda2fcd9bbdfdace51715fb95464df2ba80"
+
+[[routes]]
+pattern = "www.carlossilva.info/memorias/api/*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/memorias/api/*"
+zone_name = "carlossilva.info"

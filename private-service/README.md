@@ -1,5 +1,11 @@
 # Área privada de carlossilva.info
 
+## Memorias
+
+`/memorias/` permite escribir, leer, buscar y editar recuerdos con título, fecha opcional, autor y texto. Usa las mismas cinco cuentas familiares, proveedor Google, audience y política que las demás secciones, sin permisos públicos adicionales.
+
+`GET /memorias/api/memories`, `PUT /memorias/api/memories` y `/memorias/api/login` se sirven desde el Worker protegido. Los textos se guardan exclusivamente en `memories.json` del bucket R2 privado; nunca en Git, HTML estático ni almacenamiento local del navegador. La primera visita autenticada muestra un archivo vacío. Escrituras con control de origen y ETag para evitar perder cambios concurrentes. Límite inicial: 100 entradas de 12.000 caracteres; petición de hasta 4 MiB. Sin datos de prueba en producción.
+
 ## Empresas
 
 `/empresas/` contiene fichas de empresa (nombre, NIF/CIF, notas), escrituras enlazadas a Google Drive y cuentas bancarias (banco, titular e IBAN). No hay datos de ejemplo en producción. La cuenta se muestra enmascarada en el listado; el formulario permite verla para editarla y verifica su checksum.
