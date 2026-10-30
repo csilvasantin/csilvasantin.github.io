@@ -5,6 +5,7 @@ import pages from './pages.mjs';
 import assets from './assets.mjs';
 import {validateFamilyPlan} from '../empresas/plan.js';
 import {answerQuestion} from './assistant.mjs';
+import {validatePlaces} from '../empresas/places.js';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -43,15 +44,17 @@ export async function handleRequest(request,env,fetcher=fetch){
   const session=url.pathname==='/intranet/api/session';
   const plan=url.pathname==='/empresas/api/family-plan';
   const assistant=url.pathname==='/intranet/api/assistant';
+  const places=url.pathname==='/empresas/api/places';
   const canonical=url.pathname==='/'?'/intranet/':/^\/(intranet|memorias|escrituras|empresas|docs)(?:\/index\.html)?\/?$/.test(url.pathname)?'/'+url.pathname.split('/')[1]+'/':url.pathname;
   const page=pages[canonical],asset=assets[url.pathname];
-  if(!login&&!companies&&!memories&&!session&&!plan&&!assistant&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
-  if(assistant?request.method!=='POST':!['GET',...(companies||memories||plan?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
+  if(!login&&!companies&&!memories&&!session&&!plan&&!assistant&&!places&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  if(assistant?request.method!=='POST':!['GET',...(companies||memories||plan||places?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
   if(session)return json({authenticated:true});
   if(assistant){const result=await answerQuestion(request,env);return json(result.body,result.status);}
   if(plan)return handleArchive(request,env,{key:'family-plan.json',validate:validateFamilyPlan,empty:validateFamilyPlan({}),maxBytes:49152});
+  if(places)return handleArchive(request,env,{key:'places.json',validate:validatePlaces,empty:{schemaVersion:1,places:[]},maxBytes:524288});
   if(page||asset){
     if(page&&url.pathname!==canonical)return new Response(null,{status:302,headers:{Location:canonical,'Cache-Control':'private, no-store'}});
     const html=page?.replace('</head>','<link rel="stylesheet" href="/intranet/mascota.css"><script type="module" src="/intranet/mascota.js"></script></head>');
@@ -72,21 +75,24 @@ async function handleArchive(request,env,archive={key:'companies.json',validate:
   try{
     if(request.method==='GET'){
       const object=await env.INVENTORY.get(archive.key);
-      return json(object?archive.validate(await object.json()):archive.empty,200,{ETag:object?.httpEtag||'"empty"'});
+      const version=object?.httpEtag||'"empty"';
+      return json(object?archive.validate(await object.json()):archive.empty,200,{ETag:version,'X-Archive-Version':version});
     }
     if(request.headers.get('Origin')!==new URL(request.url).origin)return json({error:'Origin not allowed'},403);
     if(!request.headers.get('content-type')?.startsWith('application/json'))return json({error:'JSON required'},415);
-    const version=request.headers.get('If-Match');
+    // Cloudflare puede debilitar el ETag HTTP al comprimir la respuesta. La versión
+    // opaca del objeto R2 permanece igual; se conserva compatibilidad con esas pestañas.
+    const version=request.headers.get('If-Match')?.replace(/^W\//,'');
     if(!version||!/^"[a-zA-Z0-9-]{1,128}"$/.test(version))return json({error:'Current version required'},428);
     const reader=request.body?.getReader();if(!reader)return json({error:'Body required'},400);
     let size=0;const chunks=[];
     for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>archive.maxBytes){await reader.cancel();return json({error:'Request too large'},413);}chunks.push(value);}
     const bytes=new Uint8Array(size);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length;}
-    let value;try{value=archive.validate(JSON.parse(new TextDecoder().decode(bytes)));}catch{return json({error:'Invalid archive entry'},400);}
+    let value;try{value=archive.validate(JSON.parse(new TextDecoder().decode(bytes)));}catch(error){console.warn('Archive validation rejected',String(error?.message||'Invalid entry').slice(0,100));return json({error:'Invalid archive entry'},400);}
     const condition=new Headers(version==='"empty"'?{'If-None-Match':'*'}:{'If-Match':version});
     const saved=await env.INVENTORY.put(archive.key,JSON.stringify(value),{onlyIf:condition,httpMetadata:{contentType:'application/json',cacheControl:'private, no-store'}});
     if(!saved)return json({error:'Archive changed; reload before saving'},412);
-    return json(value,200,{ETag:saved.httpEtag});
-  }catch{return json({error:'Private archive unavailable'},503);}
+    return json(value,200,{ETag:saved.httpEtag,'X-Archive-Version':saved.httpEtag});
+  }catch(error){console.error('Archive storage unavailable',JSON.stringify({type:error?.name,codes:String(error?.message||'').match(/\b\d{3,6}\b/g)}));return json({error:'Private archive unavailable'},503);}
 }
-export default {fetch(request,env){return handleRequest(request,env);}};
+export default {async fetch(request,env){const response=await handleRequest(request,env);if(request.method==='PUT'&&response.status>=400)console.warn('Archive write rejected',JSON.stringify({status:response.status,path:new URL(request.url).pathname,origin:request.headers.get('Origin'),expectedOrigin:new URL(request.url).origin}));return response;}};

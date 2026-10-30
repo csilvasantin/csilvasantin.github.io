@@ -26,6 +26,7 @@ async function init(){
     data.criteria.forEach(c=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=c.title;dd.textContent=c.text;$('criteria').append(dt,dd);});
     if(response.headers.get('X-Preview-Only')==='true'){$('status').textContent='Vista previa local · Copia del inventario. El inicio de sesión con Google todavía no está activado.';$('logout').hidden=true;}else $('status').hidden=true;
     $('inventory').hidden=false;render();
+    const selected=data.records.find(r=>String(r.id)===new URLSearchParams(location.search).get('inmueble'));if(selected)detail(selected);
   }catch{$('status').classList.add('error');$('status').textContent='Entra con una de las cuentas de Google autorizadas para consultar el archivo privado. Si el dominio aún se está activando, vuelve a intentarlo en unos minutos.';$('signin-wrap').hidden=false;}
 }
 ['search','use','year','right'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{if(data)render();}));
