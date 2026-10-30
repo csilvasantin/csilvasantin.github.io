@@ -18,7 +18,7 @@ La interfaz protegida se sirve en `/escrituras/`. No contiene el inventario, nom
 
 ## Infraestructura comprobada el 30/10/2026
 
-- GoDaddy confirma los nameservers Cloudflare `matteo.ns.cloudflare.com` y `paris.ns.cloudflare.com`. La activación final de la zona sigue pendiente de propagación del registrador.
+- GoDaddy confirma los nameservers Cloudflare `matteo.ns.cloudflare.com` y `paris.ns.cloudflare.com`. La zona está Active y el certificado Universal SSL está Active (30/10/2026). Algunos resolutores conservan temporalmente el CNAME anterior de www.
 - Se contrastaron los 13 registros de servicio con los 16 de GoDaddy (los otros 3 son NS/SOA). Correo y servicios auxiliares permanecen sin proxy. La web continúa en GitHub Pages, rama main.
 - Worker desplegado en diez rutas: las cinco áreas completas, tanto en dominio raíz como en www. Bucket R2 privado, sin r2.dev ni dominios públicos. Inventario de 23 unidades guardado; Empresas se inicializa vacío después de autenticar.
 - Proyecto Google `carlos-silva-archivo-privado`, sin facturación. OAuth creado y configurado. Google se mantiene en modo de prueba con las cinco cuentas autorizadas. Prueba real del IdP completada con la cuenta del propietario.
@@ -28,13 +28,13 @@ La interfaz protegida se sirve en `/escrituras/`. No contiene el inventario, nom
 - `ACCESS_AUD` y `ACCESS_TEAM_DOMAIN` configurados en Wrangler; los cinco correos corregidos están en el secreto `ALLOWED_EMAILS`, nunca en Git.
 - El inventario es una copia de la hoja, no una sincronización automática.
 
-## Comprobación tras propagarse el DNS
+## Verificación del despliegue
 
-Comprobar que Cloudflare marque la zona Active; verificar portada, correo MX y TLS Full (Strict). Abrir ambas secciones y usar «Entrar con Google» con una cuenta permitida; con sesión cerrada no debe haber datos. Verificar lectura del inventario y archivo vacío de Empresas. Los 21 tests locales verifican firmas, issuer, audience, caducidad, lista de usuarios, origen de escrituras, versiones concurrentes y redirecciones de login.
+Cloudflare confirma zona y certificado activos, con TLS Full (Strict). GitHub Pages ha publicado las puertas de entrada sin menú ni formularios privados. Se verificaron 22 peticiones HTTPS sin sesión contra el edge Cloudflare (resolución al IP publicado por 1.1.1.1, sin omitir validación TLS): cinco páginas, dos recursos y cuatro API, tanto raíz como www. Todas devuelven 302 al login de Access y Cache-Control no-store. El navegador local conserva temporalmente la resolución antigua; la navegación autenticada completa en el dominio queda pendiente de expirar esa caché. La prueba real del proveedor Google ya fue satisfactoria. Los 21 tests locales verifican firmas, issuer, audience, caducidad, lista de usuarios, origen de escrituras, versiones concurrentes y redirecciones de login.
 
 El destino Worker protege automáticamente todas sus rutas y dominios; se conserva la misma aplicación y audience. La portada pública muestra solo «Entrar en la zona protegida»; `family-navigation.js` únicamente añade el menú familiar tras una respuesta autenticada de `/intranet/api/session`. El menú privado empieza por Inicio → Memorias → Escrituras → Empresas → Documentación.
 
-Las pruebas nuevas cubren la denegación del HTML y recursos para visitas anónimas y cuentas ajenas, el orden del menú autenticado y la ausencia de vistas privadas en el origen estático. La validación real del flujo de login del dominio queda pendiente mientras Cloudflare indique zona Pending; los DNS de 1.1.1.1 ya devuelven los nameservers correctos.
+Las pruebas nuevas cubren la denegación del HTML y recursos para visitas anónimas y cuentas ajenas, el orden del menú autenticado y la ausencia de vistas privadas en el origen estático. La validación HTTP de la protección del dominio ya es satisfactoria en el edge activo. El menú autenticado también se comprobó visualmente en la vista previa local.
 
 Documentación del alcance del destino Worker: https://developers.cloudflare.com/workers/configuration/cloudflare-access/
 
