@@ -31,11 +31,13 @@ export async function verifyAccess(request,env,fetcher=fetch){
 }
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
+  const login=url.pathname==='/escrituras/api/login'?'/escrituras/':url.pathname==='/empresas/api/login'?'/empresas/':null;
   const companies=url.pathname==='/empresas/api/companies';
-  if(!companies&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  if(!login&&!companies&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
   if(!['GET',...(companies?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
+  if(login)return new Response(null,{status:302,headers:{Location:login,'Cache-Control':'private, no-store'}});
   if(companies)return handleCompanies(request,env);
   try{
     const object=await env.INVENTORY.get('inventory.json');

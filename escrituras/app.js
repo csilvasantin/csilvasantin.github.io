@@ -15,7 +15,7 @@ function render() {
 function populate(id,index){[...new Set(data.records.map(r=>r.cells[index].text).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es',{numeric:true})).forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;$(id).append(o);});}
 async function init(){
   try {const response=await fetch('/escrituras/api/inventory',{credentials:'same-origin',cache:'no-store',redirect:'error'});
-    if(response.status===401||response.status===403){$('status').textContent='Acceso restringido. Entra con una de las cuentas de Google autorizadas.';return;}
+    if(response.status===401||response.status===403){$('status').textContent='Acceso restringido. Entra con una de las cuentas de Google autorizadas.';$('signin-wrap').hidden=false;return;}
     if(!response.ok || !(response.headers.get('content-type')||'').includes('application/json'))throw new Error('unavailable');
     data=await response.json();if(!Array.isArray(data.records)||!Array.isArray(data.headers)||data.headers.length!==16)throw new Error('invalid');
     $('total').textContent=data.records.length;$('documents').textContent=new Set(data.records.map(r=>r.cells[14].url).filter(Boolean)).size;
@@ -26,7 +26,7 @@ async function init(){
     data.criteria.forEach(c=>{const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=c.title;dd.textContent=c.text;$('criteria').append(dt,dd);});
     if(response.headers.get('X-Preview-Only')==='true'){$('status').textContent='Vista previa local · Copia del inventario. El inicio de sesión con Google todavía no está activado.';$('logout').hidden=true;}else $('status').hidden=true;
     $('inventory').hidden=false;render();
-  }catch{$('status').classList.add('error');$('status').textContent='El archivo privado todavía no está disponible. La conexión protegida con Google debe estar activa para consultar los documentos. No se han cargado datos personales.';}
+  }catch{$('status').classList.add('error');$('status').textContent='Entra con una de las cuentas de Google autorizadas para consultar el archivo privado. Si el dominio aún se está activando, vuelve a intentarlo en unos minutos.';$('signin-wrap').hidden=false;}
 }
 ['search','use','year','right'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>{if(data)render();}));
 $('clear').onclick=()=>{['search','use','year','right'].forEach(id=>$(id).value='');render();};$('columns-toggle').onclick=()=>{const expanded=$('columns-toggle').getAttribute('aria-expanded')==='true';$('columns-toggle').setAttribute('aria-expanded',String(!expanded));$('columns').hidden=expanded;};$('close').onclick=()=>$('detail').close();

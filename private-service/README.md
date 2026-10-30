@@ -6,32 +6,29 @@
 
 `GET /empresas/api/companies` y `PUT /empresas/api/companies` utilizan el mismo JWT y lista privada de usuarios que Escrituras. El archivo `companies.json` se guarda exclusivamente en R2 privado. Cada modificación requiere origen coincidente y una versión ETag válida, y la escritura condicional evita sobreescribir cambios de otra persona. Se limitan tamaño, estructura y destinos de enlaces. Nunca guardar números de cuenta en Git ni en archivos estáticos.
 
-Al activar Cloudflare Access, añadir también `www.carlossilva.info/empresas` y `carlossilva.info/empresas`, incluidas sus subrutas, con el mismo proveedor Google y las mismas cuentas autorizadas. Para usar la misma `ACCESS_AUD`, deben ser destinos de la misma aplicación Access.
+La aplicación Access protege directamente el Worker `carlossilva-private`, incluidas todas sus rutas. Las páginas estáticas muestran únicamente la interfaz y un botón «Entrar con Google». Los endpoints de inicio de sesión redirigen a su sección tras validar el JWT. No contienen datos privados.
 
 La interfaz estática está en `/escrituras/`. No contiene el inventario, nombres de titulares, direcciones ni enlaces a las escrituras. Los datos se obtienen exclusivamente de `GET /escrituras/api/inventory` tras validar un JWT firmado por Cloudflare Access y la lista privada de cinco cuentas del secreto `ALLOWED_EMAILS`.
 
 ## Infraestructura comprobada el 30/10/2026
 
-- carlossilva.info: DNS en GoDaddy (`ns71/ns72.domaincontrol.com`), web en GitHub Pages (`csilvasantin/csilvasantin.github.io`, rama main).
-- admira.shop: DNS/proxy en Cloudflare (`matteo/paris.ns.cloudflare.com`).
-- Zona Cloudflare creada (Free), pendiente de delegar desde GoDaddy. Los 13 registros de servicio se han contrastado con los 16 de GoDaddy (los otros 3 son NS/SOA). DNSSEC está apagado.
-- Wrangler renovado y Worker desplegado en ambas rutas. Bucket R2 privado creado, copia de 23 unidades guardada, acceso público r2.dev deshabilitado y sin dominios públicos.
-- Proyecto Google independiente `carlos-silva-archivo-privado`, sin facturación. Formulario OAuth preparado; pendiente de consentimiento, creación del cliente e integración con Access.
-- El Worker permanece cerrado (503) sin `ACCESS_AUD` y `ALLOWED_EMAILS`. La interfaz distingue este estado de un inicio de sesión correcto.
-- El inventario es una copia de la hoja, no una sincronización automática. No modificar la hoja fuente para publicar la web.
+- GoDaddy confirma los nameservers Cloudflare `matteo.ns.cloudflare.com` y `paris.ns.cloudflare.com`. La activación final de la zona sigue pendiente de propagación del registrador.
+- Se contrastaron los 13 registros de servicio con los 16 de GoDaddy (los otros 3 son NS/SOA). Correo y servicios auxiliares permanecen sin proxy. La web continúa en GitHub Pages, rama main.
+- Worker desplegado en las cuatro rutas de API, dos secciones por dominio raíz y www. Bucket R2 privado, sin r2.dev ni dominios públicos. Inventario de 23 unidades guardado; Empresas se inicializa vacío después de autenticar.
+- Proyecto Google `carlos-silva-archivo-privado`, sin facturación. OAuth creado y configurado. Google se mantiene en modo de prueba con las cinco cuentas autorizadas. Prueba real del IdP completada con la cuenta del propietario.
+- Proveedor Google: `070bdc8a-c9f4-468c-b51a-d9babc3fabc5`.
+- Aplicación Access: `84b08853-3d4c-4d41-9564-a095945b0221`, destino Worker completo (producción y vistas previas), Google como único proveedor, sesión de 6 horas. Cookie HttpOnly.
+- Política `0b2119c9-8da4-4691-a7a3-2841b3a4a1c9`: Allow para cinco correos exactos y Require Google. No hay Bypass ni reglas Everyone.
+- `ACCESS_AUD` y `ACCESS_TEAM_DOMAIN` configurados en Wrangler; los cinco correos corregidos están en el secreto `ALLOWED_EMAILS`, nunca en Git.
+- El inventario es una copia de la hoja, no una sincronización automática.
 
-## Activación
+## Comprobación tras propagarse el DNS
 
-1. En la misma cuenta Cloudflare que admira.shop, añadir la zona carlossilva.info. Copiar **todos** los registros existentes, incluidos MX, TXT, SPF, DKIM y DMARC. Mantener los destinos de GitHub Pages. Cambiar los nameservers en GoDaddy sólo a los asignados por Cloudflare y comprobar web/correo.
-2. Activar proxy para los registros web del dominio raíz y www. Configurar TLS Full (strict), conservando el certificado válido de GitHub Pages.
-3. En Zero Trust, configurar Google como proveedor de identidad (cuentas Google normales y de Workspace). Documentación: https://developers.cloudflare.com/cloudflare-one/integrations/identity-providers/google/
-4. Crear una aplicación Access con ambos hostnames `carlossilva.info/escrituras` y `www.carlossilva.info/escrituras`, incluyendo sus subrutas. Login únicamente con Google; política Allow únicamente para:
-   Las cinco direcciones autorizadas se mantienen en el secreto `ALLOWED_EMAILS` del Worker y en la política Access. No publicarlas en este repositorio.
-   No añadir políticas Bypass, Everyone ni acceso general por dominio. Sesión de 6 horas.
-5. Crear un bucket R2 **privado** `carlossilva-private`, sin r2.dev ni dominio público. Subir la copia local como objeto `inventory.json` con Wrangler (`r2 object put carlossilva-private/inventory.json --file <ruta-local> --remote`). Nunca incluir esa copia en Git, Pages, logs ni assets.
-6. En `wrangler.toml`, completar `ACCESS_AUD` (Application Audience de la aplicación Access). `ACCESS_TEAM_DOMAIN` ya está configurado. Son identificadores, no contraseñas. Configurar el secreto `ALLOWED_EMAILS` con las direcciones verificadas, separadas por comas. Desplegar el Worker con las dos rutas indicadas. Workers.dev y preview URLs permanecen desactivados.
-7. Publicar la interfaz en Pages. Añadir un enlace «Escrituras» en la portada cuando esté operativo.
-8. Verificar con sesión cerrada, cuenta permitida y cuenta ajena: no hay datos antes de iniciar sesión; las cinco cuentas permitidas pueden entrar; una cuenta ajena no puede. Verificar las dos variantes del dominio y el endpoint de la API. Las firmas, issuer, audience y caducidad se verifican también en el Worker para evitar suplantación por cabeceras.
+Comprobar que Cloudflare marque la zona Active; verificar portada, correo MX y TLS Full (Strict). Abrir ambas secciones y usar «Entrar con Google» con una cuenta permitida; con sesión cerrada no debe haber datos. Verificar lectura del inventario y archivo vacío de Empresas. Los 15 tests locales verifican firmas, issuer, audience, caducidad, lista de usuarios, origen de escrituras, versiones concurrentes y redirecciones de login.
+
+El destino Worker protege automáticamente todas sus rutas y dominios; no hace falta crear otra aplicación. Si se añaden destinos públicos para proteger también la interfaz estática, deben pertenecer a esta misma aplicación para conservar el audience.
+
+Documentación del alcance del destino Worker: https://developers.cloudflare.com/workers/configuration/cloudflare-access/
 
 Las escrituras siguen sujetas a los permisos originales de Drive. El acceso a la web no cambia automáticamente sus permisos: revisar la hoja y cada PDF antes de considerar completo el acceso de todas las cuentas. No habilitar enlaces públicos.
 

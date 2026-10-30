@@ -28,5 +28,4 @@ zone_name = "carlossilva.info"
 
 [vars]
 ACCESS_TEAM_DOMAIN = "fragrant-snowflake-5695.cloudflareaccess.com"
-# Falta configurar Google y copiar la audience de Access. Sin audience la API responde 503.
-# ACCESS_AUD = "audience de la aplicación Access"
+ACCESS_AUD = "f1dae04df50a656f7d389b4915af1cda2fcd9bbdfdace51715fb95464df2ba80"
