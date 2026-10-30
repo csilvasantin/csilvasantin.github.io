@@ -1,6 +1,8 @@
 // Configuración privada del Worker; la lista de familiares no se publica en GitHub.
 import {validateCompanies} from '../empresas/model.js';
 import {validateMemories} from '../memorias/model.js';
+import pages from './pages.mjs';
+import assets from './assets.mjs';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -35,10 +37,18 @@ export async function handleRequest(request,env,fetcher=fetch){
   const login=url.pathname==='/escrituras/api/login'?'/escrituras/':url.pathname==='/empresas/api/login'?'/empresas/':url.pathname==='/memorias/api/login'?'/memorias/':null;
   const companies=url.pathname==='/empresas/api/companies';
   const memories=url.pathname==='/memorias/api/memories';
-  if(!login&&!companies&&!memories&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  const session=url.pathname==='/intranet/api/session';
+  const canonical=/^\/(intranet|memorias|escrituras|empresas|docs)(?:\/index\.html)?\/?$/.test(url.pathname)?'/'+url.pathname.split('/')[1]+'/':url.pathname;
+  const page=pages[canonical],asset=assets[url.pathname];
+  if(!login&&!companies&&!memories&&!session&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
   if(!['GET',...(companies||memories?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
+  if(session)return json({authenticated:true});
+  if(page||asset){
+    if(page&&url.pathname!==canonical)return new Response(null,{status:302,headers:{Location:canonical,'Cache-Control':'private, no-store'}});
+    return new Response(page||asset[1],{headers:{...HEADERS,'Content-Type':`${page?'text/html':asset[0]}; charset=utf-8`,'X-Robots-Tag':'noindex, nofollow, noarchive','Content-Security-Policy':"frame-ancestors 'none'",'X-Frame-Options':'DENY'}});
+  }
   if(login)return new Response(null,{status:302,headers:{Location:login,'Cache-Control':'private, no-store'}});
   if(companies)return handleArchive(request,env);
   if(memories)return handleArchive(request,env,{key:'memories.json',validate:validateMemories,empty:{schemaVersion:1,memories:[]},maxBytes:4194304});

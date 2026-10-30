@@ -2,16 +2,16 @@ name = "carlossilva-private"
 account_id = "5b14266aa29050f8e5acd442c61b9783"
 main = "worker.mjs"
 compatibility_date = "2026-10-30"
-# La API sólo se sirve en su ruta del dominio. No hay origen workers.dev alternativo.
+# Páginas, recursos y API se protegen juntos. Sin origen workers.dev alternativo.
 workers_dev = false
 preview_urls = false
 
 [[routes]]
-pattern = "www.carlossilva.info/escrituras/api/*"
+pattern = "www.carlossilva.info/escrituras*"
 zone_name = "carlossilva.info"
 
 [[routes]]
-pattern = "carlossilva.info/escrituras/api/*"
+pattern = "carlossilva.info/escrituras*"
 zone_name = "carlossilva.info"
 
 [[r2_buckets]]
@@ -19,11 +19,11 @@ binding = "INVENTORY"
 bucket_name = "carlossilva-private"
 
 [[routes]]
-pattern = "www.carlossilva.info/empresas/api/*"
+pattern = "www.carlossilva.info/empresas*"
 zone_name = "carlossilva.info"
 
 [[routes]]
-pattern = "carlossilva.info/empresas/api/*"
+pattern = "carlossilva.info/empresas*"
 zone_name = "carlossilva.info"
 
 [vars]
@@ -31,9 +31,29 @@ ACCESS_TEAM_DOMAIN = "fragrant-snowflake-5695.cloudflareaccess.com"
 ACCESS_AUD = "f1dae04df50a656f7d389b4915af1cda2fcd9bbdfdace51715fb95464df2ba80"
 
 [[routes]]
-pattern = "www.carlossilva.info/memorias/api/*"
+pattern = "www.carlossilva.info/memorias*"
 zone_name = "carlossilva.info"
 
 [[routes]]
-pattern = "carlossilva.info/memorias/api/*"
+pattern = "carlossilva.info/memorias*"
 zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "www.carlossilva.info/intranet*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/intranet*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "www.carlossilva.info/docs*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/docs*"
+zone_name = "carlossilva.info"
+
+[build]
+command = "node private-service/build-assets.mjs"
+cwd = "."

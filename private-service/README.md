@@ -12,15 +12,15 @@
 
 `GET /empresas/api/companies` y `PUT /empresas/api/companies` utilizan el mismo JWT y lista privada de usuarios que Escrituras. El archivo `companies.json` se guarda exclusivamente en R2 privado. Cada modificación requiere origen coincidente y una versión ETag válida, y la escritura condicional evita sobreescribir cambios de otra persona. Se limitan tamaño, estructura y destinos de enlaces. Nunca guardar números de cuenta en Git ni en archivos estáticos.
 
-La aplicación Access protege directamente el Worker `carlossilva-private`, incluidas todas sus rutas. Las páginas estáticas muestran únicamente la interfaz y un botón «Entrar con Google». Los endpoints de inicio de sesión redirigen a su sección tras validar el JWT. No contienen datos privados.
+La aplicación Access protege directamente el Worker `carlossilva-private`, incluidas todas sus rutas. Páginas completas, JavaScript, CSS y API de `/intranet*`, `/memorias*`, `/escrituras*`, `/empresas*` y `/docs*` se sirven después de verificar el JWT firmado y la lista familiar. No hay interfaz privada renderizada antes de autenticar. Las copias HTML de GitHub Pages solo muestran una puerta de entrada sin menú, formularios ni contenido privado. Las plantillas están en `pages.mjs`; `build-assets.mjs` empaqueta los recursos en el Worker durante el despliegue. El código fuente no contiene datos privados.
 
-La interfaz estática está en `/escrituras/`. No contiene el inventario, nombres de titulares, direcciones ni enlaces a las escrituras. Los datos se obtienen exclusivamente de `GET /escrituras/api/inventory` tras validar un JWT firmado por Cloudflare Access y la lista privada de cinco cuentas del secreto `ALLOWED_EMAILS`.
+La interfaz protegida se sirve en `/escrituras/`. No contiene el inventario, nombres de titulares, direcciones ni enlaces a las escrituras. Los datos se obtienen exclusivamente de `GET /escrituras/api/inventory` tras validar un JWT firmado por Cloudflare Access y la lista privada de cinco cuentas del secreto `ALLOWED_EMAILS`.
 
 ## Infraestructura comprobada el 30/10/2026
 
 - GoDaddy confirma los nameservers Cloudflare `matteo.ns.cloudflare.com` y `paris.ns.cloudflare.com`. La activación final de la zona sigue pendiente de propagación del registrador.
 - Se contrastaron los 13 registros de servicio con los 16 de GoDaddy (los otros 3 son NS/SOA). Correo y servicios auxiliares permanecen sin proxy. La web continúa en GitHub Pages, rama main.
-- Worker desplegado en las cuatro rutas de API, dos secciones por dominio raíz y www. Bucket R2 privado, sin r2.dev ni dominios públicos. Inventario de 23 unidades guardado; Empresas se inicializa vacío después de autenticar.
+- Worker desplegado en diez rutas: las cinco áreas completas, tanto en dominio raíz como en www. Bucket R2 privado, sin r2.dev ni dominios públicos. Inventario de 23 unidades guardado; Empresas se inicializa vacío después de autenticar.
 - Proyecto Google `carlos-silva-archivo-privado`, sin facturación. OAuth creado y configurado. Google se mantiene en modo de prueba con las cinco cuentas autorizadas. Prueba real del IdP completada con la cuenta del propietario.
 - Proveedor Google: `070bdc8a-c9f4-468c-b51a-d9babc3fabc5`.
 - Aplicación Access: `84b08853-3d4c-4d41-9564-a095945b0221`, destino Worker completo (producción y vistas previas), Google como único proveedor, sesión de 6 horas. Cookie HttpOnly.
@@ -30,9 +30,11 @@ La interfaz estática está en `/escrituras/`. No contiene el inventario, nombre
 
 ## Comprobación tras propagarse el DNS
 
-Comprobar que Cloudflare marque la zona Active; verificar portada, correo MX y TLS Full (Strict). Abrir ambas secciones y usar «Entrar con Google» con una cuenta permitida; con sesión cerrada no debe haber datos. Verificar lectura del inventario y archivo vacío de Empresas. Los 15 tests locales verifican firmas, issuer, audience, caducidad, lista de usuarios, origen de escrituras, versiones concurrentes y redirecciones de login.
+Comprobar que Cloudflare marque la zona Active; verificar portada, correo MX y TLS Full (Strict). Abrir ambas secciones y usar «Entrar con Google» con una cuenta permitida; con sesión cerrada no debe haber datos. Verificar lectura del inventario y archivo vacío de Empresas. Los 21 tests locales verifican firmas, issuer, audience, caducidad, lista de usuarios, origen de escrituras, versiones concurrentes y redirecciones de login.
 
-El destino Worker protege automáticamente todas sus rutas y dominios; no hace falta crear otra aplicación. Si se añaden destinos públicos para proteger también la interfaz estática, deben pertenecer a esta misma aplicación para conservar el audience.
+El destino Worker protege automáticamente todas sus rutas y dominios; se conserva la misma aplicación y audience. La portada pública muestra solo «Entrar en la zona protegida»; `family-navigation.js` únicamente añade el menú familiar tras una respuesta autenticada de `/intranet/api/session`. El menú privado empieza por Inicio → Memorias → Escrituras → Empresas → Documentación.
+
+Las pruebas nuevas cubren la denegación del HTML y recursos para visitas anónimas y cuentas ajenas, el orden del menú autenticado y la ausencia de vistas privadas en el origen estático. La validación real del flujo de login del dominio queda pendiente mientras Cloudflare indique zona Pending; los DNS de 1.1.1.1 ya devuelven los nameservers correctos.
 
 Documentación del alcance del destino Worker: https://developers.cloudflare.com/workers/configuration/cloudflare-access/
 

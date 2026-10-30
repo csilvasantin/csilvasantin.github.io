@@ -31,6 +31,28 @@ test('company writes enforce origin, JSON and version, then save in private stor
 test('concurrent company saves fail instead of overwriting another user',async()=>{const r=await handleRequest(new Request('https://www.carlossilva.info/empresas/api/companies',{method:'PUT',headers:{'Cf-Access-Jwt-Assertion':await token(),'Content-Type':'application/json',Origin:'https://www.carlossilva.info','If-Match':'"old-version"'},body:JSON.stringify(companyFixture)}),{...env,INVENTORY:{put:async()=>null}},fetcher);assert.equal(r.status,412);});
 test('login redirects only authenticated users to fixed section paths',async()=>{for(const section of ['escrituras','empresas','memorias']){const url=`https://www.carlossilva.info/${section}/api/login?returnTo=https://attacker.example`;assert.equal((await handleRequest(new Request(url),env,fetcher)).status,401);const r=await handleRequest(new Request(url,{headers:{'Cf-Access-Jwt-Assertion':await token()}}),env,fetcher);assert.equal(r.status,302);assert.equal(r.headers.get('location'),`/${section}/`);assert.equal(r.headers.get('cache-control'),'private, no-store');}});
 const memoryFixture={schemaVersion:1,memories:[{id:'memory-example',title:'Un recuerdo de prueba',date:'2020-01-02',author:'Familia',text:'Una historia de prueba con un árbol.'}]};
+test('private HTML, navigation and assets require a signed family session',async()=>{
+  for(const path of ['/intranet/','/memorias/','/escrituras/','/empresas/','/docs/','/memorias/index.html','/memorias/app.js','/escrituras/style.css','/intranet/api/session']){
+    for(const assertion of [null,await token({email:'outsider@example.com'})]){
+      const r=await handleRequest(new Request('https://www.carlossilva.info'+path,{headers:assertion?{'Cf-Access-Jwt-Assertion':assertion}:{}}),env,fetcher);
+      assert.equal(r.status,401,path);assert.doesNotMatch(await r.text(),/<nav|<main|Nuestros|memories/);
+    }
+  }
+  for(const path of ['/intranet/','/memorias/','/escrituras/','/empresas/','/docs/']){
+    const r=await handleRequest(new Request('https://www.carlossilva.info'+path,{headers:{'Cf-Access-Jwt-Assertion':await token()}}),env,fetcher);
+    assert.equal(r.status,200);assert.match(r.headers.get('content-type'),/text\/html/);assert.match(r.headers.get('cache-control'),/no-store/);
+    const html=await r.text();assert.match(html,/>Inicio<\/a><a href="\/memorias\/"[^>]*>Memorias<\/a>/);
+  }
+});
+test('public origin contains only a login gate rather than private page markup',async()=>{
+  const {readFile}=await import('node:fs/promises');
+  for(const path of ['intranet','memorias','escrituras','empresas','docs']){
+    const html=await readFile(new URL(`../${path}/index.html`,import.meta.url),'utf8');
+    assert.match(html,/Entrar con Google/);assert.doesNotMatch(html,/<nav|<form|<table|<dialog|app\.js/);
+  }
+  const home=await readFile(new URL('../index.html',import.meta.url),'utf8');
+  assert.doesNotMatch(home,/href="\/(memorias|escrituras|empresas|docs)\//);
+});
 test('memories reject anonymous and non-family identities before touching storage',async()=>{for(const method of ['GET','PUT'])for(const assertion of [null,await token({email:'outsider@example.com'})]){let touched=false;const r=await handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{method,headers:assertion?{'Cf-Access-Jwt-Assertion':assertion}:{}}),{...env,INVENTORY:{get:()=>{touched=true;},put:()=>{touched=true;}}},fetcher);assert.equal(r.status,401);assert.equal(touched,false);}});
 test('all five allowed identities read only the private memories object',async()=>{for(const email of ALLOWED_EMAILS){const r=await handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{headers:{'Cf-Access-Jwt-Assertion':await token({email})}}),{...env,INVENTORY:{get:async key=>{assert.equal(key,'memories.json');return {httpEtag:'"v1"',json:async()=>memoryFixture};}}},fetcher);assert.equal(r.status,200);assert.equal(r.headers.get('etag'),'"v1"');assert.equal(r.headers.get('cache-control'),'private, no-store, max-age=0');assert.deepEqual(await r.json(),memoryFixture);}});
 test('memories save to a separate object and enforce origin, validation and concurrency',async()=>{let writes=0;const assertion=await token();let conflict=false;const service={...env,INVENTORY:{put:async(key,body,options)=>{writes++;assert.equal(key,'memories.json');assert.equal(options.onlyIf.get('If-Match'),'"v1"');assert.deepEqual(JSON.parse(body),memoryFixture);return conflict?null:{httpEtag:'"v2"'};}}};const save=(body=memoryFixture,origin='https://www.carlossilva.info')=>handleRequest(new Request('https://www.carlossilva.info/memorias/api/memories',{method:'PUT',headers:{'Cf-Access-Jwt-Assertion':assertion,'Content-Type':'application/json',Origin:origin,'If-Match':'"v1"'},body:JSON.stringify(body)}),service,fetcher);assert.equal((await save(memoryFixture,'https://attacker.example')).status,403);assert.equal((await save({memories:[{...memoryFixture.memories[0],text:''}]})).status,400);assert.equal(writes,0);assert.equal((await save()).status,200);conflict=true;assert.equal((await save()).status,412);});
