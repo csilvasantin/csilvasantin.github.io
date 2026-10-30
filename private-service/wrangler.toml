@@ -57,3 +57,6 @@ zone_name = "carlossilva.info"
 [build]
 command = "node private-service/build-assets.mjs"
 cwd = "."
+
+[ai]
+binding = "AI"

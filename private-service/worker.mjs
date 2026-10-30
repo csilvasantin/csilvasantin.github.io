@@ -3,6 +3,8 @@ import {validateCompanies} from '../empresas/model.js';
 import {validateMemories} from '../memorias/model.js';
 import pages from './pages.mjs';
 import assets from './assets.mjs';
+import {validateFamilyPlan} from '../empresas/plan.js';
+import {answerQuestion} from './assistant.mjs';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -38,16 +40,21 @@ export async function handleRequest(request,env,fetcher=fetch){
   const companies=url.pathname==='/empresas/api/companies';
   const memories=url.pathname==='/memorias/api/memories';
   const session=url.pathname==='/intranet/api/session';
+  const plan=url.pathname==='/empresas/api/family-plan';
+  const assistant=url.pathname==='/intranet/api/assistant';
   const canonical=/^\/(intranet|memorias|escrituras|empresas|docs)(?:\/index\.html)?\/?$/.test(url.pathname)?'/'+url.pathname.split('/')[1]+'/':url.pathname;
   const page=pages[canonical],asset=assets[url.pathname];
-  if(!login&&!companies&&!memories&&!session&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
-  if(!['GET',...(companies||memories?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
+  if(!login&&!companies&&!memories&&!session&&!plan&&!assistant&&!page&&!asset&&url.pathname!=='/escrituras/api/inventory')return json({error:'Not found'},404);
+  if(assistant?request.method!=='POST':!['GET',...(companies||memories||plan?['PUT']:[])].includes(request.method))return json({error:'Method not allowed'},405);
   if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!env.INVENTORY||!allowedEmails(env).size)return json({error:'Private service not configured'},503);
   try{await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
   if(session)return json({authenticated:true});
+  if(assistant){const result=await answerQuestion(request,env);return json(result.body,result.status);}
+  if(plan)return handleArchive(request,env,{key:'family-plan.json',validate:validateFamilyPlan,empty:validateFamilyPlan({}),maxBytes:49152});
   if(page||asset){
     if(page&&url.pathname!==canonical)return new Response(null,{status:302,headers:{Location:canonical,'Cache-Control':'private, no-store'}});
-    return new Response(page||asset[1],{headers:{...HEADERS,'Content-Type':`${page?'text/html':asset[0]}; charset=utf-8`,'X-Robots-Tag':'noindex, nofollow, noarchive','Content-Security-Policy':"frame-ancestors 'none'",'X-Frame-Options':'DENY'}});
+    const html=page?.replace('</head>','<link rel="stylesheet" href="/intranet/mascota.css"><script type="module" src="/intranet/mascota.js"></script></head>');
+    return new Response(html||asset[1],{headers:{...HEADERS,'Content-Type':`${page?'text/html':asset[0]}; charset=utf-8`,'X-Robots-Tag':'noindex, nofollow, noarchive','Content-Security-Policy':"frame-ancestors 'none'",'X-Frame-Options':'DENY'}});
   }
   if(login)return new Response(null,{status:302,headers:{Location:login,'Cache-Control':'private, no-store'}});
   if(companies)return handleArchive(request,env);
