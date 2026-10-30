@@ -1,6 +1,6 @@
 import {validateCompanies} from '../empresas/model.js';
 import {validateFamilyPlan} from '../empresas/plan.js';
-const model='@cf/meta/llama-3.1-8b-instruct';
+const model='@cf/meta/llama-3.1-8b-instruct-fp8';
 const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const redact=s=>String(s||'').replace(/\b[A-Z]{2}\d{2}(?:[\s-]?[A-Z0-9]){11,30}\b/gi,'[cuenta omitida]');
 const clean=s=>redact(s).slice(0,700);
@@ -60,5 +60,5 @@ export async function answerQuestion(request,env){
     if(typeof output?.response!=='string'||!output.response.trim())throw Error('empty');
     const answer=output.response.replace(/\b[A-Z]{2}\d{2}(?:[\s-]?[A-Z0-9]){11,30}\b/gi,'[consulta la cuenta en la ficha privada]').slice(0,5000);
     return result({answer,name,sources});
-  }catch(error){console.error('Family assistant unavailable',JSON.stringify({stage,errorType:String(error?.name||'Error').slice(0,50),code:typeof error?.code==='number'?error.code:undefined}));return result({error:'No he podido consultar el archivo ahora. Prueba de nuevo en un momento o abre las fichas.'},503);}
+  }catch(error){const details=String(error?.message||'').toLowerCase();console.error('Family assistant unavailable',JSON.stringify({stage,errorType:String(error?.name||'Error').slice(0,50),codes:details.match(/\b\d{3,6}\b/g),flags:['max_tokens','token','model','permission','terms','not found','context','too long','limit','account','deprecated','disabled','unsupported','internal','timeout','invalid'].filter(word=>details.includes(word))}));return result({error:'No he podido consultar el archivo ahora. Prueba de nuevo en un momento o abre las fichas.'},503);}
 }
