@@ -38,3 +38,22 @@ test('PortAventuraNeXT: anónimo 401, familiar 403, propietario 200 con assets e
   }});
 test('PortAventuraNeXT: el Worker no sirve nada familiar ni otras rutas en ese dominio',async()=>{for(const p of ['/intranet/','/escrituras/api/inventory','/portaventuraNext/gemelodigital/tokenizado/','/',P+'foto.jpg']){const r=await handleRequest(req(p,await token(),'www.portaventuranext.com'),env,fetcher);assert.equal(r.status,404,p);}});
 test('importación valida formato en cliente',async()=>{const {tokenizadoAssets}=await import('./tokenizado.mjs');const js=tokenizadoAssets()['/portaventuraNext/gemelodigital/tokenizado/app.js'][1];assert.match(js,/function valida/);assert.match(js,/1048576/);});
+const U=['/universos/','/netflixventura/','/universalventura/','/sonyventura/','/skydanceventura/'];
+const imgEnv={...env,INVENTORY:{get:async k=>k.startsWith('universos/')?{body:'JPEGDATA'}:null}};
+test('universos: anónimo/forjado 401 y familiar 403 en páginas, css e imágenes',async()=>{for(const host of ['www.portaventuranext.com','portaventuranext.com'])for(const p of [...U,...U.map(x=>x.slice(0,-1)),'/universos/estilo.css','/universos/img/panel_sony.jpg','/universos/img/montaje.jpg']){
+  for(const t of [null,'x.y.z']){const r=await handleRequest(req(p,t,host),imgEnv,fetcher);assert.equal(r.status,401,host+p);assert.doesNotMatch(await r.text(),/JPEGDATA|Ventura/);}
+  const f=await handleRequest(req(p,await token({email:'family@example.com'}),host),imgEnv,fetcher);assert.equal(f.status,403,p);assert.doesNotMatch(await f.text(),/JPEGDATA/);}});
+test('universos: propietario ve hub con 4 enlaces y subsites distintos con navegación',async()=>{const t=await token();
+  const hub=await (await handleRequest(req('/universos/',t,'www.portaventuranext.com'),imgEnv,fetcher)).text();
+  for(const s of U.slice(1))assert.match(hub,new RegExp(`href="${s}"`));assert.match(hub,/Concepto ilustrativo; no representa acuerdos con las marcas/);
+  const bodies=new Set();for(const s of U.slice(1)){const r=await handleRequest(req(s,t,'www.portaventuranext.com'),imgEnv,fetcher);assert.equal(r.status,200);const h=await r.text();bodies.add(h);
+    assert.match(h,/href="\/universos\/"/);for(const o of U.slice(1).filter(x=>x!==s))assert.match(h,new RegExp(`href="${o}"`));assert.match(h,/no representa acuerdos/);
+    assert.equal(/gemelodigital\/tokenizado/.test(h),s==='/netflixventura/');}
+  assert.equal(bodies.size,4);});
+test('universos: canonical slash, imagen solo propietario, imagen desconocida 404, POST 405',async()=>{const t=await token();
+  const r=await handleRequest(req('/sonyventura',t,'www.portaventuranext.com'),imgEnv,fetcher);assert.equal(r.status,302);assert.equal(r.headers.get('location'),'/sonyventura/');
+  const i=await handleRequest(req('/universos/img/panel_sony.jpg',t,'www.portaventuranext.com'),imgEnv,fetcher);assert.equal(i.status,200);assert.equal(i.headers.get('content-type'),'image/jpeg');assert.match(i.headers.get('cache-control'),/no-store/);
+  for(const p of ['/universos/img/input.png','/universos/img/../x.jpg','/universos/otra'])assert.equal((await handleRequest(req(p,t,'www.portaventuranext.com'),imgEnv,fetcher)).status,404,p);
+  assert.equal((await handleRequest(req('/universos/',t,'www.portaventuranext.com','POST'),imgEnv,fetcher)).status,405);});
+test('universos no existen en carlossilva.info',async()=>{assert.equal((await handleRequest(req('/universos/',await token(),'www.carlossilva.info'),imgEnv,fetcher)).status,404);});
+test('tokenizado en PortAventuraNeXT enlaza al mapa',async()=>{const h=await (await handleRequest(req('/gemelodigital/tokenizado/',await token(),'www.portaventuranext.com'),env,fetcher)).text();assert.match(h,/href="\/universos\/"/);});

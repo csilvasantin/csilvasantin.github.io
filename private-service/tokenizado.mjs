@@ -57,7 +57,7 @@ const htmlFor=(BASE)=>`<!doctype html>
 <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
 <title>digitalTwin tokenizado · NetflixVentura</title><link rel="stylesheet" href="${BASE}style.css"><script type="module" src="${BASE}app.js"></script></head>
 <body><header><div class="wrap" style="padding:0"><h1>digitalTwin tokenizado de <b>NetflixVentura</b></h1>
-<p class="sub">Gemelo digital ↔ figura LEGO física · PortAventura × Netflix · personajes digitales de Stranger Things y otras series de Netflix, correlacionados con figuras físicas LEGO.</p></div></header>
+${BASE===PAV_BASE?'<p><a href="/universos/">← Mapa de universos</a> · <a href="/netflixventura/">NetflixVentura</a></p>':''}<p class="sub">Gemelo digital ↔ figura LEGO física · PortAventura × Netflix · personajes digitales de Stranger Things y otras series de Netflix, correlacionados con figuras físicas LEGO.</p></div></header>
 <main class="wrap">
 <section class="notes">
 <div class="note"><strong>Fase inicial: movimiento a mano</strong>Las figuras se mueven manualmente. Sin motores, sensores ni compras. El estado lo marcas tú.</div>
