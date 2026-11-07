@@ -6,6 +6,7 @@ import assets from './assets.mjs';
 import {validateFamilyPlan} from '../empresas/plan.js';
 import {answerQuestion} from './assistant.mjs';
 import {validatePlaces} from '../empresas/places.js';
+import {isUniversosPath,serveUniversos} from './universos.mjs';
 import {baseFor,PAV_HOSTS,tokenizadoPages,tokenizadoAssets,ownerEmails,isTokenizadoPath} from './tokenizado.mjs';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
@@ -53,7 +54,14 @@ async function handleTokenizado(request,env,url,fetcher){
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
   if(isTokenizadoPath(url.pathname,baseFor(url.hostname)))return handleTokenizado(request,env,url,fetcher);
-  // En el dominio PortAventuraNeXT este Worker solo atiende el gemelo; nada más (fail-closed).
+  if(PAV_HOSTS.has(url.hostname)&&isUniversosPath(url.pathname)){
+    if(!['GET','HEAD'].includes(request.method))return json({error:'Method not allowed'},405);
+    if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!allowedEmails(env).size||!ownerEmails(env).size)return json({error:'Private service not configured'},503);
+    let identity;try{identity=await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
+    if(!ownerEmails(env).has(identity.email))return json({error:'Forbidden'},403);
+    return serveUniversos(request,env,url.pathname);
+  }
+  // En el dominio PortAventuraNeXT este Worker solo atiende gemelo y universos; nada más (fail-closed).
   if(PAV_HOSTS.has(url.hostname))return json({error:'Not found'},404);
   const loginPath=url.pathname.replace(/\/$/,'');
   const login=loginPath==='/escrituras/api/login'?'/escrituras/':loginPath==='/empresas/api/login'?'/empresas/':loginPath==='/memorias/api/login'?'/memorias/':null;
