@@ -61,3 +61,12 @@ cwd = "."
 
 [ai]
 binding = "AI"
+
+# digitalTwin tokenizado de NetflixVentura: solo propietario (secreto OWNER_EMAILS).
+[[routes]]
+pattern = "www.carlossilva.info/portaventuraNext/gemelodigital/tokenizado*"
+zone_name = "carlossilva.info"
+
+[[routes]]
+pattern = "carlossilva.info/portaventuraNext/gemelodigital/tokenizado*"
+zone_name = "carlossilva.info"

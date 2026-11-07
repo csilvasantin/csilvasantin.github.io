@@ -6,6 +6,7 @@ import assets from './assets.mjs';
 import {validateFamilyPlan} from '../empresas/plan.js';
 import {answerQuestion} from './assistant.mjs';
 import {validatePlaces} from '../empresas/places.js';
+import {BASE as TOKENIZADO,tokenizadoPages,tokenizadoAssets,ownerEmails,isTokenizadoPath} from './tokenizado.mjs';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -35,8 +36,22 @@ export async function verifyAccess(request,env,fetcher=fetch){
   if(!valid)throw new Error('Invalid signature');
   return {email,sub:claims.sub};
 }
+// /portaventuraNext/gemelodigital/tokenizado: solo el propietario (OWNER_EMAILS ⊂ ALLOWED_EMAILS).
+// Fail-closed: sin OWNER_EMAILS configurado responde 503 y nunca sirve la interfaz.
+async function handleTokenizado(request,env,url,fetcher){
+  const page=tokenizadoPages[url.pathname],asset=tokenizadoAssets[url.pathname];
+  const bare=url.pathname===TOKENIZADO.slice(0,-1)||url.pathname===TOKENIZADO+'index.html';
+  if(!page&&!asset&&!bare)return json({error:'Not found'},404);
+  if(!['GET','HEAD'].includes(request.method))return json({error:'Method not allowed'},405);
+  if(!env.ACCESS_TEAM_DOMAIN||!env.ACCESS_AUD||!allowedEmails(env).size||!ownerEmails(env).size)return json({error:'Private service not configured'},503);
+  let identity;try{identity=await verifyAccess(request,env,fetcher);}catch{return json({error:'Authentication required'},401);}
+  if(!ownerEmails(env).has(identity.email))return json({error:'Forbidden'},403);
+  if(bare)return new Response(null,{status:302,headers:{Location:TOKENIZADO,'Cache-Control':'private, no-store'}});
+  return new Response(request.method==='HEAD'?null:(page||asset[1]),{headers:{...HEADERS,'Content-Type':`${page?'text/html':asset[0]}; charset=utf-8`,'X-Robots-Tag':'noindex, nofollow, noarchive','Content-Security-Policy':"default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",'X-Frame-Options':'DENY'}});
+}
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
+  if(isTokenizadoPath(url.pathname))return handleTokenizado(request,env,url,fetcher);
   const loginPath=url.pathname.replace(/\/$/,'');
   const login=loginPath==='/escrituras/api/login'?'/escrituras/':loginPath==='/empresas/api/login'?'/empresas/':loginPath==='/memorias/api/login'?'/memorias/':null;
   const companies=url.pathname==='/empresas/api/companies';
