@@ -87,3 +87,9 @@ El CIF que figuraba pendiente se contrastó en una segunda fuente independiente 
 Se comprobó el guardado real desde el navegador y la importación de un registro existente (cancelada para conservar la ficha pendiente). Durante la prueba se detectó que Cloudflare transforma algunos ETag de respuesta al comprimirlos: el archivo ahora publica `X-Archive-Version` como versión opaca de R2, que leen los cuatro editores. Se aceptan las versiones HTTP débiles equivalentes de pestañas anteriores, conservando la condición sobre el mismo objeto R2 y el rechazo de conflictos.
 
 32 pruebas correctas, incluidas privacidad del nuevo endpoint y recursos, persistencia separada, escritura concurrente, importación sin mutar el inventario, fuentes/enlaces y fechas, estados pendientes en el contexto de la IA y regresión del guardado con ETag HTTP débil.
+
+## digitalTwin tokenizado de NetflixVentura
+
+`/portaventuraNext/gemelodigital/tokenizado/` (PortAventura × Netflix) se sirve solo desde este Worker y es **exclusiva del propietario**: además del JWT de Access y `ALLOWED_EMAILS`, exige que el correo esté en el secreto `OWNER_EMAILS` (fuera de Git). Sin `OWNER_EMAILS` responde 503; cuenta familiar, 403; anónimo, 401. No existe copia en GitHub Pages. Fase inicial manual: sin motores, sensores, fotos ni vídeo; enlaza a los ojos remotos de AdmiraNeXT sin integrarlos. Las filas de partida están marcadas como ejemplo y el estado se guarda solo en el navegador. El token es la identidad del vínculo personaje↔figura LEGO, no financiero.
+
+Despliegue: `wrangler secret put OWNER_EMAILS` y `wrangler deploy` (rutas ya en `wrangler.toml`). Tests: `node --test private-service/tokenizado.test.mjs`.
