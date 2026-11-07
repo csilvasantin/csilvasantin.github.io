@@ -57,3 +57,25 @@ test('universos: canonical slash, imagen solo propietario, imagen desconocida 40
   assert.equal((await handleRequest(req('/universos/',t,'www.portaventuranext.com','POST'),imgEnv,fetcher)).status,405);});
 test('universos no existen en carlossilva.info',async()=>{assert.equal((await handleRequest(req('/universos/',await token(),'www.carlossilva.info'),imgEnv,fetcher)).status,404);});
 test('tokenizado en PortAventuraNeXT enlaza al mapa',async()=>{const h=await (await handleRequest(req('/gemelodigital/tokenizado/',await token(),'www.portaventuranext.com'),env,fetcher)).text();assert.match(h,/href="\/universos\/"/);});
+test('Stranger Things: hitbox mapeado al rótulo real y capas neón solo propietario',async()=>{const m=await import('./universos.mjs');
+  const z=m.pct(m.ST.zona),l=m.pct(m.ST.letras);assert.deepEqual(z,{left:31.535,top:9.623,width:14.661,height:11.297});assert.deepEqual(l,{left:32.089,top:10.669,width:13.555,height:7.113});
+  assert.ok(l.left>=z.left&&l.top>=z.top&&l.left+l.width<=z.left+z.width&&l.top+l.height<=z.top+z.height);assert.ok(z.width<20&&z.height<15);
+  const t=await token();const h=await (await handleRequest(req('/netflixventura/',t,'www.portaventuranext.com'),imgEnv,fetcher)).text();
+  assert.match(h,/<button type="button" class="st-hot"[^>]*aria-pressed="false"[^>]*aria-label="Zona Stranger Things/);assert.match(h,/left:31.535%;top:9.623%;width:14.661%;height:11.297%/);
+  assert.doesNotMatch(h,/<a [^>]*>[^<]*<img class="base"/);assert.doesNotMatch(h,/<a[^>]*>\s*<button/);assert.match(h,/Stranger Things · zona seleccionada/);assert.match(h,/src="\/universos\/netflix.js"/);
+  for(const o of ['/sonyventura/','/universalventura/','/skydanceventura/'])assert.doesNotMatch(await (await handleRequest(req(o,t,'www.portaventuranext.com'),imgEnv,fetcher)).text(),/st-hot/);
+  for(const p of ['/universos/img/st_neon_stranger.png','/universos/netflix.js']){assert.equal((await handleRequest(req(p,null,'www.portaventuranext.com'),imgEnv,fetcher)).status,401);assert.equal((await handleRequest(req(p,await token({email:'family@example.com'}),'www.portaventuranext.com'),imgEnv,fetcher)).status,403);}
+  const png=await handleRequest(req('/universos/img/st_neon_things.png',t,'www.portaventuranext.com'),imgEnv,fetcher);assert.equal(png.status,200);assert.equal(png.headers.get('content-type'),'image/png');
+  assert.equal((await handleRequest(req('/universos/img/input.png',t,'www.portaventuranext.com'),imgEnv,fetcher)).status,404);});
+test('Stranger Things: CSS neón lento, reduced-motion fijo, JS teclado/aria',async()=>{const m=await import('./universos.mjs');const t=await token();
+  const css=await (await handleRequest(req('/universos/estilo.css',t,'www.portaventuranext.com'),imgEnv,fetcher)).text();
+  for(const d of css.match(/animation:neon-[ab] ([\d.]+)s/g))assert.ok(parseFloat(d.split(' ')[1])>=1);
+  assert.match(css,/prefers-reduced-motion:reduce\)\{\.neon,\.neon-s,\.neon-t\{animation:none!important/);assert.match(css,/\.st-hot:focus-visible\{outline/);assert.match(css,/\.mapa-int\.sel \.neon\{opacity:1\}|\.mapa-int\.sel \.neon\{/);
+  const js=m.netflixJs;assert.match(js,/aria-pressed/);assert.match(js,/Escape/);assert.match(js,/preventDefault/);
+  // botón nativo: Enter/Espacio disparan click; simulación de estado
+  const els={};const mk=id=>els[id]={attrs:{},classList:{s:new Set(),toggle(c,on){on?this.s.add(c):this.s.delete(c)},contains(c){return this.s.has(c)}},setAttribute(k,v){this.attrs[k]=v},getAttribute(k){return this.attrs[k]},hidden:true,handlers:{},addEventListener(e,f){this.handlers[e]=f},focus(){}};
+  ['mapa-int','st-hot','st-info','ampliar'].forEach(mk);els['st-hot'].attrs['aria-pressed']='false';
+  const doc={getElementById:id=>els[id],handlers:{},addEventListener(e,f){this.handlers[e]=f}};new Function('document',js)(doc);
+  els['st-hot'].handlers.click({preventDefault(){}});assert.equal(els['st-hot'].attrs['aria-pressed'],'true');assert.equal(els['st-info'].hidden,false);assert.ok(els['mapa-int'].classList.contains('sel'));
+  doc.handlers.keydown({key:'Escape'});assert.equal(els['st-hot'].attrs['aria-pressed'],'false');assert.equal(els['st-info'].hidden,true);
+  els['ampliar'].handlers.click();assert.ok(els['mapa-int'].classList.contains('ampliado'));});
