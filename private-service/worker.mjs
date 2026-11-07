@@ -6,7 +6,7 @@ import assets from './assets.mjs';
 import {validateFamilyPlan} from '../empresas/plan.js';
 import {answerQuestion} from './assistant.mjs';
 import {validatePlaces} from '../empresas/places.js';
-import {BASE as TOKENIZADO,tokenizadoPages,tokenizadoAssets,ownerEmails,isTokenizadoPath} from './tokenizado.mjs';
+import {baseFor,PAV_HOSTS,tokenizadoPages,tokenizadoAssets,ownerEmails,isTokenizadoPath} from './tokenizado.mjs';
 export function allowedEmails(env){return new Set(String(env.ALLOWED_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
 const HEADERS = {'Cache-Control':'private, no-store, max-age=0','Content-Type':'application/json; charset=utf-8','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer','Vary':'Cf-Access-Jwt-Assertion'};
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{...HEADERS,...headers}});
@@ -39,7 +39,8 @@ export async function verifyAccess(request,env,fetcher=fetch){
 // /portaventuraNext/gemelodigital/tokenizado: solo el propietario (OWNER_EMAILS ⊂ ALLOWED_EMAILS).
 // Fail-closed: sin OWNER_EMAILS configurado responde 503 y nunca sirve la interfaz.
 async function handleTokenizado(request,env,url,fetcher){
-  const page=tokenizadoPages[url.pathname],asset=tokenizadoAssets[url.pathname];
+  const TOKENIZADO=baseFor(url.hostname);
+  const page=tokenizadoPages(TOKENIZADO)[url.pathname],asset=tokenizadoAssets(TOKENIZADO)[url.pathname];
   const bare=url.pathname===TOKENIZADO.slice(0,-1)||url.pathname===TOKENIZADO+'index.html';
   if(!page&&!asset&&!bare)return json({error:'Not found'},404);
   if(!['GET','HEAD'].includes(request.method))return json({error:'Method not allowed'},405);
@@ -51,7 +52,9 @@ async function handleTokenizado(request,env,url,fetcher){
 }
 export async function handleRequest(request,env,fetcher=fetch){
   const url=new URL(request.url);
-  if(isTokenizadoPath(url.pathname))return handleTokenizado(request,env,url,fetcher);
+  if(isTokenizadoPath(url.pathname,baseFor(url.hostname)))return handleTokenizado(request,env,url,fetcher);
+  // En el dominio PortAventuraNeXT este Worker solo atiende el gemelo; nada más (fail-closed).
+  if(PAV_HOSTS.has(url.hostname))return json({error:'Not found'},404);
   const loginPath=url.pathname.replace(/\/$/,'');
   const login=loginPath==='/escrituras/api/login'?'/escrituras/':loginPath==='/empresas/api/login'?'/empresas/':loginPath==='/memorias/api/login'?'/memorias/':null;
   const companies=url.pathname==='/empresas/api/companies';

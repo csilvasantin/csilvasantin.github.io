@@ -27,3 +27,14 @@ test('el propietario debe estar también en la política familiar (Access) para 
 test('rutas familiares no cambian para cuentas familiares',async()=>{const r=await handleRequest(req('/intranet/api/session',await token({email:'family@example.com'})),env,fetcher);assert.equal(r.status,200);});
 test('variantes de mayúsculas no sirven la interfaz',async()=>{const r=await handleRequest(req('/portaventuranext/gemelodigital/tokenizado/',await token()),env,fetcher);assert.notEqual(r.status,200);});
 test('fuente publicada sin correos reales ni secretos',async()=>{const {readFile}=await import('node:fs/promises');const s=await readFile(new URL('./tokenizado.mjs',import.meta.url),'utf8');assert.doesNotMatch(s,/@(gmail|admira)\.com/);assert.doesNotMatch(s,/<img|<video|<iframe/);});
+const P='/gemelodigital/tokenizado/';
+test('PortAventuraNeXT: anónimo 401, familiar 403, propietario 200 con assets en su base',async()=>{
+  for(const host of ['www.portaventuranext.com','portaventuranext.com']){
+    for(const p of [P,P+'app.js',P+'style.css',P.slice(0,-1)])assert.equal((await handleRequest(req(p,null,host),env,fetcher)).status,401,host+p);
+    assert.equal((await handleRequest(req(P,await token({email:'family@example.com'}),host),env,fetcher)).status,403);
+    const r=await handleRequest(req(P,await token(),host),env,fetcher);assert.equal(r.status,200);const h=await r.text();assert.match(h,new RegExp('href="'+P+'style.css"'));assert.match(h,/Importar JSON/);
+    assert.equal((await handleRequest(req(P+'app.js',await token(),host),env,fetcher)).status,200);
+    const red=await handleRequest(req(P.slice(0,-1),await token(),host),env,fetcher);assert.equal(red.headers.get('location'),P);
+  }});
+test('PortAventuraNeXT: el Worker no sirve nada familiar ni otras rutas en ese dominio',async()=>{for(const p of ['/intranet/','/escrituras/api/inventory','/portaventuraNext/gemelodigital/tokenizado/','/',P+'foto.jpg']){const r=await handleRequest(req(p,await token(),'www.portaventuranext.com'),env,fetcher);assert.equal(r.status,404,p);}});
+test('importación valida formato en cliente',async()=>{const {tokenizadoAssets}=await import('./tokenizado.mjs');const js=tokenizadoAssets()['/portaventuraNext/gemelodigital/tokenizado/app.js'][1];assert.match(js,/function valida/);assert.match(js,/1048576/);});

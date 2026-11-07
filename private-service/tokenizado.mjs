@@ -3,6 +3,9 @@
 // Sin datos reales: ni inventario LEGO, ni fotos, ni cámaras, ni posiciones. El estado manual
 // vive solo en el navegador del propietario (localStorage) hasta definir almacenamiento privado.
 export const BASE='/portaventuraNext/gemelodigital/tokenizado/';
+export const PAV_HOSTS=new Set(['www.portaventuranext.com','portaventuranext.com']);
+export const PAV_BASE='/gemelodigital/tokenizado/';
+export function baseFor(host){return PAV_HOSTS.has(host)?PAV_BASE:BASE;}
 const css=`:root{--bg:#0b0b0f;--panel:#15151c;--line:#2a2a36;--red:#e50914;--txt:#f2f2f5;--mut:#9a9aaa;--ok:#3ecf8e;--warn:#f5b942}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
 header{padding:28px 24px 12px;border-bottom:1px solid var(--line)}h1{margin:0;font-size:26px;letter-spacing:.3px}h1 b{color:var(--red)}
@@ -13,7 +16,7 @@ header{padding:28px 24px 12px;border-bottom:1px solid var(--line)}h1{margin:0;fo
 button{cursor:pointer}button.primary{background:var(--red);border-color:var(--red)}table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
 th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}th{color:var(--mut);font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.4px}
 td input,td select{width:100%}.tag{display:inline-block;font-size:11.5px;padding:2px 7px;border-radius:20px;border:1px solid var(--line);color:var(--mut)}.tag.ej{border-color:var(--warn);color:var(--warn)}
-.tok{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--mut)}.muted{color:var(--mut);font-size:13px}a{color:#ff6b72}footer{color:var(--mut);font-size:12.5px;padding:18px 24px 40px;max-width:1180px;margin:0 auto}
+.tok{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:var(--mut)}.muted{color:var(--mut);font-size:13px}a{color:#ff6b72}.filebtn{display:inline-block;cursor:pointer;background:#1d1d26;border:1px solid var(--line);border-radius:8px;padding:7px 10px}.filebtn input{position:absolute;opacity:0;width:1px;height:1px}.filebtn:focus-within,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--red);outline-offset:2px}.legend{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}footer{color:var(--mut);font-size:12.5px;padding:18px 24px 40px;max-width:1180px;margin:0 auto}
 @media(max-width:760px){table,thead,tbody,tr,td,th{display:block}thead{display:none}td{border:0;padding:4px 10px}tr{border-bottom:1px solid var(--line);padding:8px 0}}`;
 const js=`const KEY='netflixventura.gemelo.v1';
 const EJEMPLOS=[['Stranger Things','Eleven'],['Stranger Things','Mike Wheeler'],['Stranger Things','Dustin Henderson'],['Stranger Things','Lucas Sinclair'],['Stranger Things','Will Byers'],['Stranger Things','Max Mayfield'],['Stranger Things','Jim Hopper'],['Stranger Things','Steve Harrington']]
@@ -44,14 +47,17 @@ document.addEventListener('click',e=>{const d=e.target.dataset?.del;if(d!=null){
 $('#nueva').onclick=()=>{filas.push({serie:'',personaje:'',figura:'',zona:'',estado:'sin-figura',nota:'',ejemplo:false});save();render();};
 $('#filtro').onchange=render;
 $('#exportar').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({version:1,filas},null,2)],{type:'application/json'}));a.download='netflixventura-gemelo.json';a.click();};
+function valida(d){if(!d||d.version!==1||!Array.isArray(d.filas)||d.filas.length>500)throw new Error('Formato no válido: se espera {version:1, filas:[…]} (máx. 500)');
+ return d.filas.map((f,i)=>{if(typeof f!=='object'||!f)throw new Error('Fila '+(i+1)+' no válida');const t=k=>String(f[k]??'').slice(0,200);const estado=ESTADOS[f.estado]?f.estado:'sin-figura';return {serie:t('serie'),personaje:t('personaje'),figura:t('figura'),zona:t('zona'),estado,nota:t('nota'),ejemplo:f.ejemplo===true};});}
+$('#importar').onchange=async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;try{if(file.size>1048576)throw new Error('Archivo demasiado grande (máx. 1 MB)');const nuevas=valida(JSON.parse(await file.text()));if(!confirm('Sustituir '+filas.length+' filas por '+nuevas.length+' importadas?'))return;filas=nuevas;save();render();$('#estado').textContent='Importadas '+nuevas.length+' filas · guardado en este navegador';}catch(err){$('#estado').textContent='No importado: '+err.message;}};
 $('#reset').onclick=()=>{if(confirm('¿Volver a los ejemplos? Se borra lo guardado en este navegador.')){localStorage.removeItem(KEY);filas=load();render();}};
 render();`;
-const html=`<!doctype html>
+const htmlFor=(BASE)=>`<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
 <title>digitalTwin tokenizado · NetflixVentura</title><link rel="stylesheet" href="${BASE}style.css"><script type="module" src="${BASE}app.js"></script></head>
 <body><header><div class="wrap" style="padding:0"><h1>digitalTwin tokenizado de <b>NetflixVentura</b></h1>
-<p class="sub">PortAventura × Netflix · personajes digitales de Stranger Things y otras series de Netflix, correlacionados con figuras físicas LEGO.</p></div></header>
+<p class="sub">Gemelo digital ↔ figura LEGO física · PortAventura × Netflix · personajes digitales de Stranger Things y otras series de Netflix, correlacionados con figuras físicas LEGO.</p></div></header>
 <main class="wrap">
 <section class="notes">
 <div class="note"><strong>Fase inicial: movimiento a mano</strong>Las figuras se mueven manualmente. Sin motores, sensores ni compras. El estado lo marcas tú.</div>
@@ -61,11 +67,11 @@ const html=`<!doctype html>
 </section>
 <div class="bar"><button class="primary" id="nueva">+ Añadir personaje</button>
 <select id="filtro" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option value="sin-figura">Sin figura</option><option value="asignada">Asignada</option><option value="colocada">Colocada a mano</option><option value="vista">Comprobada en ojos remotos</option></select>
-<button id="exportar">Exportar JSON</button><button id="reset">Volver a ejemplos</button><span class="muted" id="estado"></span></div>
-<p class="muted" id="resumen"></p>
+<button id="exportar">Exportar JSON</button><label class="filebtn">Importar JSON<input type="file" id="importar" accept="application/json,.json"></label><button id="reset">Volver a ejemplos</button><span class="muted" id="estado" role="status" aria-live="polite"></span></div>
+<p class="muted" id="resumen"></p><p class="legend" aria-label="Flujo de vinculación"><span class="tag">1 · Sin figura</span><span class="tag">2 · Figura asignada</span><span class="tag">3 · Colocada a mano</span><span class="tag">4 · Comprobada por ti en ojos remotos</span></p>
 <table><thead><tr><th>Serie</th><th>Personaje digital</th><th>Figura LEGO física</th><th>Zona maqueta</th><th>Estado manual</th><th>Token de vínculo</th><th></th></tr></thead><tbody id="cuerpo"></tbody></table>
 </main><footer>Acceso exclusivo del propietario · servido tras verificación de identidad · sin caché.</footer></body></html>`;
-export const tokenizadoPages={[BASE]:html};
-export const tokenizadoAssets={[BASE+'style.css']:['text/css',css],[BASE+'app.js']:['text/javascript',js]};
+export function tokenizadoPages(base=BASE){return {[base]:htmlFor(base)};}
+export function tokenizadoAssets(base=BASE){return {[base+'style.css']:['text/css',css],[base+'app.js']:['text/javascript',js]};}
 export function ownerEmails(env){return new Set(String(env.OWNER_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean));}
-export function isTokenizadoPath(pathname){return pathname==='/portaventuraNext/gemelodigital/tokenizado'||pathname.startsWith(BASE);}
+export function isTokenizadoPath(pathname,base=BASE){return pathname===base.slice(0,-1)||pathname.startsWith(base);}

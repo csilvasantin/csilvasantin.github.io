@@ -70,3 +70,12 @@ zone_name = "carlossilva.info"
 [[routes]]
 pattern = "carlossilva.info/portaventuraNext/gemelodigital/tokenizado*"
 zone_name = "carlossilva.info"
+
+# Mismo gemelo en PortAventuraNeXT (solo esta ruta; el resto del sitio sigue en Pages).
+[[routes]]
+pattern = "www.portaventuranext.com/gemelodigital/tokenizado*"
+zone_name = "portaventuranext.com"
+
+[[routes]]
+pattern = "portaventuranext.com/gemelodigital/tokenizado*"
+zone_name = "portaventuranext.com"
